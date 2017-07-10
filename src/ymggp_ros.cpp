@@ -6,7 +6,7 @@
  */
 
 
-#include <ymggp_ros/YmgGPROS.h>
+#include <ymg_planner_ros/YmgGPROS.h>
 #include <pluginlib/class_list_macros.h>
 #include <tf/transform_listener.h>
 

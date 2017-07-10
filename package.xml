@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>ymggp_ros</name>
+  <name>ymg_planner_ros</name>
   <version>0.0.0</version>
-  <description>The ymggp_ros package</description>
+  <description>The ymg_planner_ros package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
