@@ -11,7 +11,6 @@
 #include <tf/transform_listener.h>
 
 using namespace ymggp;
-using namespace std;
 
 //register this planner as a BaseGlobalPlanner plugin
 PLUGINLIB_DECLARE_CLASS(ymggp, YmgGPROS, ymggp::YmgGPROS, nav_core::BaseGlobalPlanner)
@@ -31,12 +30,11 @@ YmgGPROS::YmgGPROS()
  */
 void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
 {/*{{{*/
-	cout<<"initialized"<<endl;
-
 	if (!initialized_) {
 		ros::NodeHandle private_nh("~/" + name);
 		private_nh.param("path_resolution", path_resolution_, 20.0);
-		private_nh.param("global_frame", global_frame_, string("map"));
+		private_nh.param("path_length", path_length_, 10.0);
+		private_nh.param("global_frame", global_frame_, std::string("map"));
 		plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
 
 		// ros::NodeHandle prefix_nh;
@@ -71,28 +69,46 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 	// 			tf::resolve(tf_prefix_, global_frame_).c_str(), tf::resolve(tf_prefix_, start.header.frame_id).c_str());
 	// 	return false;
 	// }
+	
+	plan.clear();
 
-	double dist = sq_distance(start, goal);
-	int points = dist * path_resolution_;
-
-	double step_x = (goal.pose.position.x - start.pose.position.x) / points;
-	double step_y = (goal.pose.position.y - start.pose.position.y) / points;
 	ros::Time plan_time = ros::Time::now();
-	for (int i=0; i<points; ++i)
+	if (plan_.empty()) {
+		geometry_msgs::PoseStamped pose;
+		pose.header.stamp = plan_time;
+		pose.header.frame_id = global_frame_;
+		pose.pose.position = start.pose.position;
+		pose.pose.orientation = start.pose.orientation;
+		plan_.push_back(pose);
+	}
+
+	geometry_msgs::PoseStamped endpoint = plan_.back();
+
+	int points = sq_distance(endpoint, goal) * path_resolution_;
+	double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
+	double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
+	
+	for (int i=1; i<points; ++i)
 	{
 		geometry_msgs::PoseStamped pose;
 		pose.header.stamp = plan_time;
 		pose.header.frame_id = global_frame_;
-		pose.pose.position.x = start.pose.position.x + step_x * i;
-		pose.pose.position.y = start.pose.position.y + step_y * i;
+		pose.pose.position.x = endpoint.pose.position.x + step_x * i;
+		pose.pose.position.y = endpoint.pose.position.y + step_y * i;
 		pose.pose.position.z = 0.0;
 		pose.pose.orientation.x = 0.0;
 		pose.pose.orientation.y = 0.0;
 		pose.pose.orientation.z = 0.0;
 		pose.pose.orientation.w = 1.0;
-		plan.push_back(pose);
+		plan_.push_back(pose);
 	}
 
+	if (path_resolution_ * path_length_ < plan_.size()) {
+		int erase_index = plan_.size() - path_resolution_ * path_length_;
+		plan_.erase(plan_.begin(), plan_.begin()+erase_index); 
+	}
+
+	plan = plan_;
 	publishPlan(plan);
 	return !plan.empty();
 }/*}}}*/

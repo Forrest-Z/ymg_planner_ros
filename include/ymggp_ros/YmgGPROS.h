@@ -34,7 +34,9 @@ namespace ymggp
 
 		private:
 			std::string global_frame_, tf_prefix_;
+			std::vector<geometry_msgs::PoseStamped> plan_;
 			double path_resolution_;   //**< path resolution in point/m */
+			double path_length_;       //**< path length in meters */
       inline double sq_distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
 
 	};   // class YmgGPROS
