@@ -1,7 +1,7 @@
 global and local planner (auther: ymg)
 ======================================
 
-__<global planner>__
+__Global Planner__
 
 __Published Topics__  
 ~/YmgGPROS/plan (nav_msgs/Path)  
