@@ -1,23 +1,23 @@
 /**
  * @file ymggp_ros.cpp
- * @brief ymj global planner library for ros
+ * @brief YMG's global planner library for ros
  * @author YMG
- * @date 2017.05
+ * @date 2017.07
  */
 
 
 #include <ymg_planner_ros/YmgGPROS.h>
 #include <pluginlib/class_list_macros.h>
-#include <tf/transform_listener.h>
 
 using namespace ymggp;
 
-//register this planner as a BaseGlobalPlanner plugin
-PLUGINLIB_DECLARE_CLASS(ymggp, YmgGPROS, ymggp::YmgGPROS, nav_core::BaseGlobalPlanner)
+// register this planner as a BaseGlobalPlanner plugin
+PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPROS, nav_core::BaseGlobalPlanner)
 
-	/**
-	 * @brief constructer
-	 */
+
+/**
+ * @brief constructer
+ */
 YmgGPROS::YmgGPROS()
 	: initialized_(false)
 {}
@@ -33,19 +33,19 @@ void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ro
 	if (!initialized_) {
 		ros::NodeHandle private_nh("~/" + name);
 		private_nh.param("path_resolution", path_resolution_, 20.0);
-		private_nh.param("path_length", path_length_, 10.0);
-		private_nh.param("global_frame", global_frame_, std::string("map"));
+		private_nh.param("max_path_length", max_path_length_, 20.0);
 		plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
 
-		// ros::NodeHandle prefix_nh;
-		// tf_prefix_ = tf::getPrefixParam(prefix_nh);
+		// ROS_INFO("[YmgGPROS] global_frame = %s", global_frame_.c_str());
+		// ROS_INFO("[YmgGPROS] path_resolution = %f", path_resolution_);
+		// ROS_INFO("[YmgGPROS] max_path_length = %f", max_path_length_);
 
+		global_frame_ = costmap_ros->getGlobalFrameID();
 		initialized_ = true;
 	}
 	else
 		ROS_WARN("This planner has already been initialized, you can't call it twice, doing nothing");
 }/*}}}*/
-// class YmgGPROS
 
 /**
  * @brief Given a goal pose in the world, compute a plan
@@ -57,19 +57,24 @@ void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ro
 bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start, 
 		const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
+	if (!initialized_) {
+		ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+		return false;
+	}
 
-	// if(tf::resolve(tf_prefix_, goal.header.frame_id) != tf::resolve(tf_prefix_, global_frame_)){
-	// 	ROS_ERROR("The goal pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
-	// 			tf::resolve(tf_prefix_, global_frame_).c_str(), tf::resolve(tf_prefix_, goal.header.frame_id).c_str());
-	// 	return false;
-	// }
-	//
-	// if(tf::resolve(tf_prefix_, start.header.frame_id) != tf::resolve(tf_prefix_, global_frame_)){
-	// 	ROS_ERROR("The start pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
-	// 			tf::resolve(tf_prefix_, global_frame_).c_str(), tf::resolve(tf_prefix_, start.header.frame_id).c_str());
-	// 	return false;
-	// }
-	
+	if (goal.header.frame_id != global_frame_) {
+		ROS_ERROR("The goal pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
+				global_frame_.c_str(), goal.header.frame_id.c_str());
+		return false;
+	}
+
+	if (start.header.frame_id != global_frame_) {
+		ROS_ERROR("The start pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
+				global_frame_.c_str(), start.header.frame_id.c_str());
+		return false;
+	}
+
+
 	plan.clear();
 
 	ros::Time plan_time = ros::Time::now();
@@ -87,7 +92,7 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 	int points = sq_distance(endpoint, goal) * path_resolution_;
 	double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
 	double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
-	
+
 	for (int i=1; i<points; ++i)
 	{
 		geometry_msgs::PoseStamped pose;
@@ -103,8 +108,8 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		plan_.push_back(pose);
 	}
 
-	if (path_resolution_ * path_length_ < plan_.size()) {
-		int erase_index = plan_.size() - path_resolution_ * path_length_;
+	int erase_index = plan_.size() - path_resolution_ * max_path_length_;
+	if (1 <= erase_index) {
 		plan_.erase(plan_.begin(), plan_.begin()+erase_index); 
 	}
 
@@ -119,6 +124,11 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
  */
 void YmgGPROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
+	if (!initialized_) {
+		ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+		return;
+	}
+
 	nav_msgs::Path gui_path;
 	gui_path.poses.resize(path.size());
 
@@ -129,7 +139,7 @@ void YmgGPROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 	}
 
 	// Extract the plan in world co-ordinates, we assume the path is all in the same frame
-	for(unsigned int i=0; i < path.size(); i++){
+	for(unsigned int i=0; i<path.size(); ++i){
 		gui_path.poses[i] = path[i];
 	}
 

@@ -56,7 +56,8 @@
   <run_depend>tf</run_depend>
 
   <export>
-		<nav_core plugin="${prefix}/bgp_plugin.xml" />
+		<nav_core plugin="${prefix}/ymggp_plugin.xml" />
+		<!-- <nav_core plugin="${prefix}/ymglp_plugin.xml" /> -->
   </export>
 
 </package>

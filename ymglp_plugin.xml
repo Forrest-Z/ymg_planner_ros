@@ -1,0 +1,7 @@
+<library path="lib/libymggp">
+  <class name="ymglp/YmgLPROS" type="ymglp::YmgLPROS" base_class_type="nav_core::BaseLocalPlanner">
+    <description>
+      A implementation of YMG's original local planer
+    </description>
+  </class>
+</library>

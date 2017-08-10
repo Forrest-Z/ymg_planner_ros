@@ -29,9 +29,19 @@ include_directories(
 	${catkin_INCLUDE_DIRS}
 	)
 
+
 add_library(ymggp
 	src/ymggp_ros.cpp
 	)
 target_link_libraries(ymggp
 	${catkin_LIBRARIES}
 	)
+
+
+add_library(ymglp
+	src/ymglp_ros.cpp
+	)
+target_link_libraries(ymglp
+	${catkin_LIBRARIES}
+	)
+
