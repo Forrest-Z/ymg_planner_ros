@@ -155,7 +155,7 @@ inline double YmgGPROS::sq_distance(const geometry_msgs::PoseStamped& p1, const 
 {/*{{{*/
 	double dx = p1.pose.position.x - p2.pose.position.x;
 	double dy = p1.pose.position.y - p2.pose.position.y;
-	return dx*dx +dy*dy;
+	return sqrt(dx*dx + dy*dy);
 }/*}}}*/
 
 
