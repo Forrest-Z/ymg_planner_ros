@@ -57,7 +57,7 @@
 
   <export>
 		<nav_core plugin="${prefix}/ymggp_plugin.xml" />
-		<!-- <nav_core plugin="${prefix}/ymglp_plugin.xml" /> -->
+		<nav_core plugin="${prefix}/ymglp_plugin.xml" />
   </export>
 
 </package>
