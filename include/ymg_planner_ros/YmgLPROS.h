@@ -34,8 +34,8 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef DWA_LOCAL_PLANNER_DWA_PLANNER_ROS_H_
-#define DWA_LOCAL_PLANNER_DWA_PLANNER_ROS_H_
+#ifndef YMGLPROS_H_
+#define YMGLPROS_H_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -141,8 +141,8 @@ namespace ymglp {
 
       costmap_2d::Costmap2DROS* costmap_ros_;
 
-      // dynamic_reconfigure::Server<DWAPlannerConfig> *dsrv_;
-      // dwa_local_planner::DWAPlannerConfig default_config_;
+      dynamic_reconfigure::Server<YmgLPConfig> *dsrv_;
+      ymglp::YmgLPConfig default_config_;
       bool setup_;
       tf::Stamped<tf::Pose> current_pose_;
 

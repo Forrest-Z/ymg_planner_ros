@@ -34,8 +34,8 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef DWA_LOCAL_PLANNER_DWA_PLANNER_H_
-#define DWA_LOCAL_PLANNER_DWA_PLANNER_H_
+#ifndef YMGLP_H_
+#define YMGLP_H_
 
 #include <vector>
 #include <Eigen/Core>
