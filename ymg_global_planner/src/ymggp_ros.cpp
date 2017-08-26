@@ -6,7 +6,7 @@
  */
 
 
-#include <ymg_planner_ros/ymggp_ros.h>
+#include <ymg_global_planner/ymggp_ros.h>
 #include <pluginlib/class_list_macros.h>
 
 using namespace ymggp;

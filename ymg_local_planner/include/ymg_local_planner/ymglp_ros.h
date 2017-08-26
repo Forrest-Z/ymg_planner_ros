@@ -43,7 +43,7 @@
 #include <tf/transform_listener.h>
 
 #include <dynamic_reconfigure/server.h>
-#include <ymg_planner_ros/YmgLPConfig.h>
+#include <ymg_local_planner/YmgLPConfig.h>
 
 #include <angles/angles.h>
 
@@ -55,7 +55,7 @@
 
 #include <base_local_planner/odometry_helper_ros.h>
 
-#include <ymg_planner_ros/ymglp.h>
+#include <ymg_local_planner/ymglp.h>
 
 namespace ymglp {
   /**
