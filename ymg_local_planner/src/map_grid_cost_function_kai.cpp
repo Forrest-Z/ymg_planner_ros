@@ -12,7 +12,7 @@ MapGridCostFunctionKai::MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
     yshift_(yshift),
     is_local_goal_function_(is_local_goal_function),
     stop_on_failure_(true),
-		valid_length_ratio_(valid_length_ratio)   // XXX added
+		valid_length_ratio_(valid_length_ratio)
 	{}
 
 void MapGridCostFunctionKai::setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses) {
@@ -44,7 +44,13 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj) {
   unsigned int cell_x, cell_y;
   double grid_dist;
 
-  for (unsigned int i = 0; i < traj.getPointsSize() * valid_length_ratio_; ++i) {
+	int loop_start = 0;
+	int loop_end = traj.getPointsSize() * valid_length_ratio_;
+	if (aggregationType_ == Last) {
+		loop_start = loop_end - 1;
+	}
+
+  for (int i = loop_start; i < loop_end; ++i) {
     traj.getPoint(i, px, py, pth);
 
     // translate point forward if specified
@@ -75,17 +81,17 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj) {
     }
 
     switch( aggregationType_ ) {
-    case Last:
-      cost = grid_dist;
-      break;
-    case Sum:
-      cost += grid_dist;
-      break;
-    case Product:
-      if (cost > 0) {
-        cost *= grid_dist;
-      }
-      break;
+			case Last:
+				cost = grid_dist;
+				break;
+			case Sum:
+				cost += grid_dist;
+				break;
+			case Product:
+				if (cost > 0) {
+					cost *= grid_dist;
+				}
+				break;
     }
   }
   return cost;
