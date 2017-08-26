@@ -108,13 +108,10 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		plan_.push_back(pose);
 	}
 
-	std::cout<<" A g_path_size = "<<plan_.size()<<std::endl;
-
 	int erase_index = plan_.size() - path_resolution_ * max_path_length_;
 	if (1 <= erase_index) {
 		plan_.erase(plan_.begin(), plan_.begin()+erase_index); 
 	}
-	std::cout<<"B g_path_size = "<<plan_.size()<<std::endl;
 
 	plan = plan_;
 	publishPlan(plan);

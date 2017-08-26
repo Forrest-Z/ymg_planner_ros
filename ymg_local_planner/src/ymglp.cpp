@@ -1,44 +1,8 @@
-/*********************************************************************
-*
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2009, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of Willow Garage, Inc. nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-* Author: Eitan Marder-Eppstein
-*********************************************************************/
 #include <ymg_local_planner/ymglp.h>
 
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
-#include <base_local_planner/map_grid_cost_function.h>
+#include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <cmath>
 
 //for computing path distance
@@ -51,8 +15,9 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 namespace ymglp {
-  void YmgLP::reconfigure(YmgLPConfig &config)
-  {
+
+  void YmgLP::reconfigure (YmgLPConfig &config)
+  {/*{{{*/
 
     boost::mutex::scoped_lock l(configuration_mutex_);
 
@@ -113,13 +78,14 @@ namespace ymglp {
     vsamples_[2] = vth_samp;
 
 
-  }
+  }/*}}}*/
 
-  YmgLP::YmgLP(std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
+  YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
+/*{{{*/
       planner_util_(planner_util),
       obstacle_costs_(planner_util->getCostmap()),
-      path_costs_(planner_util->getCostmap()),   // XXX default
-      // path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Sum),   // XXX changed
+      // path_costs_(planner_util->getCostmap()),   // XXX default
+      path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Last, 0.3),   // XXX changed
       goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       alignment_costs_(planner_util->getCostmap())
@@ -182,11 +148,11 @@ namespace ymglp {
     scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlanner(generator_list, critics);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);
-  }
+  }/*}}}*/
 
   // used for visualization only, total_costs are not really total costs
-  bool YmgLP::getCellCosts(int cx, int cy, float &path_cost, float &goal_cost, float &occ_cost, float &total_cost) {
-
+  bool YmgLP::getCellCosts (int cx, int cy, float &path_cost, float &goal_cost, float &occ_cost, float &total_cost)
+	{/*{{{*/
     path_cost = path_costs_.getCellCosts(cx, cy);
     goal_cost = goal_costs_.getCellCosts(cx, cy);
     occ_cost = planner_util_->getCostmap()->getCost(cx, cy);
@@ -202,21 +168,20 @@ namespace ymglp {
         gdist_scale_ * resolution * goal_cost +
         occdist_scale_ * occ_cost;
     return true;
-  }
+  }/*}}}*/
 
-  bool YmgLP::setPlan(const std::vector<geometry_msgs::PoseStamped>& orig_global_plan) {
+  bool YmgLP::setPlan (const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
+	{/*{{{*/
     oscillation_costs_.resetOscillationFlags();
     return planner_util_->setPlan(orig_global_plan);
-  }
+  }/*}}}*/
 
   /**
    * This function is used when other strategies are to be applied,
    * but the cost functions for obstacles are to be reused.
    */
-  bool YmgLP::checkTrajectory(
-      Eigen::Vector3f pos,
-      Eigen::Vector3f vel,
-      Eigen::Vector3f vel_samples){
+  bool YmgLP::checkTrajectory (Eigen::Vector3f pos, Eigen::Vector3f vel, Eigen::Vector3f vel_samples)
+	{/*{{{*/
     oscillation_costs_.resetOscillationFlags();
     base_local_planner::Trajectory traj;
     geometry_msgs::PoseStamped goal_pose = global_plan_.back();
@@ -237,12 +202,12 @@ namespace ymglp {
 
     //otherwise the check fails
     return false;
-  }
+  }/*}}}*/
 
 
-  void YmgLP::updatePlanAndLocalCosts(
-      tf::Stamped<tf::Pose> global_pose,
-      const std::vector<geometry_msgs::PoseStamped>& new_plan) {
+  void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
+      const std::vector<geometry_msgs::PoseStamped>& new_plan)
+	{/*{{{*/
     global_plan_.resize(new_plan.size());
     for (unsigned int i = 0; i < new_plan.size(); ++i) {
       global_plan_[i] = new_plan[i];
@@ -286,18 +251,18 @@ namespace ymglp {
       // once we are close to goal, trying to keep the nose close to anything destabilizes behavior.
       alignment_costs_.setScale(0.0);
     }
-  }
+  }/*}}}*/
 
 
   /*
    * given the current state of the robot, find a good trajectory
    */
-  base_local_planner::Trajectory YmgLP::findBestPath(
+  base_local_planner::Trajectory YmgLP::findBestPath (
       tf::Stamped<tf::Pose> global_pose,
       tf::Stamped<tf::Pose> global_vel,
       tf::Stamped<tf::Pose>& drive_velocities,
-      std::vector<geometry_msgs::Point> footprint_spec) {
-
+      std::vector<geometry_msgs::Point> footprint_spec)
+	{/*{{{*/
     obstacle_costs_.setFootprint(footprint_spec);
 
     //make sure that our configuration doesn't change mid-run
@@ -371,5 +336,5 @@ namespace ymglp {
     }
 
     return result_traj_;
-  }
+  }/*}}}*/
 };
