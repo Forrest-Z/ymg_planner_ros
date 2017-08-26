@@ -35,7 +35,7 @@
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
 
-#include <ymg_planner_ros/YmgLPROS.h>
+#include <ymg_planner_ros/ymglp_ros.h>
 #include <Eigen/Core>
 #include <cmath>
 

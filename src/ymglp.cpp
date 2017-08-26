@@ -34,7 +34,7 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#include <ymg_planner_ros/YmgLP.h>
+#include <ymg_planner_ros/ymglp.h>
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
 #include <base_local_planner/map_grid_cost_function.h>

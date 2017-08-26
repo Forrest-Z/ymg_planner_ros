@@ -34,8 +34,8 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef YMGLPROS_H_
-#define YMGLPROS_H_
+#ifndef YMGLP_ROS_H_
+#define YMGLP_ROS_H_
 
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
@@ -55,7 +55,7 @@
 
 #include <base_local_planner/odometry_helper_ros.h>
 
-#include <ymg_planner_ros/YmgLP.h>
+#include <ymg_planner_ros/ymglp.h>
 
 namespace ymglp {
   /**

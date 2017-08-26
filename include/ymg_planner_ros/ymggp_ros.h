@@ -1,12 +1,12 @@
 /**
- * @file YmgGPRos.h
+ * @file ymggp_ros.h
  * @brief YMG's global planner header for ros
  * @author YMG
  * @date 2017.07
  */
 
-#ifndef YMGGPROS_H_
-#define YMGGPROS_H_
+#ifndef YMGGP_ROS_H_
+#define YMGGP_ROS_H_
 
 #include <ros/ros.h>
 #include <nav_core/base_global_planner.h>
