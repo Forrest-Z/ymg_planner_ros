@@ -44,14 +44,8 @@ target_link_libraries(ymggp
 	${catkin_LIBRARIES}
 	)
 
-add_library(ymglplp
-	src/ymglp.cpp
-	)
-target_link_libraries(ymglplp
-	${catkin_LIBRARIES}
-	)
-
 add_library(ymglp
+	src/ymglp.cpp
 	src/ymglp_ros.cpp
 	)
 target_link_libraries(ymglp

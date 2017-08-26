@@ -37,6 +37,7 @@
 #include <ymg_planner_ros/YmgLP.h>
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
+#include <base_local_planner/map_grid_cost_function.h>
 #include <cmath>
 
 //for computing path distance
@@ -116,7 +117,8 @@ namespace ymglp {
   YmgLP::YmgLP(std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
       planner_util_(planner_util),
       obstacle_costs_(planner_util->getCostmap()),
-      path_costs_(planner_util->getCostmap()),
+      // path_costs_(planner_util->getCostmap()),   // XXX default
+      path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Sum),   // XXX changed
       goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       alignment_costs_(planner_util->getCostmap())
