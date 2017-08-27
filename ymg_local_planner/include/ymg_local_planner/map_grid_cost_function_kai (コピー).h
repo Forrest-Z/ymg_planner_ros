@@ -9,6 +9,13 @@
 namespace base_local_planner {
 
 /**
+ * when scoring a trajectory according to the values in mapgrid, we can take
+ *return the value of the last point (if no of the earlier points were in
+ * return collision), the sum for all points, or the product of all (non-zero) points
+ */
+enum CostAggregationType {Last, Sum, Product};
+
+/**
  * This class provides cost based on a map_grid of a small area of the world.
  * The map_grid covers a the costmap, the costmap containing the information
  * about sensed obstacles. The map_grid is used by setting
@@ -29,8 +36,10 @@ namespace base_local_planner {
 class MapGridCostFunctionKai: public base_local_planner::TrajectoryCostFunction {
 public:
   MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
-      double forward_point_distance = 0.0,
+      double xshift = 0.0,
+      double yshift = 0.0,
       bool is_local_goal_function = false,
+      CostAggregationType aggregationType = Last,
 			double valid_length_ratio = 1.0   // XXX added
 			);
 
@@ -41,7 +50,8 @@ public:
    */
   void setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses);
 
-  void setForwardPointDistance(double forward_point_distance) {forward_point_distance_ = forward_point_distance;}
+  void setXShift(double xshift) {xshift_ = xshift;}
+  void setYShift(double yshift) {yshift_ = yshift;}
 
   /** @brief If true, failures along the path cause the entire path to be rejected.
    *
@@ -78,8 +88,13 @@ private:
   costmap_2d::Costmap2D* costmap_;
 
   base_local_planner::MapGrid map_;
-
-  double forward_point_distance_;
+  CostAggregationType aggregationType_;
+  /// xshift and yshift allow scoring for different
+  // ooints of robots than center, like fron or back
+  // this can help with alignment or keeping specific
+  // wheels on tracks both default to 0
+  double xshift_;
+  double yshift_;
   // if true, we look for a suitable local goal on path, else we use the full path for costs
   bool is_local_goal_function_;
   bool stop_on_failure_;

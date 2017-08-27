@@ -3,15 +3,12 @@
 namespace base_local_planner {
 
 MapGridCostFunctionKai::MapGridCostFunctionKai(
-		costmap_2d::Costmap2D* costmap,
-    double xshift, double yshift, bool is_local_goal_function,
-    CostAggregationType aggregationType, double valid_length_ratio)
+		costmap_2d::Costmap2D* costmap, double forward_point_distance,
+		bool is_local_goal_function, double valid_length_ratio)
 	:/*{{{*/
     costmap_(costmap),
     map_(costmap->getSizeInCellsX(), costmap->getSizeInCellsY()),
-    aggregationType_(aggregationType),
-    xshift_(xshift),
-    yshift_(yshift),
+    forward_point_distance_(forward_point_distance),
     is_local_goal_function_(is_local_goal_function),
     stop_on_failure_(true),
 		valid_length_ratio_(valid_length_ratio)
@@ -43,66 +40,40 @@ double MapGridCostFunctionKai::getCellCosts (unsigned int px, unsigned int py)
 double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
   double cost = 0.0;
-  if (aggregationType_ == Product) {
-    cost = 1.0;
-  }
-  double px, py, pth;
-  unsigned int cell_x, cell_y;
-  double grid_dist;
+  double foot_x, foot_y, foot_th,  head_x, head_y;
+  unsigned int foot_cell_x, foot_cell_y,  head_cell_x, head_cell_y;
+  double foot_grid_dist, head_grid_dist;
 
-	int loop_index_begin = 0;
-	int loop_index_end = traj.getPointsSize() * valid_length_ratio_;
-	if (aggregationType_ == Last) {
-		loop_index_begin = std::max(0, loop_index_end-1);
+	int score_traj_index = traj.getPointsSize() * valid_length_ratio_ -1; 
+	traj.getPoint(score_traj_index, foot_x, foot_y, foot_th);
+
+	head_x = foot_x + forward_point_distance_ * cos(foot_th);
+	head_y = foot_y + forward_point_distance_ * sin(foot_th);
+
+	if ( ! costmap_->worldToMap(foot_x, foot_y, foot_cell_x, foot_cell_y)) {
+		ROS_WARN("Off Map (foot) %f, %f", foot_x, foot_y);
+		return -5.0;
 	}
-	// std::cout<<"traj_size - end_index = "<<traj.getPointsSize()<<" - "<<loop_index_end<<std::endl;
-	// std::cout<<"loop_index_begin - end = "<<loop_index_begin<<" - "<<loop_index_end<<std::endl;
 
-  for (int i = loop_index_begin; i < loop_index_end; ++i) {
-  // for (int i = 0; i < traj.getPointsSize(); ++i) {
-    traj.getPoint(i, px, py, pth);
+	if ( ! costmap_->worldToMap(head_x, head_y, head_cell_x, head_cell_y)) {
+		ROS_WARN("Off Map (head) %f, %f", head_x, head_y);
+		return -4.0;
+	}
 
-    // translate point forward if specified
-    if (xshift_ != 0.0) {
-      px = px + xshift_ * cos(pth);
-      py = py + xshift_ * sin(pth);
-    }
-    // translate point sideways if specified
-    if (yshift_ != 0.0) {
-      px = px + yshift_ * cos(pth + M_PI_2);
-      py = py + yshift_ * sin(pth + M_PI_2);
-    }
+	foot_grid_dist = getCellCosts(foot_cell_x, foot_cell_y);
+	head_grid_dist = getCellCosts(head_cell_x, head_cell_y);
 
-    //we won't allow trajectories that go off the map... shouldn't happen that often anyways
-    if ( ! costmap_->worldToMap(px, py, cell_x, cell_y)) {
-      //we're off the map
-      ROS_WARN("Off Map %f, %f", px, py);
-      return -4.0;
-    }
-    grid_dist = getCellCosts(cell_x, cell_y);
-    //if a point on this trajectory has no clear path to the goal... it may be invalid
-    if (stop_on_failure_) {
-      if (grid_dist == map_.obstacleCosts()) {
-        return -3.0;
-      } else if (grid_dist == map_.unreachableCellCosts()) {
-        return -2.0;
-      }
-    }
+	//if a point on this trajectory has no clear path to the goal... it may be invalid
+	if (stop_on_failure_) {
+		if (foot_grid_dist == map_.obstacleCosts()) {
+			return -3.0;
+		} else if (foot_grid_dist == map_.unreachableCellCosts()) {
+			return -2.0;
+		}
+	}
 
-    switch( aggregationType_ ) {
-			case Last:
-				cost = grid_dist;
-				break;
-			case Sum:
-				cost += grid_dist;
-				break;
-			case Product:
-				if (cost > 0) {
-					cost *= grid_dist;
-				}
-				break;
-    }
-  }
+	cost = (foot_grid_dist + head_grid_dist) / 2.0;
+
   return cost;
 }/*}}}*/
 

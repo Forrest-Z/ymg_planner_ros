@@ -31,11 +31,13 @@ namespace ymglp {
     pdist_scale_ = config.path_distance_bias;
     // pdistscale used for both path and alignment, set  forward_point_distance to zero to discard alignment
     path_costs_.setScale(resolution * pdist_scale_);
-    path_costs_.setForwardPointDistance(forward_point_distance_);
+    // path_costs_.setScale(resolution * pdist_scale_ * 0.5);
+    // alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
-    goal_costs_.setForwardPointDistance(forward_point_distance_);
+    // goal_costs_.setScale(resolution * gdist_scale_ * 0.5);
+    // goal_front_costs_.setScale(resolution * gdist_scale_ * 0.5);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);
@@ -43,6 +45,8 @@ namespace ymglp {
     stop_time_buffer_ = config.stop_time_buffer;
     oscillation_costs_.setOscillationResetDist(config.oscillation_reset_dist, config.oscillation_reset_angle);
     forward_point_distance_ = config.forward_point_distance;
+    // goal_front_costs_.setXShift(forward_point_distance_);
+    // alignment_costs_.setXShift(forward_point_distance_);
 
     // obstacle costs can vary due to scaling footprint feature
     obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
@@ -83,8 +87,8 @@ namespace ymglp {
       obstacle_costs_(planner_util->getCostmap()),
       // path_costs_(planner_util->getCostmap()),   // default
       // goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)   // default
-      path_costs_(planner_util->getCostmap(), 0.0, false, 0.5),
-      goal_costs_(planner_util->getCostmap(), 0.0, true, 0.5)
+      path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Last, 0.5),
+      goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true, base_local_planner::Last, 0.5)
       // goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       // alignment_costs_(planner_util->getCostmap())
   {
