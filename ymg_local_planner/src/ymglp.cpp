@@ -31,12 +31,14 @@ namespace ymglp {
     double resolution = planner_util_->getCostmap()->getResolution();
     pdist_scale_ = config.path_distance_bias;
     // pdistscale used for both path and alignment, set  forward_point_distance to zero to discard alignment
-    path_costs_.setScale(resolution * pdist_scale_ * 0.5);
-    alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
+    path_costs_.setScale(resolution * pdist_scale_);
+    // path_costs_.setScale(resolution * pdist_scale_ * 0.5);
+    // alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
 
     gdist_scale_ = config.goal_distance_bias;
-    goal_costs_.setScale(resolution * gdist_scale_ * 0.5);
-    goal_front_costs_.setScale(resolution * gdist_scale_ * 0.5);
+    goal_costs_.setScale(resolution * gdist_scale_);
+    // goal_costs_.setScale(resolution * gdist_scale_ * 0.5);
+    // goal_front_costs_.setScale(resolution * gdist_scale_ * 0.5);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);
@@ -44,8 +46,8 @@ namespace ymglp {
     stop_time_buffer_ = config.stop_time_buffer;
     oscillation_costs_.setOscillationResetDist(config.oscillation_reset_dist, config.oscillation_reset_angle);
     forward_point_distance_ = config.forward_point_distance;
-    goal_front_costs_.setXShift(forward_point_distance_);
-    alignment_costs_.setXShift(forward_point_distance_);
+    // goal_front_costs_.setXShift(forward_point_distance_);
+    // alignment_costs_.setXShift(forward_point_distance_);
 
     // obstacle costs can vary due to scaling footprint feature
     obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
@@ -86,14 +88,14 @@ namespace ymglp {
       obstacle_costs_(planner_util->getCostmap()),
       // path_costs_(planner_util->getCostmap()),   // XXX default
       path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Last, 0.3),   // XXX changed
-      goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
-      goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
-      alignment_costs_(planner_util->getCostmap())
+      goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)
+      // goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
+      // alignment_costs_(planner_util->getCostmap())
   {
     ros::NodeHandle private_nh("~/" + name);
 
-    goal_front_costs_.setStopOnFailure( false );
-    alignment_costs_.setStopOnFailure( false );
+    // goal_front_costs_.setStopOnFailure( false );
+    // alignment_costs_.setStopOnFailure( false );
 
     //Assuming this planner is being run within the navigation stack, we can
     //just do an upward search for the frequency at which its being run. This
@@ -136,8 +138,8 @@ namespace ymglp {
     std::vector<base_local_planner::TrajectoryCostFunction*> critics;
     critics.push_back(&oscillation_costs_); // discards oscillating motions (assisgns cost -1)
     critics.push_back(&obstacle_costs_); // discards trajectories that move into obstacles
-    critics.push_back(&goal_front_costs_); // prefers trajectories that make the nose go towards (local) nose goal
-    critics.push_back(&alignment_costs_); // prefers trajectories that keep the robot nose on nose path
+    // critics.push_back(&goal_front_costs_); // prefers trajectories that make the nose go towards (local) nose goal
+    // critics.push_back(&alignment_costs_); // prefers trajectories that keep the robot nose on nose path
     critics.push_back(&path_costs_); // prefers trajectories on global path
     critics.push_back(&goal_costs_); // prefers trajectories that go towards (local) goal, based on wave propagation
 
@@ -220,37 +222,39 @@ namespace ymglp {
     goal_costs_.setTargetPoses(global_plan_);
 
     // alignment costs
-    geometry_msgs::PoseStamped goal_pose = global_plan_.back();
-
-    Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
-    double sq_dist =
-        (pos[0] - goal_pose.pose.position.x) * (pos[0] - goal_pose.pose.position.x) +
-        (pos[1] - goal_pose.pose.position.y) * (pos[1] - goal_pose.pose.position.y);
+    // geometry_msgs::PoseStamped goal_pose = global_plan_.back();
+    //
+    // Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
+    // double sq_dist =
+    //     (pos[0] - goal_pose.pose.position.x) * (pos[0] - goal_pose.pose.position.x) +
+    //     (pos[1] - goal_pose.pose.position.y) * (pos[1] - goal_pose.pose.position.y);
 
     // we want the robot nose to be drawn to its final position
     // (before robot turns towards goal orientation), not the end of the
     // path for the robot center. Choosing the final position after
     // turning towards goal orientation causes instability when the
     // robot needs to make a 180 degree turn at the end
-    std::vector<geometry_msgs::PoseStamped> front_global_plan = global_plan_;
-    double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
-    front_global_plan.back().pose.position.x = front_global_plan.back().pose.position.x +
-      forward_point_distance_ * cos(angle_to_goal);
-    front_global_plan.back().pose.position.y = front_global_plan.back().pose.position.y + forward_point_distance_ *
-      sin(angle_to_goal);
 
-    goal_front_costs_.setTargetPoses(front_global_plan);
-    
-    // keeping the nose on the path
-    if (sq_dist > forward_point_distance_ * forward_point_distance_ * cheat_factor_) {
-      double resolution = planner_util_->getCostmap()->getResolution();
-      alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
-      // costs for robot being aligned with path (nose on path, not ju
-      alignment_costs_.setTargetPoses(global_plan_);
-    } else {
-      // once we are close to goal, trying to keep the nose close to anything destabilizes behavior.
-      alignment_costs_.setScale(0.0);
-    }
+    // std::vector<geometry_msgs::PoseStamped> front_global_plan = global_plan_;
+    // double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
+    // front_global_plan.back().pose.position.x = front_global_plan.back().pose.position.x +
+    //   forward_point_distance_ * cos(angle_to_goal);
+    // front_global_plan.back().pose.position.y = front_global_plan.back().pose.position.y + forward_point_distance_ *
+    //   sin(angle_to_goal);
+    //
+    // goal_front_costs_.setTargetPoses(front_global_plan);
+    //
+    // // keeping the nose on the path
+    // if (sq_dist > forward_point_distance_ * forward_point_distance_ * cheat_factor_) {
+    //   double resolution = planner_util_->getCostmap()->getResolution();
+    //   
+		// 	alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
+    //   // costs for robot being aligned with path (nose on path, not ju
+    //   alignment_costs_.setTargetPoses(global_plan_);
+    // } else {
+    //   // once we are close to goal, trying to keep the nose close to anything destabilizes behavior.
+    //   alignment_costs_.setScale(0.0);
+    // }
   }/*}}}*/
 
 

@@ -2,9 +2,11 @@
 
 namespace base_local_planner {
 
-MapGridCostFunctionKai::MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
+MapGridCostFunctionKai::MapGridCostFunctionKai(
+		costmap_2d::Costmap2D* costmap,
     double xshift, double yshift, bool is_local_goal_function,
-    CostAggregationType aggregationType, double valid_length_ratio) :
+    CostAggregationType aggregationType, double valid_length_ratio)
+	:/*{{{*/
     costmap_(costmap),
     map_(costmap->getSizeInCellsX(), costmap->getSizeInCellsY()),
     aggregationType_(aggregationType),
@@ -13,13 +15,15 @@ MapGridCostFunctionKai::MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
     is_local_goal_function_(is_local_goal_function),
     stop_on_failure_(true),
 		valid_length_ratio_(valid_length_ratio)
-	{}
+	{}/*}}}*/
 
-void MapGridCostFunctionKai::setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses) {
+void MapGridCostFunctionKai::setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses)
+{/*{{{*/
   target_poses_ = target_poses;
-}
+}/*}}}*/
 
-bool MapGridCostFunctionKai::prepare() {
+bool MapGridCostFunctionKai::prepare ()
+{/*{{{*/
   map_.resetPathDist();
 
   if (is_local_goal_function_) {
@@ -28,14 +32,16 @@ bool MapGridCostFunctionKai::prepare() {
     map_.setTargetCells(*costmap_, target_poses_);
   }
   return true;
-}
+}/*}}}*/
 
-double MapGridCostFunctionKai::getCellCosts(unsigned int px, unsigned int py) {
+double MapGridCostFunctionKai::getCellCosts (unsigned int px, unsigned int py)
+{/*{{{*/
   double grid_dist = map_(px, py).target_dist;
   return grid_dist;
-}
+}/*}}}*/
 
-double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj) {
+double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
+{/*{{{*/
   double cost = 0.0;
   if (aggregationType_ == Product) {
     cost = 1.0;
@@ -44,13 +50,14 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj) {
   unsigned int cell_x, cell_y;
   double grid_dist;
 
-	int loop_start = 0;
-	int loop_end = traj.getPointsSize() * valid_length_ratio_;
+	int loop_index_begin = 0;
+	int loop_index_end = traj.getPointsSize() * valid_length_ratio_;
 	if (aggregationType_ == Last) {
-		loop_start = loop_end - 1;
+		loop_index_begin = loop_index_end - 1;
 	}
 
-  for (int i = loop_start; i < loop_end; ++i) {
+  // for (int i = loop_index_start; i < loop_index_end; ++i) {
+  for (int i = 0; i < traj.getPointsSize(); ++i) {
     traj.getPoint(i, px, py, pth);
 
     // translate point forward if specified
@@ -95,6 +102,6 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj) {
     }
   }
   return cost;
-}
+}/*}}}*/
 
 } /* namespace base_local_planner */

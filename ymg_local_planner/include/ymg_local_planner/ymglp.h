@@ -137,8 +137,8 @@ namespace ymglp {
       base_local_planner::ObstacleCostFunction obstacle_costs_;
       base_local_planner::MapGridCostFunctionKai path_costs_;   // XXX changed
       base_local_planner::MapGridCostFunctionKai goal_costs_;
-      base_local_planner::MapGridCostFunctionKai goal_front_costs_;
-      base_local_planner::MapGridCostFunctionKai alignment_costs_;
+      // base_local_planner::MapGridCostFunctionKai goal_front_costs_;
+      // base_local_planner::MapGridCostFunctionKai alignment_costs_;
 
       base_local_planner::SimpleScoredSamplingPlanner scored_sampling_planner_;
   };
