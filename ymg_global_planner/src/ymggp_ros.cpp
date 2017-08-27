@@ -40,7 +40,7 @@ void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ro
 		// ROS_INFO("[YmgGPROS] path_resolution = %f", path_resolution_);
 		// ROS_INFO("[YmgGPROS] max_path_length = %f", max_path_length_);
 
-		max_path_points_ = max_path_length_ * path_resolution_;
+		max_path_size_ = max_path_length_ * path_resolution_;
 		global_frame_ = costmap_ros->getGlobalFrameID();
 		initialized_ = true;
 	}
@@ -109,18 +109,17 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		plan_.push_back(pose);
 	}
 
-	// int erase_index = plan_.size() - max_path_points_;
-	// if (1 <= erase_index) {
-	// 	plan_.erase(plan_.begin(), plan_.begin()+erase_index); 
-	// }
-	
-	if (max_path_points_ < plan_.size()) {
-			std::vector<geometry_msgs::PoseStamped> cut_plan;
-			for (int i = plan_.size()-max_path_points_; i<plan_.size(); ++i) {
-				cut_plan.push_back(plan_[i]);
-			}
-			plan_ = cut_plan;
+	if (max_path_size_ < plan_.size()) {
+		plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
 	}
+	
+	// if (max_path_points_ < plan_.size()) {
+	// 		std::vector<geometry_msgs::PoseStamped> cut_plan;
+	// 		for (int i = plan_.size()-max_path_size_; i<plan_.size(); ++i) {
+	// 			cut_plan.push_back(plan_[i]);
+	// 		}
+	// 		plan_ = cut_plan;
+	// }
 
 	plan = plan_;
 	publishPlan(plan);

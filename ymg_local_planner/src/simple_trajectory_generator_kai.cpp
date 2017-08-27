@@ -51,31 +51,13 @@ void SimpleTrajectoryGeneratorKai::initialise(
     Eigen::Vector3f max_vel = Eigen::Vector3f::Zero();
     Eigen::Vector3f min_vel = Eigen::Vector3f::Zero();
 
-    if ( ! use_dwa_) {
-      // there is no point in overshooting the goal, and it also may break the
-      // robot behavior, so we limit the velocities to those that do not overshoot in sim_time
-      double dist = hypot(goal[0] - pos[0], goal[1] - pos[1]);
-      max_vel_x = std::max(std::min(max_vel_x, dist / sim_time_), min_vel_x);
-      max_vel_y = std::max(std::min(max_vel_y, dist / sim_time_), min_vel_y);
+		max_vel[0] = std::min(max_vel_x, vel[0] + acc_lim[0] * sim_period_);
+		max_vel[1] = std::min(max_vel_y, vel[1] + acc_lim[1] * sim_period_);
+		max_vel[2] = std::min(max_vel_th, vel[2] + acc_lim[2] * sim_period_);
 
-      // if we use continous acceleration, we can sample the max velocity we can reach in sim_time_
-      max_vel[0] = std::min(max_vel_x, vel[0] + acc_lim[0] * sim_time_);
-      max_vel[1] = std::min(max_vel_y, vel[1] + acc_lim[1] * sim_time_);
-      max_vel[2] = std::min(max_vel_th, vel[2] + acc_lim[2] * sim_time_);
-
-      min_vel[0] = std::max(min_vel_x, vel[0] - acc_lim[0] * sim_time_);
-      min_vel[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_time_);
-      min_vel[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_time_);
-    } else {
-      // with dwa do not accelerate beyond the first step, we only sample within velocities we reach in sim_period
-      max_vel[0] = std::min(max_vel_x, vel[0] + acc_lim[0] * sim_period_);
-      max_vel[1] = std::min(max_vel_y, vel[1] + acc_lim[1] * sim_period_);
-      max_vel[2] = std::min(max_vel_th, vel[2] + acc_lim[2] * sim_period_);
-
-      min_vel[0] = std::max(min_vel_x, vel[0] - acc_lim[0] * sim_period_);
-      min_vel[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
-      min_vel[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
-    }
+		min_vel[0] = std::max(min_vel_x, vel[0] - acc_lim[0] * sim_period_);
+		min_vel[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
+		min_vel[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
     Eigen::Vector3f vel_samp = Eigen::Vector3f::Zero();
     VelocityIterator x_it(min_vel[0], max_vel[0], vsamples[0]);
@@ -101,13 +83,10 @@ void SimpleTrajectoryGeneratorKai::setParameters(
     double sim_time,
     double sim_granularity,
     double angular_sim_granularity,
-    bool use_dwa,
     double sim_period) {
   sim_time_ = sim_time;
   sim_granularity_ = sim_granularity;
   angular_sim_granularity_ = angular_sim_granularity;
-  use_dwa_ = use_dwa;
-  continued_acceleration_ = ! use_dwa_;
   sim_period_ = sim_period;
 }
 
@@ -179,31 +158,16 @@ bool SimpleTrajectoryGeneratorKai::generateTrajectory(
   traj.time_delta_ = dt;
 
   Eigen::Vector3f loop_vel;
-  if (continued_acceleration_) {
-    // assuming the velocity of the first cycle is the one we want to store in the trajectory object
-    loop_vel = computeNewVelocities(sample_target_vel, vel, limits_->getAccLimits(), dt);
-    traj.xv_     = loop_vel[0];
-    traj.yv_     = loop_vel[1];
-    traj.thetav_ = loop_vel[2];
-  } else {
-    // assuming sample_vel is our target velocity within acc limits for one timestep
-    loop_vel = sample_target_vel;
-    traj.xv_     = sample_target_vel[0];
-    traj.yv_     = sample_target_vel[1];
-    traj.thetav_ = sample_target_vel[2];
-  }
+	loop_vel = sample_target_vel;
+	traj.xv_     = sample_target_vel[0];
+	traj.yv_     = sample_target_vel[1];
+	traj.thetav_ = sample_target_vel[2];
 
   //simulate the trajectory and check for collisions, updating costs along the way
   for (int i = 0; i < num_steps; ++i) {
 
     //add the point to the trajectory so we can draw it later if we want
     traj.addPoint(pos[0], pos[1], pos[2]);
-
-    if (continued_acceleration_) {
-      //calculate velocities
-      loop_vel = computeNewVelocities(sample_target_vel, loop_vel, limits_->getAccLimits(), dt);
-      //ROS_WARN_NAMED("Generator", "Flag: %d, Loop_Vel %f, %f, %f", continued_acceleration_, loop_vel[0], loop_vel[1], loop_vel[2]);
-    }
 
     //update the position of the robot using the velocities passed in
     pos = computeNewPositions(pos, loop_vel, dt);

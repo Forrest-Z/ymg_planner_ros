@@ -25,7 +25,6 @@ namespace ymglp {
         config.sim_time,
         config.sim_granularity,
         config.angular_sim_granularity,
-        config.use_dwa,
         sim_period_);
 
     double resolution = planner_util_->getCostmap()->getResolution();

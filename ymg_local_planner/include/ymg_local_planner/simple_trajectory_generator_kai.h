@@ -75,7 +75,6 @@ public:
   void setParameters(double sim_time,
       double sim_granularity,
       double angular_sim_granularity,
-      bool use_dwa = false,
       double sim_period = 0.0);
 
   /**
@@ -111,11 +110,9 @@ protected:
   Eigen::Vector3f vel_;
 
   // whether velocity of trajectory changes over time or not
-  bool continued_acceleration_;
   bool discretize_by_time_;
 
   double sim_time_, sim_granularity_, angular_sim_granularity_;
-  bool use_dwa_;
   double sim_period_; // only for dwa
 };
 
