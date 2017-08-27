@@ -55,7 +55,7 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
 	if (aggregationType_ == Last) {
 		loop_index_begin = std::max(0, loop_index_end-1);
 	}
-	std::cout<<"traj_size = "<<traj.getPointsSize()<<std::endl;
+	std::cout<<"traj_size - end_index = "<<traj.getPointsSize()<<" - "<<loop_index_end<<std::endl;
 	std::cout<<"loop_index_begin - end = "<<loop_index_begin<<" - "<<loop_index_end<<std::endl;
 
   for (int i = loop_index_begin; i < loop_index_end; ++i) {
