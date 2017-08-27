@@ -46,6 +46,6 @@ target_link_libraries(ymglp
 	${catkin_LIBRARIES}
 	)
 add_dependencies(ymglp
-	dwa_local_planner_gencfg
+	ymg_local_planner_gencfg
 	)
 
