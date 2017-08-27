@@ -41,6 +41,7 @@ add_library(ymglp
 	src/ymglp_ros.cpp
 	src/map_grid_cost_function_kai.cpp
 	src/simple_scored_sampling_planner_kai.cpp
+	src/simple_trajectory_generator_kai.cpp
 	)
 target_link_libraries(ymglp
 	${catkin_LIBRARIES}
