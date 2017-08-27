@@ -25,6 +25,7 @@ namespace ymglp {
         config.sim_time,
         config.sim_granularity,
         config.angular_sim_granularity,
+        config.use_dwa,
         sim_period_);
 
     double resolution = planner_util_->getCostmap()->getResolution();
@@ -147,8 +148,7 @@ namespace ymglp {
     std::vector<base_local_planner::TrajectorySampleGenerator*> generator_list;
     generator_list.push_back(&generator_);
 
-    scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlanner(generator_list, critics);
-    // scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
+    scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);
   }/*}}}*/

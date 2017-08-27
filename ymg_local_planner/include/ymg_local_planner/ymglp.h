@@ -22,8 +22,7 @@
 #include <base_local_planner/oscillation_cost_function.h>
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <base_local_planner/obstacle_cost_function.h>
-#include <base_local_planner/simple_scored_sampling_planner.h>
-// #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
+#include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
 
 #include <nav_msgs/Path.h>
 
@@ -141,8 +140,7 @@ namespace ymglp {
       // base_local_planner::MapGridCostFunctionKai goal_front_costs_;
       // base_local_planner::MapGridCostFunctionKai alignment_costs_;
 
-      base_local_planner::SimpleScoredSamplingPlanner scored_sampling_planner_;
-      // base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
+      base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
   };
 };
 #endif
