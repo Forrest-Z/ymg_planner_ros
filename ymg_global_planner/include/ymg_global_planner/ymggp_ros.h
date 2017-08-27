@@ -34,6 +34,7 @@ namespace ymggp
 			std::vector<geometry_msgs::PoseStamped> plan_;
 			double path_resolution_;   //**< path resolution in point/m */
 			double max_path_length_;   //**< max_path length in meters */
+			double max_path_points_;   //**< max_path points in meters */
       inline double sq_distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
 
 	};   // class YmgGPROS
