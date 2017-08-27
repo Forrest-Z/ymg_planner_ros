@@ -88,8 +88,8 @@ namespace ymglp {
       obstacle_costs_(planner_util->getCostmap()),
       // path_costs_(planner_util->getCostmap()),   // default
       // goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)   // default
-      path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Last, 0.3),
-      goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true, base_local_planner::Last, 0.3)
+      path_costs_(planner_util->getCostmap(), 0.0, 0.0, false, base_local_planner::Last, 0.5),
+      goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true, base_local_planner::Last, 0.5)
       // goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       // alignment_costs_(planner_util->getCostmap())
   {
