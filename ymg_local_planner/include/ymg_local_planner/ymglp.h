@@ -5,7 +5,7 @@
 #include <Eigen/Core>
 
 
-#include <ymg_planner_ros/YmgLPConfig.h>
+#include <ymg_local_planner/YmgLPConfig.h>
 
 //for creating a local cost grid
 #include <base_local_planner/map_grid_visualizer.h>

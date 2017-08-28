@@ -30,8 +30,7 @@ class MapGridCostFunctionKai: public base_local_planner::TrajectoryCostFunction 
 public:
   MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
       double forward_point_distance = 0.0,
-      bool is_local_goal_function = false,
-			double valid_length_ratio = 1.0   // XXX added
+      bool is_local_goal_function = false
 			);
 
   ~MapGridCostFunctionKai() {}
@@ -42,6 +41,8 @@ public:
   void setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses);
 
   void setForwardPointDistance(double forward_point_distance) {forward_point_distance_ = forward_point_distance;}
+  
+	void setValidTrajRatio(double valid_traj_ratio) {valid_traj_ratio_ = valid_traj_ratio;}
 
   /** @brief If true, failures along the path cause the entire path to be rejected.
    *
@@ -84,7 +85,7 @@ private:
   bool is_local_goal_function_;
   bool stop_on_failure_;
 
-	double valid_length_ratio_;   // XXX added
+	double valid_traj_ratio_;
 };
 
 } /* namespace base_local_planner */

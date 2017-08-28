@@ -4,14 +4,14 @@ namespace base_local_planner {
 
 MapGridCostFunctionKai::MapGridCostFunctionKai(
 		costmap_2d::Costmap2D* costmap, double forward_point_distance,
-		bool is_local_goal_function, double valid_length_ratio)
+		bool is_local_goal_function)
 	:/*{{{*/
     costmap_(costmap),
     map_(costmap->getSizeInCellsX(), costmap->getSizeInCellsY()),
     forward_point_distance_(forward_point_distance),
     is_local_goal_function_(is_local_goal_function),
     stop_on_failure_(true),
-		valid_length_ratio_(valid_length_ratio)
+		valid_traj_ratio_(1.0)
 	{}/*}}}*/
 
 void MapGridCostFunctionKai::setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses)
@@ -44,7 +44,7 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
   unsigned int foot_cell_x, foot_cell_y,  head_cell_x, head_cell_y;
   double foot_grid_dist, head_grid_dist;
 
-	int score_traj_index = traj.getPointsSize() * valid_length_ratio_ -1; 
+	int score_traj_index = (traj.getPointsSize()-1) * valid_traj_ratio_; 
 	traj.getPoint(score_traj_index, foot_x, foot_y, foot_th);
 
 	head_x = foot_x + forward_point_distance_ * cos(foot_th);

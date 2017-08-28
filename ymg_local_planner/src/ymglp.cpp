@@ -28,14 +28,17 @@ namespace ymglp {
         sim_period_);
 
     double resolution = planner_util_->getCostmap()->getResolution();
+		double valid_traj_ratio = config.sim_time_traj / config.sim_time;
+
     pdist_scale_ = config.path_distance_bias;
-    // pdistscale used for both path and alignment, set  forward_point_distance to zero to discard alignment
     path_costs_.setScale(resolution * pdist_scale_);
     path_costs_.setForwardPointDistance(forward_point_distance_);
+    path_costs_.setValidTrajRatio(valid_traj_ratio);
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
     goal_costs_.setForwardPointDistance(forward_point_distance_);
+    goal_costs_.setValidTrajRatio(valid_traj_ratio);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);
@@ -83,8 +86,8 @@ namespace ymglp {
       obstacle_costs_(planner_util->getCostmap()),
       // path_costs_(planner_util->getCostmap()),   // default
       // goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)   // default
-      path_costs_(planner_util->getCostmap(), 0.0, false, 0.5),
-      goal_costs_(planner_util->getCostmap(), 0.0, true, 0.5)
+      path_costs_(planner_util->getCostmap(), 0.0, false),
+      goal_costs_(planner_util->getCostmap(), 0.0, true)
       // goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
       // alignment_costs_(planner_util->getCostmap())
   {
@@ -217,40 +220,6 @@ namespace ymglp {
     // costs for not going towards the local goal as much as possible
     goal_costs_.setTargetPoses(global_plan_);
 
-    // alignment costs
-    // geometry_msgs::PoseStamped goal_pose = global_plan_.back();
-    //
-    // Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
-    // double sq_dist =
-    //     (pos[0] - goal_pose.pose.position.x) * (pos[0] - goal_pose.pose.position.x) +
-    //     (pos[1] - goal_pose.pose.position.y) * (pos[1] - goal_pose.pose.position.y);
-
-    // we want the robot nose to be drawn to its final position
-    // (before robot turns towards goal orientation), not the end of the
-    // path for the robot center. Choosing the final position after
-    // turning towards goal orientation causes instability when the
-    // robot needs to make a 180 degree turn at the end
-
-    // std::vector<geometry_msgs::PoseStamped> front_global_plan = global_plan_;
-    // double angle_to_goal = atan2(goal_pose.pose.position.y - pos[1], goal_pose.pose.position.x - pos[0]);
-    // front_global_plan.back().pose.position.x = front_global_plan.back().pose.position.x +
-    //   forward_point_distance_ * cos(angle_to_goal);
-    // front_global_plan.back().pose.position.y = front_global_plan.back().pose.position.y + forward_point_distance_ *
-    //   sin(angle_to_goal);
-    //
-    // goal_front_costs_.setTargetPoses(front_global_plan);
-    //
-    // // keeping the nose on the path
-    // if (sq_dist > forward_point_distance_ * forward_point_distance_ * cheat_factor_) {
-    //   double resolution = planner_util_->getCostmap()->getResolution();
-    //   
-		// 	alignment_costs_.setScale(resolution * pdist_scale_ * 0.5);
-    //   // costs for robot being aligned with path (nose on path, not ju
-    //   alignment_costs_.setTargetPoses(global_plan_);
-    // } else {
-    //   // once we are close to goal, trying to keep the nose close to anything destabilizes behavior.
-    //   alignment_costs_.setScale(0.0);
-    // }
   }/*}}}*/
 
 
