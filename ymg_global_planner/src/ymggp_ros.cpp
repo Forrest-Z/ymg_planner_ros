@@ -91,6 +91,7 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 	geometry_msgs::PoseStamped endpoint = plan_.back();
 
 	int points = sq_distance(endpoint, goal) * path_resolution_;
+	ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
 	double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
 	double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
 
