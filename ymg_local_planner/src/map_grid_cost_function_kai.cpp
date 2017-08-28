@@ -43,7 +43,7 @@ double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
   double foot_grid_dist;
 
 	int score_traj_index = (traj.getPointsSize()-1) * valid_traj_ratio_; 
-	std::cout<<"traj_size - score_traj_index"<<traj.getPointsSize()<<" - "<<score_traj_index<<std::endl;
+	// std::cout<<"traj_size - score_traj_index = "<<traj.getPointsSize()<<" - "<<score_traj_index<<std::endl;
 	traj.getPoint(score_traj_index, foot_x, foot_y, foot_th);
 
 	if ( ! costmap_->worldToMap(foot_x, foot_y, foot_cell_x, foot_cell_y)) {
