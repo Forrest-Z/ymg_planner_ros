@@ -32,7 +32,7 @@ namespace ymglp {
 
     pdist_scale_ = config.path_distance_bias;
     path_costs_.setScale(resolution * pdist_scale_);
-    path_costs_.setForwardPointDistance(forward_point_distance_);
+    path_costs_.setForwardPointDistance(config.forward_point_distance);
     path_costs_.setValidTrajRatio(valid_traj_ratio);
 
     gdist_scale_ = config.goal_distance_bias;
@@ -44,7 +44,6 @@ namespace ymglp {
 
     stop_time_buffer_ = config.stop_time_buffer;
     oscillation_costs_.setOscillationResetDist(config.oscillation_reset_dist, config.oscillation_reset_angle);
-    forward_point_distance_ = config.forward_point_distance;
 
     // obstacle costs can vary due to scaling footprint feature
     obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
