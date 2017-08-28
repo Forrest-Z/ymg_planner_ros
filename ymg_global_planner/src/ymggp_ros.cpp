@@ -92,26 +92,29 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 
 	int points = sq_distance(endpoint, goal) * path_resolution_;
 	ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
-	double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
-	double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
 
-	for (int i=1; i<points; ++i)
-	{
-		geometry_msgs::PoseStamped pose;
-		pose.header.stamp = plan_time;
-		pose.header.frame_id = global_frame_;
-		pose.pose.position.x = endpoint.pose.position.x + step_x * i;
-		pose.pose.position.y = endpoint.pose.position.y + step_y * i;
-		pose.pose.position.z = 0.0;
-		pose.pose.orientation.x = 0.0;
-		pose.pose.orientation.y = 0.0;
-		pose.pose.orientation.z = 0.0;
-		pose.pose.orientation.w = 1.0;
-		plan_.push_back(pose);
-	}
+	if (1 <= points) {
+		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
+		double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
 
-	if (max_path_size_ < plan_.size()) {
-		plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
+		for (int i=1; i<=points; ++i)
+		{
+			geometry_msgs::PoseStamped pose;
+			pose.header.stamp = plan_time;
+			pose.header.frame_id = global_frame_;
+			pose.pose.position.x = endpoint.pose.position.x + step_x * i;
+			pose.pose.position.y = endpoint.pose.position.y + step_y * i;
+			pose.pose.position.z = 0.0;
+			pose.pose.orientation.x = 0.0;
+			pose.pose.orientation.y = 0.0;
+			pose.pose.orientation.z = 0.0;
+			pose.pose.orientation.w = 1.0;
+			plan_.push_back(pose);
+		}
+
+		if (max_path_size_ < plan_.size()) {
+			plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
+		}
 	}
 	
 	// if (max_path_points_ < plan_.size()) {
