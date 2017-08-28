@@ -2,13 +2,11 @@
 
 namespace base_local_planner {
 
-MapGridCostFunctionKai::MapGridCostFunctionKai(
-		costmap_2d::Costmap2D* costmap, double forward_point_distance,
-		bool is_local_goal_function)
+MapGridCostFunctionKai::MapGridCostFunctionKai (costmap_2d::Costmap2D* costmap, bool is_local_goal_function)
 	:/*{{{*/
     costmap_(costmap),
     map_(costmap->getSizeInCellsX(), costmap->getSizeInCellsY()),
-    forward_point_distance_(forward_point_distance),
+    forward_point_distance_(-1.0),
     is_local_goal_function_(is_local_goal_function),
     stop_on_failure_(true),
 		valid_traj_ratio_(1.0)

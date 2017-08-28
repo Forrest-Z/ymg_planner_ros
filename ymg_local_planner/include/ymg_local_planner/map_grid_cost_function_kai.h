@@ -21,17 +21,11 @@ namespace base_local_planner {
  * This can be used to favor trajectories which stay on a given path, or which
  * approach a given goal.
  * @param costmap_ros Reference to object giving updates of obstacles around robot
- * @param xshift where the scoring point is with respect to robot center pose
- * @param yshift where the scoring point is with respect to robot center pose
  * @param is_local_goal_function, scores for local goal rather than whole path
- * @param aggregationType how to combine costs along trajectory
  */
 class MapGridCostFunctionKai: public base_local_planner::TrajectoryCostFunction {
 public:
-  MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
-      double forward_point_distance = 0.0,
-      bool is_local_goal_function = false
-			);
+  MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap, bool is_local_goal_function = false);
 
   ~MapGridCostFunctionKai() {}
 

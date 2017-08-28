@@ -37,7 +37,6 @@ namespace ymglp {
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
-    goal_costs_.setForwardPointDistance(forward_point_distance_);
     goal_costs_.setValidTrajRatio(valid_traj_ratio);
 
     occdist_scale_ = config.occdist_scale;
@@ -84,12 +83,8 @@ namespace ymglp {
 /*{{{*/
       planner_util_(planner_util),
       obstacle_costs_(planner_util->getCostmap()),
-      // path_costs_(planner_util->getCostmap()),   // default
-      // goal_costs_(planner_util->getCostmap(), 0.0, 0.0, true)   // default
-      path_costs_(planner_util->getCostmap(), 0.0, false),
-      goal_costs_(planner_util->getCostmap(), 0.0, true)
-      // goal_front_costs_(planner_util->getCostmap(), 0.0, 0.0, true),
-      // alignment_costs_(planner_util->getCostmap())
+      path_costs_(planner_util->getCostmap(), false),
+      goal_costs_(planner_util->getCostmap(), true)
   {
     ros::NodeHandle private_nh("~/" + name);
 
