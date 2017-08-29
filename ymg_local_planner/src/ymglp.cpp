@@ -22,13 +22,13 @@ namespace ymglp {
     boost::mutex::scoped_lock l(configuration_mutex_);
 
     generator_.setParameters(
-        config.sim_time,
+        config.sim_time_obstacle,
         config.sim_granularity,
         config.angular_sim_granularity,
         sim_period_);
 
     double resolution = planner_util_->getCostmap()->getResolution();
-		double valid_traj_ratio = config.sim_time_traj / config.sim_time;
+		double valid_traj_ratio = config.sim_time_trajectory / config.sim_time_obstacle;
 
     pdist_scale_ = config.path_distance_bias;
     path_costs_.setScale(resolution * pdist_scale_);
@@ -78,7 +78,7 @@ namespace ymglp {
 
   }/*}}}*/
 
-  YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
+  YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtilKai *planner_util) :
 /*{{{*/
       planner_util_(planner_util),
       obstacle_costs_(planner_util->getCostmap()),
