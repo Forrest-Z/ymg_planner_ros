@@ -87,12 +87,27 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		pose.pose.orientation = start.pose.orientation;
 		plan_.push_back(pose);
 	}
+	
+	// get nearest plan index and shorten trajectory
+	double min_dist = 1000.0;
+	int min_dist_path_index = 0;
+	for (int i=0; i<plan_.size(); ++i) {
+		double dist = sq_distance(start, plan_[i]);
+		if (dist < min_dist) {
+			min_dist = dist;
+			min_dist_path_index = i;
+		}
+	}
+
+	std::vector<geometry_msgs::PoseStamped> new_plan;
+	for (int i=min_dist_path_index; i<plan_.size(); ++i) {
+		new_plan.push_back(plan_[i]);
+	}
+
 
 	geometry_msgs::PoseStamped endpoint = plan_.back();
-
 	int points = sq_distance(endpoint, goal) * path_resolution_;
 	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
-
 	if (1 <= points) {
 		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
 		double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
@@ -109,13 +124,16 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 			pose.pose.orientation.y = 0.0;
 			pose.pose.orientation.z = 0.0;
 			pose.pose.orientation.w = 1.0;
-			plan_.push_back(pose);
+			new_plan.push_back(pose);
+			// plan_.push_back(pose);
 		}
 
-		if (max_path_size_ < plan_.size()) {
-			plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
-		}
+		// if (max_path_size_ < plan_.size()) {
+		// 	plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
+		// }
 	}
+
+	plan_ = new_plan;
 	
 	// if (max_path_points_ < plan_.size()) {
 	// 		std::vector<geometry_msgs::PoseStamped> cut_plan;
