@@ -27,7 +27,7 @@ namespace ymglp {
       }
 
       // update generic local planner params
-      base_local_planner::LocalPlannerLimitsKai limits;
+      base_local_planner::LocalPlannerLimits limits;
       limits.max_trans_vel = config.max_trans_vel;
       limits.min_trans_vel = config.min_trans_vel;
       limits.max_vel_x = config.max_vel_x;
@@ -242,7 +242,7 @@ namespace ymglp {
       std::vector<geometry_msgs::PoseStamped> transformed_plan;
       publishGlobalPlan(transformed_plan);
       publishLocalPlan(local_plan);
-      base_local_planner::LocalPlannerLimitsKai limits = planner_util_.getCurrentLimits();
+      base_local_planner::LocalPlannerLimits limits = planner_util_.getCurrentLimits();
       return latchedStopRotateController_.computeVelocityCommandsStopRotate(
           cmd_vel,
           limits.getAccLimits(),

@@ -15,8 +15,8 @@
 #include <costmap_2d/costmap_2d.h>
 
 #include <base_local_planner/trajectory.h>
-#include <ymg_local_planner/local_planner_limits_kai.h>
-#include <ymg_local_planner/local_planner_util_kai.h>
+#include <base_local_planner/local_planner_limits.h>
+#include <base_local_planner/local_planner_util.h>
 #include <ymg_local_planner/simple_trajectory_generator_kai.h>
 
 #include <base_local_planner/oscillation_cost_function.h>
@@ -39,7 +39,7 @@ namespace ymglp {
        * @param costmap_ros A pointer to the costmap instance the planner should use
        * @param global_frame the frame id of the tf frame to use
        */
-      YmgLP(std::string name, base_local_planner::LocalPlannerUtilKai *planner_util);
+      YmgLP(std::string name, base_local_planner::LocalPlannerUtil *planner_util);
 
       /**
        * @brief  Destructor for the planner
@@ -108,7 +108,7 @@ namespace ymglp {
 
     private:
 
-      base_local_planner::LocalPlannerUtilKai *planner_util_;
+      base_local_planner::LocalPlannerUtil *planner_util_;
 
       double stop_time_buffer_; ///< @brief How long before hitting something we're going to enforce that the robot stop
       double pdist_scale_, gdist_scale_, occdist_scale_;

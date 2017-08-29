@@ -43,8 +43,6 @@ add_library(ymglp
 	src/simple_scored_sampling_planner_kai.cpp
 	src/simple_trajectory_generator_kai.cpp
 	src/obstacle_cost_function_kai.cpp
-	src/local_planner_util_kai.cpp
-	src/latched_stop_rotate_controller_kai.cpp
 	)
 target_link_libraries(ymglp
 	${catkin_LIBRARIES}

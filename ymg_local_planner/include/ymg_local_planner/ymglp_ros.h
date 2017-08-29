@@ -15,7 +15,7 @@
 
 #include <costmap_2d/costmap_2d_ros.h>
 #include <nav_core/base_local_planner.h>
-#include <ymg_local_planner/latched_stop_rotate_controller_kai.h>
+#include <base_local_planner/latched_stop_rotate_controller.h>
 
 #include <base_local_planner/odometry_helper_ros.h>
 
@@ -99,7 +99,7 @@ namespace ymglp {
       // for visualisation, publishers of global and local plan
       ros::Publisher g_plan_pub_, l_plan_pub_;
 
-      base_local_planner::LocalPlannerUtilKai planner_util_;
+      base_local_planner::LocalPlannerUtil planner_util_;
 
       boost::shared_ptr<YmgLP> dp_; ///< @brief The trajectory controller
 
@@ -110,7 +110,7 @@ namespace ymglp {
       bool setup_;
       tf::Stamped<tf::Pose> current_pose_;
 
-      base_local_planner::LatchedStopRotateControllerKai latchedStopRotateController_;
+      base_local_planner::LatchedStopRotateController latchedStopRotateController_;
 
 
       bool initialized_;

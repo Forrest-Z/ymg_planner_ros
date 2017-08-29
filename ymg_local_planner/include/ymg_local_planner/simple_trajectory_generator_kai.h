@@ -2,7 +2,7 @@
 #define SIMPLE_TRAJECTORY_GENERATOR_KAI_H_
 
 #include <base_local_planner/trajectory_sample_generator.h>
-#include <ymg_local_planner/local_planner_limits_kai.h>
+#include <base_local_planner/local_planner_limits.h>
 #include <Eigen/Core>
 
 namespace base_local_planner {
@@ -43,7 +43,7 @@ public:
       const Eigen::Vector3f& pos,
       const Eigen::Vector3f& vel,
       const Eigen::Vector3f& goal,
-      base_local_planner::LocalPlannerLimitsKai* limits,
+      base_local_planner::LocalPlannerLimits* limits,
       const Eigen::Vector3f& vsamples,
       std::vector<Eigen::Vector3f> additional_samples,
       bool discretize_by_time = false);
@@ -60,7 +60,7 @@ public:
       const Eigen::Vector3f& pos,
       const Eigen::Vector3f& vel,
       const Eigen::Vector3f& goal,
-      base_local_planner::LocalPlannerLimitsKai* limits,
+      base_local_planner::LocalPlannerLimits* limits,
       const Eigen::Vector3f& vsamples,
       bool discretize_by_time = false);
 
@@ -105,7 +105,7 @@ protected:
   unsigned int next_sample_index_;
   // to store sample params of each sample between init and generation
   std::vector<Eigen::Vector3f> sample_params_;
-  base_local_planner::LocalPlannerLimitsKai* limits_;
+  base_local_planner::LocalPlannerLimits* limits_;
   Eigen::Vector3f pos_;
   Eigen::Vector3f vel_;
 
