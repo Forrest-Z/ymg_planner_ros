@@ -1,0 +1,6 @@
+# ########## ymglp params ##########
+
+YmgGPROS:
+  path_resolution: 10.0
+  max_path_length: 20.0
+

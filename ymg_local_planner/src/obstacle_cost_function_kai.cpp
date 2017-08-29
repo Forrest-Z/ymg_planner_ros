@@ -57,7 +57,7 @@ double ObstacleCostFnctionKai::scoreTrajectory(Trajectory &traj) {
     if(sum_scores_)
         cost +=  f_cost;
     else
-        cost = f_cost;
+        cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
   return cost;
 }
