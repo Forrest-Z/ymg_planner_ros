@@ -15,7 +15,7 @@
 #include <costmap_2d/costmap_2d.h>
 
 #include <base_local_planner/trajectory.h>
-#include <base_local_planner/local_planner_limits.h>
+#include <ymg_local_planner/local_planner_limits_kai.h>
 #include <ymg_local_planner/local_planner_util_kai.h>
 #include <ymg_local_planner/simple_trajectory_generator_kai.h>
 

@@ -19,7 +19,7 @@ void LocalPlannerUtilKai::initialize(
   }
 }
 
-void LocalPlannerUtilKai::reconfigureCB(LocalPlannerLimits &config, bool restore_defaults)
+void LocalPlannerUtilKai::reconfigureCB(LocalPlannerLimitsKai &config, bool restore_defaults)
 {
   if(setup_ && restore_defaults) {
     config = default_limits_;
@@ -30,14 +30,14 @@ void LocalPlannerUtilKai::reconfigureCB(LocalPlannerLimits &config, bool restore
     setup_ = true;
   }
   boost::mutex::scoped_lock l(limits_configuration_mutex_);
-  limits_ = LocalPlannerLimits(config);
+  limits_ = LocalPlannerLimitsKai(config);
 }
 
 costmap_2d::Costmap2D* LocalPlannerUtilKai::getCostmap() {
   return costmap_;
 }
 
-LocalPlannerLimits LocalPlannerUtilKai::getCurrentLimits() {
+LocalPlannerLimitsKai LocalPlannerUtilKai::getCurrentLimits() {
   boost::mutex::scoped_lock l(limits_configuration_mutex_);
   return limits_;
 }

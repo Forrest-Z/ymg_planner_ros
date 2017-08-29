@@ -8,7 +8,7 @@
 #include <nav_msgs/Odometry.h>
 
 #include <base_local_planner/goal_functions.h>
-#include <base_local_planner/local_planner_limits.h>
+#include <ymg_local_planner/local_planner_limits_kai.h>
 
 namespace base_local_planner {
 
@@ -74,7 +74,7 @@ bool LatchedStopRotateControllerKai::isGoalReached(LocalPlannerUtilKai* planner_
   double goal_x = goal_pose.getOrigin().getX();
   double goal_y = goal_pose.getOrigin().getY();
 
-  base_local_planner::LocalPlannerLimits limits = planner_util->getCurrentLimits();
+  base_local_planner::LocalPlannerLimitsKai limits = planner_util->getCurrentLimits();
 
   //check to see if we've reached the goal position
   if ((latch_xy_goal_tolerance_ && xy_tolerance_latch_) ||
@@ -143,7 +143,7 @@ bool LatchedStopRotateControllerKai::rotateToGoal(
     geometry_msgs::Twist& cmd_vel,
     Eigen::Vector3f acc_lim,
     double sim_period,
-    base_local_planner::LocalPlannerLimits& limits,
+    base_local_planner::LocalPlannerLimitsKai& limits,
     boost::function<bool (Eigen::Vector3f pos,
                           Eigen::Vector3f vel,
                           Eigen::Vector3f vel_samples)> obstacle_check) {
@@ -203,7 +203,7 @@ bool LatchedStopRotateControllerKai::computeVelocityCommandsStopRotate(geometry_
     return false;
   }
 
-  base_local_planner::LocalPlannerLimits limits = planner_util->getCurrentLimits();
+  base_local_planner::LocalPlannerLimitsKai limits = planner_util->getCurrentLimits();
 
   //if the user wants to latch goal tolerance, if we ever reach the goal location, we'll
   //just rotate in place

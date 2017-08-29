@@ -9,7 +9,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 
-#include <base_local_planner/local_planner_limits.h>
+#include <ymg_local_planner/local_planner_limits_kai.h>
 
 
 namespace base_local_planner {
@@ -34,8 +34,8 @@ private:
 
   boost::mutex limits_configuration_mutex_;
   bool setup_;
-  LocalPlannerLimits default_limits_;
-  LocalPlannerLimits limits_;
+  LocalPlannerLimitsKai default_limits_;
+  LocalPlannerLimitsKai limits_;
   bool initialized_;
 
 public:
@@ -43,7 +43,7 @@ public:
   /**
    * @brief  Callback to update the local planner's parameters
    */
-  void reconfigureCB(LocalPlannerLimits &config, bool restore_defaults);
+  void reconfigureCB(LocalPlannerLimitsKai &config, bool restore_defaults);
 
   LocalPlannerUtilKai() : initialized_(false) {}
 
@@ -62,7 +62,7 @@ public:
 
   costmap_2d::Costmap2D* getCostmap();
 
-  LocalPlannerLimits getCurrentLimits();
+  LocalPlannerLimitsKai getCurrentLimits();
 
   std::string getGlobalFrame(){ return global_frame_; }
 };

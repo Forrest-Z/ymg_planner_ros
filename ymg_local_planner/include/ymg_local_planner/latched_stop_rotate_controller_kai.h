@@ -58,7 +58,7 @@ public:
       geometry_msgs::Twist& cmd_vel,
       Eigen::Vector3f acc_lim,
       double sim_period,
-      base_local_planner::LocalPlannerLimits& limits,
+      base_local_planner::LocalPlannerLimitsKai& limits,
       boost::function<bool (Eigen::Vector3f pos,
                             Eigen::Vector3f vel,
                             Eigen::Vector3f vel_samples)> obstacle_check);
