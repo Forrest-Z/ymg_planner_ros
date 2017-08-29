@@ -60,6 +60,21 @@ The acceleration limit of the robot in the theta direction
 ~/YmgLPROS/acc_limit_trans (double[m/s^2], default: 0.1)  
 The absolute value of the maximum translational acceleration for the robot in m/s^2  
 
+~/YmgLPROS/prune_plan (bool, default: false)  
+Start following closest point of global plan, not first point (if different).  
+
+~/YmgLPROS/xy_goal_tolerance (double[m], default: 0.1)  
+Within what maximum distance we consider the robot to be in goal  
+
+~/YmgLPROS/yaw_goal_tolerance (double[rad], default: 0.1)  
+Within what maximum angle difference we consider the robot to face goal direction  
+
+~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.1)  
+Below what maximum velocity we consider the robot to be stopped in translation  
+
+~/YmgLPROS/rot_stopped_vel (double[m/s], default: 0.1)  
+Below what maximum rotation velocity we consider the robot to be stopped in rotation  
+
 ~/YmgLPROS/sim_time_obstacle (double[sec], defalut: 1.7)  
 The amount of time to roll trajectories out for in seconds  
 

@@ -13,8 +13,6 @@ YmgLPROS:
   max_rot_vel: 0.5
   min_rot_vel: 0.0
 
-  holonomic_robot: false
-
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.2
 
