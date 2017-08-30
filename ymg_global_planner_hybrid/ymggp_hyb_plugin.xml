@@ -1,0 +1,7 @@
+<library path="lib/libymggp">
+  <class name="ymggp/YmgGPHybROS" type="ymggp::YmgGPHybROS" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>
+      A implementation of YMG's original global planer
+    </description>
+  </class>
+</library>
