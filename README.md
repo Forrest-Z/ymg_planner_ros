@@ -117,10 +117,10 @@ The maximum factor to scale the robot's footprint by
 ~/YmgLPROS/vx_samples (int, default: 3)  
 The number of samples to use when exploring the x velocity space  
 
-~/YmgLPROS/vy_samples (int, default: 10)  
+~/YmgLPROS/vy_samples (int, default: 0)  
 The number of samples to use when exploring the y velocity space  
 
-~/YmgLPROS/vth_samples (int, default: 20)  
+~/YmgLPROS/vth_samples (int, default: 21)  
 The number of samples to use when exploring the theta velocity space  
 
 ~/YmgLPROS/restore_defaults (bool, default: False)  
