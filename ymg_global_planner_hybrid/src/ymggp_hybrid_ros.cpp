@@ -324,9 +324,6 @@ namespace ymggp {
       potarr_pub_.publish(pot_area);
     }
 
-    //publish the plan for visualization purposes
-    publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
-
     return !plan.empty();
 	}/*}}}*/
 
@@ -344,8 +341,12 @@ namespace ymggp {
       return false;
     }
 
-		// return makePlanNavfn(start, goal, tolerance, plan);
-		return ymg_global_planner_.makePlan(start, goal, plan);
+		bool result = ymg_global_planner_.makePlan(start, goal, plan);
+		// bool result = makePlanNavfn(start, goal, tolerance, plan);
+
+    publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
+
+		return result;
   }/*}}}*/
 
   void YmgGPHybROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a)
