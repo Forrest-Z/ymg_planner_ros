@@ -1,4 +1,4 @@
-<library path="lib/libymggp">
+<library path="lib/libymggp_hybrid">
   <class name="ymggp/YmgGPHybROS" type="ymggp::YmgGPHybROS" base_class_type="nav_core::BaseGlobalPlanner">
     <description>
       A implementation of YMG's original global planer
