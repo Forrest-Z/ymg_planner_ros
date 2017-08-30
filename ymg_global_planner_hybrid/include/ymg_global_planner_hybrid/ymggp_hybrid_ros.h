@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <navfn/navfn.h>
+#include <ymg_global_planner/ymggp.h>
 #include <costmap_2d/costmap_2d.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Point.h>
@@ -160,6 +161,7 @@ namespace ymggp {
       boost::mutex mutex_;
       ros::ServiceServer make_plan_srv_;
       std::string global_frame_;
+			YmgGP ymg_global_planner_;
   };
 };
 

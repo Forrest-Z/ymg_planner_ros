@@ -48,11 +48,16 @@ namespace ymggp {
       private_nh.param("planner_window_y", planner_window_y_, 0.0);
       private_nh.param("default_tolerance", default_tolerance_, 0.0);
 
+			double path_resolution;
+			private_nh.param("path_resolution", path_resolution, 10.0);
+
       //get the tf prefix
       ros::NodeHandle prefix_nh;
       tf_prefix_ = tf::getPrefixParam(prefix_nh);
 
       make_plan_srv_ =  private_nh.advertiseService("make_plan", &YmgGPHybROS::makePlanService, this);
+		
+			ymg_global_planner_.initialize(global_frame, path_resolution);
 
       initialized_ = true;
     }
@@ -339,7 +344,8 @@ namespace ymggp {
       return false;
     }
 
-		return makePlanNavfn(start, goal, tolerance, plan);
+		// return makePlanNavfn(start, goal, tolerance, plan);
+		return ymg_global_planner_.makePlan(start, goal, plan);
   }/*}}}*/
 
   void YmgGPHybROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a)

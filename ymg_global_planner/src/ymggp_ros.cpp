@@ -59,11 +59,10 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		return false;
 	}
 
-
-
 	plan.clear();
 	ymg_global_planner_.makePlan(start, goal, plan);
 	publishPlan(plan);
+
 	return !plan.empty();
 }/*}}}*/
 

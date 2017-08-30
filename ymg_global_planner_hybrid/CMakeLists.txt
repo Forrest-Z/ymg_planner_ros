@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES ymg_global_planner_hybrid
 #  CATKIN_DEPENDS costmap_2d geometry_msgs nav_core nav_msgs navfn pluginlib roscpp tf
 #  DEPENDS system_lib
