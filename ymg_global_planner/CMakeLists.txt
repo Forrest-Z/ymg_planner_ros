@@ -31,6 +31,7 @@ include_directories(
 
 add_library(ymggp
 	src/ymggp_ros.cpp
+	src/ymggp.cpp
 	)
 target_link_libraries(ymggp
 	${catkin_LIBRARIES}

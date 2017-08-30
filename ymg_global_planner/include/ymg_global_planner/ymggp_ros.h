@@ -1,6 +1,6 @@
 /**
  * @file ymggp_ros.h
- * @brief YMG's global planner header for ros
+ * @brief YMG's global planner plugin for ros
  * @author YMG
  * @date 2017.07
  */
@@ -13,6 +13,7 @@
 #include <costmap_2d/costmap_2d.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <ymg_global_planner/ymggp.h>
 
 
 namespace ymggp
@@ -30,12 +31,7 @@ namespace ymggp
 		private:
 			bool initialized_;
       ros::Publisher plan_pub_;
-			std::string global_frame_;
-			std::vector<geometry_msgs::PoseStamped> plan_;
-			double path_resolution_;   //**< path resolution in point/m */
-			double max_path_length_;   //**< max_path length in meters */
-			double max_path_size_;   //**< max_path points in meters */
-      inline double sq_distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
+			YmgGP ymg_global_planner_;
 
 	};   // class YmgGPROS
 };   // namespace ymggp

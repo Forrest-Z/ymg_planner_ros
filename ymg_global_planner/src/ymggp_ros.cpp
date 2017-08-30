@@ -1,6 +1,6 @@
 /**
  * @file ymggp_ros.cpp
- * @brief YMG's global planner library for ros
+ * @brief YMG's global planner plugin for ros
  * @author YMG
  * @date 2017.07
  */
@@ -32,16 +32,12 @@ void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ro
 {/*{{{*/
 	if (!initialized_) {
 		ros::NodeHandle private_nh("~/" + name);
-		private_nh.param("path_resolution", path_resolution_, 10.0);
-		private_nh.param("max_path_length", max_path_length_, 20.0);
+		double path_resolution, max_path_length;
+		private_nh.param("path_resolution", path_resolution, 10.0);
 		plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
 
-		// ROS_INFO("[YmgGPROS] global_frame = %s", global_frame_.c_str());
-		// ROS_INFO("[YmgGPROS] path_resolution = %f", path_resolution_);
-		// ROS_INFO("[YmgGPROS] max_path_length = %f", max_path_length_);
+		ymg_global_planner_.initialize(costmap_ros->getGlobalFrameID(), path_resolution);
 
-		max_path_size_ = max_path_length_ * path_resolution_;
-		global_frame_ = costmap_ros->getGlobalFrameID();
 		initialized_ = true;
 	}
 	else
@@ -63,90 +59,10 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		return false;
 	}
 
-	if (goal.header.frame_id != global_frame_) {
-		ROS_ERROR("The goal pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
-				global_frame_.c_str(), goal.header.frame_id.c_str());
-		return false;
-	}
-
-	if (start.header.frame_id != global_frame_) {
-		ROS_ERROR("The start pose passed to this planner must be in the %s frame.  It is instead in the %s frame.", 
-				global_frame_.c_str(), start.header.frame_id.c_str());
-		return false;
-	}
 
 
 	plan.clear();
-
-	ros::Time plan_time = ros::Time::now();
-	if (plan_.empty()) {
-		geometry_msgs::PoseStamped pose;
-		pose.header.stamp = plan_time;
-		pose.header.frame_id = global_frame_;
-		pose.pose.position = start.pose.position;
-		pose.pose.orientation = start.pose.orientation;
-		plan_.push_back(pose);
-	}
-	
-	// get nearest plan index and shorten trajectory
-	double min_dist = 1000.0;
-	int min_dist_path_index = 0;
-	for (int i=0; i<plan_.size(); ++i) {
-		double dist = sq_distance(start, plan_[i]);
-		if (dist < min_dist) {
-			min_dist = dist;
-		}
-		else {
-			min_dist_path_index = i;
-			break;
-		}
-	}
-
-	std::vector<geometry_msgs::PoseStamped> new_plan;
-	for (int i=min_dist_path_index; i<plan_.size(); ++i) {
-		new_plan.push_back(plan_[i]);
-	}
-
-
-	geometry_msgs::PoseStamped endpoint = plan_.back();
-	int points = sq_distance(endpoint, goal) * path_resolution_;
-	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
-	if (1 <= points) {
-		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
-		double step_y = (goal.pose.position.y - endpoint.pose.position.y) / points;
-
-		for (int i=1; i<=points; ++i)
-		{
-			geometry_msgs::PoseStamped pose;
-			pose.header.stamp = plan_time;
-			pose.header.frame_id = global_frame_;
-			pose.pose.position.x = endpoint.pose.position.x + step_x * i;
-			pose.pose.position.y = endpoint.pose.position.y + step_y * i;
-			pose.pose.position.z = 0.0;
-			pose.pose.orientation.x = 0.0;
-			pose.pose.orientation.y = 0.0;
-			pose.pose.orientation.z = 0.0;
-			pose.pose.orientation.w = 1.0;
-			new_plan.push_back(pose);
-			// plan_.push_back(pose);
-		}
-
-		// if (max_path_size_ < plan_.size()) {
-		// 	plan_.erase(plan_.begin(), plan_.begin() + plan_.size()-max_path_size_); 
-		// }
-	}
-
-	plan_ = new_plan;
-	
-	// if (max_path_points_ < plan_.size()) {
-	// 		std::vector<geometry_msgs::PoseStamped> cut_plan;
-	// 		for (int i = plan_.size()-max_path_size_; i<plan_.size(); ++i) {
-	// 			cut_plan.push_back(plan_[i]);
-	// 		}
-	// 		plan_ = cut_plan;
-	// }
-
-	plan = plan_;
+	ymg_global_planner_.makePlan(start, goal, plan);
 	publishPlan(plan);
 	return !plan.empty();
 }/*}}}*/
@@ -177,18 +93,6 @@ void YmgGPROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 	}
 
 	plan_pub_.publish(gui_path);
-}/*}}}*/
-
-/**
- * @brief calc distance between two poses
- * @param p1 pose1
- * @param p2 pose2
- */
-inline double YmgGPROS::sq_distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
-{/*{{{*/
-	double dx = p1.pose.position.x - p2.pose.position.x;
-	double dy = p1.pose.position.y - p2.pose.position.y;
-	return sqrt(dx*dx + dy*dy);
 }/*}}}*/
 
 
