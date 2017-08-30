@@ -368,6 +368,7 @@ namespace ymggp {
 	bool YmgGPHybROS::checkStuck(const geometry_msgs::PoseStamped& pose)
 	{/*{{{*/
 		std::cout<<"start time = "<<pose.header.seq<<std::endl;
+		std::cout<<"ros time = "<<ros::Time::now()<<std::endl;
 		return true;
 	}/*}}}*/
 
