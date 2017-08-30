@@ -177,8 +177,6 @@ namespace ymggp {
 	bool YmgGPHybROS::makePlanNavfn (const geometry_msgs::PoseStamped& start, 
       const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 	{/*{{{*/
-    boost::mutex::scoped_lock lock(mutex_);
-
     //clear the plan, just in case
     plan.clear();
 
@@ -336,14 +334,16 @@ namespace ymggp {
   bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
       const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 	{/*{{{*/
+    boost::mutex::scoped_lock lock(mutex_);
+
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return false;
     }
 
 		ROS_INFO("make_plan function is now running");
-		bool result = ymg_global_planner_.makePlan(start, goal, plan);
-		// bool result = makePlanNavfn(start, goal, tolerance, plan);
+		// bool result = ymg_global_planner_.makePlan(start, goal, plan);
+		bool result = makePlanNavfn(start, goal, tolerance, plan);
 
     publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
 
