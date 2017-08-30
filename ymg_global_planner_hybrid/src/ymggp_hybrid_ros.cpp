@@ -341,9 +341,9 @@ namespace ymggp {
       return false;
     }
 
-		ROS_INFO("make_plan function is now running");
-		// bool result = ymg_global_planner_.makePlan(start, goal, plan);
-		bool result = makePlanNavfn(start, goal, tolerance, plan);
+		// ROS_INFO("make_plan function is now running");
+		bool result = ymg_global_planner_.makePlan(start, goal, plan);
+		// bool result = makePlanNavfn(start, goal, tolerance, plan);
 
     publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
 
