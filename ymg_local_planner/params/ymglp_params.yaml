@@ -17,7 +17,7 @@ YmgLPROS:
   xy_goal_tolerance: 0.2
 
   sim_time_obstacle: 4.0
-  sim_time_trajectory: 2.0
+  sim_time_trajectory: 1.5
   sim_granularity: 0.025
   vx_samples: 3
   vy_samples: 0
