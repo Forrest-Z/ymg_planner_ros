@@ -35,12 +35,17 @@ double MapGridCostFunctionKai::getCellCosts (unsigned int px, unsigned int py)
   return grid_dist;
 }/*}}}*/
 
-double MapGridCostFunctionKai::scoreTrajectory(Trajectory &traj)
+double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 {/*{{{*/
   double cost = 0.0;
   double foot_x, foot_y, foot_th;
   unsigned int foot_cell_x, foot_cell_y;
   double foot_grid_dist;
+
+	if (!traj.getPointsSize()) {
+		ROS_ERROR("trajectory size is zero");
+		return 5.0;
+	}
 
 	int score_traj_index = (traj.getPointsSize()-1) * valid_traj_ratio_; 
 	// std::cout<<"traj_size - score_traj_index = "<<traj.getPointsSize()<<" - "<<score_traj_index<<std::endl;
