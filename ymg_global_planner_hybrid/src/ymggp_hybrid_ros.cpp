@@ -35,7 +35,8 @@ namespace ymggp {
 
       ros::NodeHandle private_nh("~/" + name);
 
-      plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
+      navfn_plan_pub_ = private_nh.advertise<nav_msgs::Path>("navfn_plan", 1);
+      ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
 
       private_nh.param("visualize_potential", visualize_potential_, false);
 
@@ -57,6 +58,7 @@ namespace ymggp {
 
       make_plan_srv_ =  private_nh.advertiseService("make_plan", &YmgGPHybROS::makePlanService, this);
 		
+			use_navfn_ = false;
 			ymg_global_planner_.initialize(global_frame, path_resolution);
 
       initialized_ = true;
@@ -174,8 +176,7 @@ namespace ymggp {
     wy = costmap_->getOriginY() + my * costmap_->getResolution();
   }/*}}}*/
 
-	bool YmgGPHybROS::makePlanNavfn (const geometry_msgs::PoseStamped& start, 
-      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
+	bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 	{/*{{{*/
     boost::mutex::scoped_lock lock(mutex_);
 
@@ -324,7 +325,17 @@ namespace ymggp {
       potarr_pub_.publish(pot_area);
     }
 
+    publishNavfnPlan(plan);
+
     return !plan.empty();
+	}/*}}}*/
+	
+	bool YmgGPHybROS::makeYmggpPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
+	{/*{{{*/
+		ymg_global_planner_.makePlan(start, goal, plan);
+		publishYmggpPlan(plan);
+
+		return !plan.empty();
 	}/*}}}*/
 
   bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
@@ -341,16 +352,26 @@ namespace ymggp {
       return false;
     }
 
-		// ROS_INFO("make_plan function is now running");
-		bool result = ymg_global_planner_.makePlan(start, goal, plan);
-		// bool result = makePlanNavfn(start, goal, tolerance, plan);
+		plan.clear();
+		bool result = makeYmggpPlan(start, goal, plan);
 
-    publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
+		checkStuck(start);
+
+		if (use_navfn_) {
+			plan.clear();
+			result = makeNavfnPlan(start, goal, tolerance, plan);
+		}
 
 		return result;
   }/*}}}*/
 
-  void YmgGPHybROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a)
+	bool YmgGPHybROS::checkStuck(const geometry_msgs::PoseStamped& pose)
+	{/*{{{*/
+		std::cout<<"start time = "<<pose.header.seq<<std::endl;
+		return true;
+	}/*}}}*/
+
+  void YmgGPHybROS::publishNavfnPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
@@ -372,7 +393,32 @@ namespace ymggp {
       gui_path.poses[i] = path[i];
     }
 
-    plan_pub_.publish(gui_path);
+    navfn_plan_pub_.publish(gui_path);
+  }/*}}}*/
+
+  void YmgGPHybROS::publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& path)
+	{/*{{{*/
+    if(!initialized_){
+      ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+      return;
+    }
+
+    //create a message for the plan 
+    nav_msgs::Path gui_path;
+    gui_path.poses.resize(path.size());
+
+    if(!path.empty())
+    {
+      gui_path.header.frame_id = path[0].header.frame_id;
+      gui_path.header.stamp = path[0].header.stamp;
+    }
+
+    // Extract the plan in world co-ordinates, we assume the path is all in the same frame
+    for(unsigned int i=0; i < path.size(); i++){
+      gui_path.poses[i] = path[i];
+    }
+
+    navfn_plan_pub_.publish(gui_path);
   }/*}}}*/
 
   bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
@@ -435,7 +481,8 @@ namespace ymggp {
     }
 
     //publish the plan for visualization purposes
-    publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
+    publishNavfnPlan(plan);
+
     return !plan.empty();
   }/*}}}*/
 };

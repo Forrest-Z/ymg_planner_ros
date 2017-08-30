@@ -65,8 +65,18 @@ namespace ymggp {
        * @param plan The plan... filled by the planner
        * @return True if a valid plan was found, false otherwise
        */
-      bool makePlanNavfn(const geometry_msgs::PoseStamped& start, 
+      bool makeNavfnPlan(const geometry_msgs::PoseStamped& start, 
           const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan);
+
+      /**
+       * @brief Given a goal pose in the world, compute a plan
+       * @param start The start pose 
+       * @param goal The goal pose 
+       * @param plan The plan... filled by the planner
+       * @return True if a valid plan was found, false otherwise
+       */
+      bool makeYmggpPlan(const geometry_msgs::PoseStamped& start, 
+          const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);
 
       /**
        * @brief Given a goal pose in the world, compute a plan
@@ -129,7 +139,8 @@ namespace ymggp {
       /**
        * @brief  Publish a path for visualization purposes
        */
-      void publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a);
+      void publishNavfnPlan(const std::vector<geometry_msgs::PoseStamped>& path);
+      void publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 
       ~YmgGPHybROS(){}
 
@@ -142,7 +153,7 @@ namespace ymggp {
        */
       costmap_2d::Costmap2D* costmap_;
       boost::shared_ptr<navfn::NavFn> planner_;
-      ros::Publisher plan_pub_;
+      ros::Publisher navfn_plan_pub_, ymggp_plan_pub_;
       pcl_ros::Publisher<navfn::PotarrPoint> potarr_pub_;
       bool initialized_, allow_unknown_, visualize_potential_;
 
@@ -154,6 +165,8 @@ namespace ymggp {
         return dx*dx +dy*dy;
       }
 
+
+			bool use_navfn_;
       void mapToWorld(double mx, double my, double& wx, double& wy);
       void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
       double planner_window_x_, planner_window_y_, default_tolerance_;
@@ -162,6 +175,8 @@ namespace ymggp {
       ros::ServiceServer make_plan_srv_;
       std::string global_frame_;
 			YmgGP ymg_global_planner_;
+			bool checkStuck(const geometry_msgs::PoseStamped& pose);
+			std::vector<geometry_msgs::PoseStamped> pose_history_;
   };
 };
 
