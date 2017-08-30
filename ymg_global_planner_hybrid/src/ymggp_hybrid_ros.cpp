@@ -26,7 +26,8 @@ namespace ymggp {
       initialize(name, costmap, global_frame);
   }
 
-  void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame){
+  void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
+	{/*{{{*/
     if(!initialized_){
       costmap_ = costmap;
       global_frame_ = global_frame;
@@ -57,17 +58,20 @@ namespace ymggp {
     }
     else
       ROS_WARN("This planner has already been initialized, you can't call it twice, doing nothing");
-  }
+  }/*}}}*/
 
-  void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
+  void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
+	{/*{{{*/
     initialize(name, costmap_ros->getCostmap(), costmap_ros->getGlobalFrameID());
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point){
+  bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point)
+	{/*{{{*/
     return validPointPotential(world_point, default_tolerance_);
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point, double tolerance){
+  bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point, double tolerance)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return false;
@@ -92,9 +96,10 @@ namespace ymggp {
     }
 
     return false;
-  }
+  }/*}}}*/
 
-  double YmgGPHybROS::getPointPotential(const geometry_msgs::Point& world_point){
+  double YmgGPHybROS::getPointPotential(const geometry_msgs::Point& world_point)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return -1.0;
@@ -106,9 +111,10 @@ namespace ymggp {
 
     unsigned int index = my * planner_->nx + mx;
     return planner_->potarr[index];
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::computePotential(const geometry_msgs::Point& world_point){
+  bool YmgGPHybROS::computePotential(const geometry_msgs::Point& world_point)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return false;
@@ -134,9 +140,10 @@ namespace ymggp {
     planner_->setGoal(map_goal);
 
     return planner_->calcNavFnDijkstra();
-  }
+  }/*}}}*/
 
-  void YmgGPHybROS::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my){
+  void YmgGPHybROS::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return;
@@ -144,34 +151,28 @@ namespace ymggp {
 
     //set the associated costs in the cost map to be free
     costmap_->setCost(mx, my, costmap_2d::FREE_SPACE);
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp){
+  bool YmgGPHybROS::makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp)
+	{/*{{{*/
     makePlan(req.start, req.goal, resp.plan.poses);
 
     resp.plan.header.stamp = ros::Time::now();
     resp.plan.header.frame_id = global_frame_;
 
     return true;
-  } 
+  } /*}}}*/
 
-  void YmgGPHybROS::mapToWorld(double mx, double my, double& wx, double& wy) {
+  void YmgGPHybROS::mapToWorld(double mx, double my, double& wx, double& wy)
+	{/*{{{*/
     wx = costmap_->getOriginX() + mx * costmap_->getResolution();
     wy = costmap_->getOriginY() + my * costmap_->getResolution();
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
-      const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
-    return makePlan(start, goal, default_tolerance_, plan);
-  }
-
-  bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
-      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan){
+	bool YmgGPHybROS::makePlanNavfn (const geometry_msgs::PoseStamped& start, 
+      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
+	{/*{{{*/
     boost::mutex::scoped_lock lock(mutex_);
-    if(!initialized_){
-      ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
-      return false;
-    }
 
     //clear the plan, just in case
     plan.clear();
@@ -322,9 +323,27 @@ namespace ymggp {
     publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
 
     return !plan.empty();
-  }
+	}/*}}}*/
 
-  void YmgGPHybROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a){
+  bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
+      const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
+	{/*{{{*/
+    return makePlan(start, goal, default_tolerance_, plan);
+  }/*}}}*/
+
+  bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start, 
+      const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
+	{/*{{{*/
+    if(!initialized_){
+      ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
+      return false;
+    }
+
+		return makePlanNavfn(start, goal, tolerance, plan);
+  }/*}}}*/
+
+  void YmgGPHybROS::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path, double r, double g, double b, double a)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return;
@@ -346,9 +365,10 @@ namespace ymggp {
     }
 
     plan_pub_.publish(gui_path);
-  }
+  }/*}}}*/
 
-  bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan){
+  bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
+	{/*{{{*/
     if(!initialized_){
       ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
       return false;
@@ -409,5 +429,5 @@ namespace ymggp {
     //publish the plan for visualization purposes
     publishPlan(plan, 0.0, 1.0, 0.0, 0.0);
     return !plan.empty();
-  }
+  }/*}}}*/
 };

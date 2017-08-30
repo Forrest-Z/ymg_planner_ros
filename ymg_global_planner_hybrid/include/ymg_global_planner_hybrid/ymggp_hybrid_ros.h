@@ -60,6 +60,17 @@ namespace ymggp {
        * @brief Given a goal pose in the world, compute a plan
        * @param start The start pose 
        * @param goal The goal pose 
+       * @param tolerance The tolerance on the goal point for the planner
+       * @param plan The plan... filled by the planner
+       * @return True if a valid plan was found, false otherwise
+       */
+      bool makePlanNavfn(const geometry_msgs::PoseStamped& start, 
+          const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan);
+
+      /**
+       * @brief Given a goal pose in the world, compute a plan
+       * @param start The start pose 
+       * @param goal The goal pose 
        * @param plan The plan... filled by the planner
        * @return True if a valid plan was found, false otherwise
        */
