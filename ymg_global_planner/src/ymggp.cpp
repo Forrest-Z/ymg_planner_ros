@@ -48,10 +48,10 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 		return false;
 	}
 
-	ros::Time plan_time = ros::Time::now();
+	ros::Time time_now = ros::Time::now();
 	if (plan_.empty()) {
 		geometry_msgs::PoseStamped pose;
-		pose.header.stamp = plan_time;
+		pose.header.stamp = time_now;
 		pose.header.frame_id = global_frame_;
 		pose.pose.position = start.pose.position;
 		pose.pose.orientation = start.pose.orientation;
@@ -85,7 +85,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 		for (int i=1; i<=points; ++i)
 		{
 			geometry_msgs::PoseStamped pose;
-			pose.header.stamp = plan_time;
+			pose.header.stamp = time_now;
 			pose.header.frame_id = global_frame_;
 			pose.pose.position.x = endpoint.pose.position.x + step_x * i;
 			pose.pose.position.y = endpoint.pose.position.y + step_y * i;

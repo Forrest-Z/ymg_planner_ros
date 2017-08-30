@@ -36,4 +36,5 @@ add_library(ymggp_hybrid
 	)
 target_link_libraries(ymggp_hybrid
 	${catkin_LIBRARIES}
+	ymggp
 	)
