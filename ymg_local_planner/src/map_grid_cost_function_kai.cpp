@@ -43,8 +43,8 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
   double foot_grid_dist;
 
 	if (!traj.getPointsSize()) {
-		ROS_ERROR("trajectory size is zero");
-		return 5.0;
+		// ROS_ERROR("trajectory size is zero");
+		return -6.0;
 	}
 
 	int score_traj_index = (traj.getPointsSize()-1) * valid_traj_ratio_; 
