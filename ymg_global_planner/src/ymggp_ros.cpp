@@ -95,7 +95,10 @@ bool YmgGPROS::makePlan(const geometry_msgs::PoseStamped& start,
 		double dist = sq_distance(start, plan_[i]);
 		if (dist < min_dist) {
 			min_dist = dist;
+		}
+		else {
 			min_dist_path_index = i;
+			break;
 		}
 	}
 
