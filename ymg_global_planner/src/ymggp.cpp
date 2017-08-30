@@ -100,6 +100,8 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 
 	plan_ = new_plan;
 	plan = new_plan;
+
+	return !plan.empty();
 }/*}}}*/
 
 /**
