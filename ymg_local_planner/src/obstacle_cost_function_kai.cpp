@@ -5,7 +5,7 @@
 
 namespace base_local_planner {
 
-ObstacleCostFnctionKai::ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap,
+ObstacleCostFunctionKai::ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
 		double additional_sim_time, double sim_granularity) 
     : costmap_(costmap), sum_scores_(false),
 		additional_sim_time_(additional_sim_time), sim_granularity_(sim_granularity) {
@@ -14,29 +14,29 @@ ObstacleCostFnctionKai::ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap,
   }
 }
 
-ObstacleCostFnctionKai::~ObstacleCostFnctionKai() {
+ObstacleCostFunctionKai::~ObstacleCostFunctionKai() {
   if (world_model_ != NULL) {
     delete world_model_;
   }
 }
 
 
-void ObstacleCostFnctionKai::setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed) {
+void ObstacleCostFunctionKai::setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed) {
   // TODO: move this to prepare if possible
   max_trans_vel_ = max_trans_vel;
   max_scaling_factor_ = max_scaling_factor;
   scaling_speed_ = scaling_speed;
 }
 
-void ObstacleCostFnctionKai::setFootprint(std::vector<geometry_msgs::Point> footprint_spec) {
+void ObstacleCostFunctionKai::setFootprint(std::vector<geometry_msgs::Point> footprint_spec) {
   footprint_spec_ = footprint_spec;
 }
 
-bool ObstacleCostFnctionKai::prepare() {
+bool ObstacleCostFunctionKai::prepare() {
   return true;
 }
 
-double ObstacleCostFnctionKai::scoreTrajectory(Trajectory &traj)
+double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {
 	// Trajectory traj = orig_traj;
 	if (0.0 < additional_sim_time_) {
@@ -78,7 +78,7 @@ double ObstacleCostFnctionKai::scoreTrajectory(Trajectory &traj)
   return cost;
 }
 
-double ObstacleCostFnctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor) {
+double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor) {
   double vmag = hypot(traj.xv_, traj.yv_);
 
   //if we're over a certain speed threshold, we'll scale the robot's
@@ -92,7 +92,7 @@ double ObstacleCostFnctionKai::getScalingFactor(Trajectory &traj, double scaling
   return scale;
 }
 
-double ObstacleCostFnctionKai::footprintCost (
+double ObstacleCostFunctionKai::footprintCost (
     const double& x,
     const double& y,
     const double& th,

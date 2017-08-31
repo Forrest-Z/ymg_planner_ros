@@ -84,6 +84,7 @@ namespace ymglp {
 /*{{{*/
       planner_util_(planner_util),
       obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
+      // obstacle_costs_(planner_util->getCostmap()),
       path_costs_(planner_util->getCostmap(), false),
       goal_costs_(planner_util->getCostmap(), true)
   {

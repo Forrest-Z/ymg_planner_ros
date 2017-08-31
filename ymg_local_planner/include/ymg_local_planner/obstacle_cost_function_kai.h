@@ -9,16 +9,16 @@
 namespace base_local_planner {
 
 /**
- * class ObstacleCostFnctionKai
+ * class ObstacleCostFunctionKai
  * @brief Uses costmap 2d to assign negative costs if robot footprint
  * is in obstacle on any point of the trajectory.
  */
-class ObstacleCostFnctionKai : public TrajectoryCostFunction {
+class ObstacleCostFunctionKai : public TrajectoryCostFunction {
 
 public:
-  ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap,
+  ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
 			double additional_sim_time = -1.0, double sim_granularity = 0.025);
-  ~ObstacleCostFnctionKai();
+  ~ObstacleCostFunctionKai();
 
   bool prepare();
   double scoreTrajectory(Trajectory &traj);
