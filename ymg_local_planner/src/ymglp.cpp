@@ -22,26 +22,25 @@ namespace ymglp {
     boost::mutex::scoped_lock l(configuration_mutex_);
 
     generator_.setParameters(
-        config.sim_time_obstacle,
+        config.sim_time,
         config.sim_granularity,
         config.angular_sim_granularity,
         sim_period_);
 
     double resolution = planner_util_->getCostmap()->getResolution();
-		double valid_traj_ratio = config.sim_time_trajectory / config.sim_time_obstacle;
 
     pdist_scale_ = config.path_distance_bias;
     path_costs_.setScale(resolution * pdist_scale_);
     path_costs_.setForwardPointDistance(config.forward_point_distance);
-    path_costs_.setValidTrajRatio(valid_traj_ratio);
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
     goal_costs_.setForwardPointDistance(config.forward_point_distance);
-    goal_costs_.setValidTrajRatio(valid_traj_ratio);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);
+		obstacle_costs_.setAdditionalSimTime(config.additional_sim_time);
+		obstacle_costs_.setSimGranularity(config.sim_granularity);
 
     stop_time_buffer_ = config.stop_time_buffer;
     oscillation_costs_.setOscillationResetDist(config.oscillation_reset_dist, config.oscillation_reset_angle);

@@ -27,6 +27,8 @@ public:
 
   void setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed);
   void setFootprint(std::vector<geometry_msgs::Point> footprint_spec);
+	void setAdditionalSimTime (double additional_sim_time) { additional_sim_time_ = additional_sim_time; }
+	void setSimGranularity (double sim_granularity) { sim_granularity_ = sim_granularity; }
 
   // helper functions, made static for easy unit testing
   static double getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor);

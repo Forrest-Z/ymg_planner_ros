@@ -16,17 +16,17 @@ YmgLPROS:
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.2
 
-  sim_time_obstacle: 1.5
-  sim_time_trajectory: 1.5
+  sim_time: 1.5
   sim_granularity: 0.025
   angular_sim_granularity: 0.1
+  additional_sim_time: 2.5
   vx_samples: 4
   vy_samples: 0
   vth_samples: 19
   controller_frequency: 5.0
 
-  path_distance_bias: 32.0
-  goal_distance_bias: 12.0
+  path_distance_bias: 40.0
+  goal_distance_bias: 10.0
   occdist_scale: 0.01
 
   local_goal_distance: 2.0
