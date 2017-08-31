@@ -138,7 +138,10 @@ namespace ymglp {
       // base_local_planner::MapGridCostFunctionKai goal_front_costs_;
       // base_local_planner::MapGridCostFunctionKai alignment_costs_;
 
+			inline double sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
       base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
+			double local_goal_distance_;
+      ros::Publisher local_goal_pub_;
   };
 };
 #endif

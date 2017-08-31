@@ -48,6 +48,8 @@ namespace ymglp {
     // obstacle costs can vary due to scaling footprint feature
     obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
 
+		local_goal_distance_ = config.local_goal_distance;
+
     int vx_samp, vy_samp, vth_samp;
     vx_samp = config.vx_samples;
     vy_samp = config.vy_samples;
@@ -141,6 +143,7 @@ namespace ymglp {
     generator_list.push_back(&generator_);
 
     scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
+		local_goal_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("local_goal", 1);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);
   }/*}}}*/
@@ -211,10 +214,52 @@ namespace ymglp {
     // costs for going away from path
     path_costs_.setTargetPoses(global_plan_);
 
+		geometry_msgs::PoseStamped current_pose;
+		current_pose.pose.position.x = global_pose.getOrigin().getX();
+		current_pose.pose.position.y = global_pose.getOrigin().getY();
+
+		// find closest point in the global plan
+		int closest_index = global_plan_.size();
+		double closest_dist = 1000.0;
+		for (int i=0; i<global_plan_.size(); ++i) {
+			double dist = sqDistance(current_pose, global_plan_[i]);
+			if (dist < closest_dist) {
+				closest_dist = dist;
+				closest_index = i;
+			}
+		}
+
+		// calc local goal and shorten the global plan
+		double now_distance = 0.0;
+		int local_goal_index = -1;
+		for (int i=closest_index+1; i<global_plan_.size(); ++i) {
+			now_distance += sqDistance(global_plan_[i-1], global_plan_[i]);
+			if (local_goal_distance_ < now_distance) {
+				local_goal_index = i;
+				break;
+			}
+		}
+
+		std::vector<geometry_msgs::PoseStamped> shortened_plan;
+		for (int i=closest_index; i<local_goal_index; ++i) {
+			shortened_plan.push_back(global_plan_[i]);
+		}
+
+		geometry_msgs::PoseStamped local_goal_msg = shortened_plan.back();
+		local_goal_pub_.publish(local_goal_msg);
+
     // costs for not going towards the local goal as much as possible
-    goal_costs_.setTargetPoses(global_plan_);
+    goal_costs_.setTargetPoses(shortened_plan);
+    // goal_costs_.setTargetPoses(global_plan_);
 
   }/*}}}*/
+
+	inline double YmgLP::sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
+	{/*{{{*/
+		double dx = p1.pose.position.x - p2.pose.position.x;
+		double dy = p1.pose.position.y - p2.pose.position.y;
+		return sqrt(dx*dx + dy*dy);
+	}/*}}}*/
 
 
   /*
