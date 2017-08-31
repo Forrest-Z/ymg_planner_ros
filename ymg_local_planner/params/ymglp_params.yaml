@@ -16,7 +16,7 @@ YmgLPROS:
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.2
 
-  sim_time_obstacle: 4.0
+  sim_time_obstacle: 1.5
   sim_time_trajectory: 1.5
   sim_granularity: 0.025
   angular_sim_granularity: 0.1

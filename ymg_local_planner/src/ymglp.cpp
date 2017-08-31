@@ -83,7 +83,7 @@ namespace ymglp {
   YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
 /*{{{*/
       planner_util_(planner_util),
-      obstacle_costs_(planner_util->getCostmap()),
+      obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
       path_costs_(planner_util->getCostmap(), false),
       goal_costs_(planner_util->getCostmap(), true)
   {
