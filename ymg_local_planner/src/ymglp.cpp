@@ -37,6 +37,7 @@ namespace ymglp {
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
+    goal_costs_.setForwardPointDistance(config.forward_point_distance);
     goal_costs_.setValidTrajRatio(valid_traj_ratio);
 
     occdist_scale_ = config.occdist_scale;

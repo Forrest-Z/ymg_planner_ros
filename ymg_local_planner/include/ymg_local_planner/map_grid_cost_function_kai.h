@@ -25,7 +25,8 @@ namespace base_local_planner {
  */
 class MapGridCostFunctionKai: public base_local_planner::TrajectoryCostFunction {
 public:
-  MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap, bool is_local_goal_function = false);
+  MapGridCostFunctionKai(costmap_2d::Costmap2D* costmap,
+			bool is_local_goal_function = false, double forward_point_distance = -1.0);
 
   ~MapGridCostFunctionKai() {}
 
@@ -33,7 +34,7 @@ public:
    * set line segments on the grid with distance 0, resets the grid
    */
   void setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses);
-
+  
   void setForwardPointDistance(double forward_point_distance) {forward_point_distance_ = forward_point_distance;}
   
 	void setValidTrajRatio(double valid_traj_ratio) {valid_traj_ratio_ = valid_traj_ratio;}
