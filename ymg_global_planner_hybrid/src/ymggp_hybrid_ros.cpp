@@ -49,8 +49,10 @@ namespace ymggp {
       private_nh.param("planner_window_y", planner_window_y_, 0.0);
       private_nh.param("default_tolerance", default_tolerance_, 0.0);
 
-			double path_resolution;
-			private_nh.param("path_resolution", path_resolution, 10.0);
+			private_nh.param("path_resolution", path_resolution_, 10.0);
+			private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
+			private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
+			private_nh.param("recovery_dist", recovery_dist_, 1.0);
 
       //get the tf prefix
       ros::NodeHandle prefix_nh;
@@ -59,7 +61,9 @@ namespace ymggp {
       make_plan_srv_ =  private_nh.advertiseService("make_plan", &YmgGPHybROS::makePlanService, this);
 		
 			use_navfn_ = false;
-			ymg_global_planner_.initialize(global_frame, path_resolution);
+			ymg_global_planner_.initialize(global_frame, path_resolution_);
+			odom_helper_.setOdomTopic("odom");
+			last_move_time_ = ros::Time::now();
 
       initialized_ = true;
     }
@@ -355,21 +359,64 @@ namespace ymggp {
 		plan.clear();
 		bool result = makeYmggpPlan(start, goal, plan);
 
-		checkStuck(start);
+		if (isStuck()) {
+			use_navfn_ = true;
+			setNavfnGoal(plan);
+		}
 
-		if (use_navfn_) {
+		if (use_navfn_)
+		{
 			plan.clear();
-			result = makeNavfnPlan(start, goal, tolerance, plan);
+			if (sq_distance(start, navfn_goal_) < recovery_dist_) {
+				use_navfn_ = false;
+				publishNavfnPlan(plan);
+			}
+			else {
+				result = makeNavfnPlan(start, navfn_goal_, tolerance, plan);
+			}
 		}
 
 		return result;
   }/*}}}*/
 
-	bool YmgGPHybROS::checkStuck(const geometry_msgs::PoseStamped& pose)
+  bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan)
 	{/*{{{*/
-		std::cout<<"start time = "<<pose.header.seq<<std::endl;
-		std::cout<<"ros time = "<<ros::Time::now()<<std::endl;
-		return true;
+		double dist_step = 1.0 / path_resolution_;
+		double dist = 0.0;
+		double px, py;
+		unsigned int cell_x, cell_y;
+
+		for (int i=0; i<plan.size(); ++i) {
+			dist += dist_step;
+			if (navfn_goal_dist_ < dist) {
+				px = plan[i].pose.position.x;
+				py = plan[i].pose.position.y;
+				if (costmap_->worldToMap(px, py, cell_x, cell_y)
+						&& costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
+					navfn_goal_ = plan[i];
+					return true;
+				}
+			}
+		}
+
+		ROS_INFO("setNavfnGoal() cannot find valid goal");
+		navfn_goal_ = plan.back();
+		return false;
+	}/*}}}*/
+
+	bool YmgGPHybROS::isStuck()
+	{/*{{{*/
+    tf::Stamped<tf::Pose> robot_vel;
+    odom_helper_.getRobotVel(robot_vel);
+
+		if (0.05 < robot_vel.getOrigin().getX()) {
+			last_move_time_ = ros::Time::now();
+		}
+		else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time_) {
+			if (!use_navfn_) return true;
+		}
+
+		return false;
 	}/*}}}*/
 
   void YmgGPHybROS::publishNavfnPlan(const std::vector<geometry_msgs::PoseStamped>& path)

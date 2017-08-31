@@ -14,6 +14,7 @@
 #include <nav_msgs/GetPlan.h>
 #include <navfn/potarr_point.h>
 #include <pcl_ros/publisher.h>
+#include <base_local_planner/odometry_helper_ros.h>
 
 namespace ymggp {
   /**
@@ -166,7 +167,6 @@ namespace ymggp {
       }
 
 
-			bool use_navfn_;
       void mapToWorld(double mx, double my, double& wx, double& wy);
       void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
       double planner_window_x_, planner_window_y_, default_tolerance_;
@@ -174,9 +174,18 @@ namespace ymggp {
       boost::mutex mutex_;
       ros::ServiceServer make_plan_srv_;
       std::string global_frame_;
+
+			bool use_navfn_;
 			YmgGP ymg_global_planner_;
-			bool checkStuck(const geometry_msgs::PoseStamped& pose);
-			std::vector<geometry_msgs::PoseStamped> pose_history_;
+      base_local_planner::OdometryHelperRos odom_helper_;
+			bool isStuck();
+			bool setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan);
+			geometry_msgs::PoseStamped navfn_goal_;
+			double path_resolution_;
+			double navfn_goal_dist_;
+			double recovery_dist_;
+			ros::Time last_move_time_;
+			double stuck_timeout_;
   };
 };
 
