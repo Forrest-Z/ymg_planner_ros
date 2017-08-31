@@ -52,7 +52,7 @@ namespace ymggp {
 			private_nh.param("path_resolution", path_resolution_, 10.0);
 			private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
 			private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
-			private_nh.param("recovery_dist", recovery_dist_, 1.0);
+			private_nh.param("recovery_dist", recovery_dist_, 2.0);
 
       //get the tf prefix
       ros::NodeHandle prefix_nh;
