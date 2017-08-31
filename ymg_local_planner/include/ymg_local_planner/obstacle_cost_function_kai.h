@@ -16,7 +16,8 @@ namespace base_local_planner {
 class ObstacleCostFnctionKai : public TrajectoryCostFunction {
 
 public:
-  ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap);
+  ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap,
+			double additional_sim_time = -1.0, double sim_granularity = 0.025);
   ~ObstacleCostFnctionKai();
 
   bool prepare();
@@ -46,6 +47,8 @@ private:
   bool sum_scores_;
   //footprint scaling with velocity;
   double max_scaling_factor_, scaling_speed_;
+
+	double additional_sim_time_, sim_granularity_;
 };
 
 } /* namespace base_local_planner */

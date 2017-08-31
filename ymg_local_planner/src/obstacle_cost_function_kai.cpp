@@ -5,8 +5,10 @@
 
 namespace base_local_planner {
 
-ObstacleCostFnctionKai::ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap) 
-    : costmap_(costmap), sum_scores_(false) {
+ObstacleCostFnctionKai::ObstacleCostFnctionKai(costmap_2d::Costmap2D* costmap,
+		double additional_sim_time, double sim_granularity) 
+    : costmap_(costmap), sum_scores_(false),
+		additional_sim_time_(additional_sim_time), sim_granularity_(sim_granularity) {
   if (costmap != NULL) {
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
   }
@@ -34,7 +36,21 @@ bool ObstacleCostFnctionKai::prepare() {
   return true;
 }
 
-double ObstacleCostFnctionKai::scoreTrajectory(Trajectory &traj) {
+double ObstacleCostFnctionKai::scoreTrajectory(Trajectory &traj)
+{
+	// Trajectory traj = orig_traj;
+	if (0.0 < additional_sim_time_) {
+		double additional_length = traj.xv_ * additional_sim_time_;
+		double additional_points = additional_length / sim_granularity_;
+
+		double ep_x, ep_y, ep_th;
+		traj.getEndpoint(ep_x, ep_y, ep_th);
+		for (int i=0; i<additional_points; ++i) {
+			double len = (i+1) * sim_granularity_;
+			traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
+		}
+	}
+
   double cost = 0;
   double scale = getScalingFactor(traj, scaling_speed_, max_trans_vel_, max_scaling_factor_);
   double px, py, pth;
