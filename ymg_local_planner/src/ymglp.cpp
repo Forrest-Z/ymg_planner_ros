@@ -143,7 +143,7 @@ namespace ymglp {
     generator_list.push_back(&generator_);
 
     scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
-		local_goal_pub_ = private_nh.advertise<geometry_msgs::Point>("local_goal", 1);
+		local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);
   }/*}}}*/
@@ -250,10 +250,11 @@ namespace ymglp {
 			}
 		}
 
-		geometry_msgs::Point local_goal_msg;
-		local_goal_msg.x = shortened_plan.back().pose.position.x;
-		local_goal_msg.y = shortened_plan.back().pose.position.y;
-		local_goal_msg.z = 0.0;
+		geometry_msgs::PointStamped local_goal_msg;
+		local_goal_msg.header = new_plan.front().header;
+		local_goal_msg.point.x = shortened_plan.back().pose.position.x;
+		local_goal_msg.point.y = shortened_plan.back().pose.position.y;
+		local_goal_msg.point.z = 0.0;
 		local_goal_pub_.publish(local_goal_msg);
 
     // costs for not going towards the local goal as much as possible
