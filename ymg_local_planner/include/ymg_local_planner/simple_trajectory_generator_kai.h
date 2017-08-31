@@ -45,8 +45,7 @@ public:
       const Eigen::Vector3f& goal,
       base_local_planner::LocalPlannerLimits* limits,
       const Eigen::Vector3f& vsamples,
-      std::vector<Eigen::Vector3f> additional_samples,
-      bool discretize_by_time = false);
+      std::vector<Eigen::Vector3f> additional_samples);
 
   /**
    * @param pos current robot position
@@ -61,8 +60,7 @@ public:
       const Eigen::Vector3f& vel,
       const Eigen::Vector3f& goal,
       base_local_planner::LocalPlannerLimits* limits,
-      const Eigen::Vector3f& vsamples,
-      bool discretize_by_time = false);
+      const Eigen::Vector3f& vsamples);
 
   /**
    * This function is to be called only when parameters change
@@ -108,9 +106,6 @@ protected:
   base_local_planner::LocalPlannerLimits* limits_;
   Eigen::Vector3f pos_;
   Eigen::Vector3f vel_;
-
-  // whether velocity of trajectory changes over time or not
-  bool discretize_by_time_;
 
   double sim_time_, sim_granularity_, angular_sim_granularity_;
   double sim_period_; // only for dwa

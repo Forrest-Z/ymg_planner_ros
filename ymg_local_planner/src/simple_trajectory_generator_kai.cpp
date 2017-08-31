@@ -12,12 +12,12 @@ void SimpleTrajectoryGeneratorKai::initialise(
     const Eigen::Vector3f& goal,
     base_local_planner::LocalPlannerLimits* limits,
     const Eigen::Vector3f& vsamples,
-    std::vector<Eigen::Vector3f> additional_samples,
-    bool discretize_by_time) {
-  initialise(pos, vel, goal, limits, vsamples, discretize_by_time);
+    std::vector<Eigen::Vector3f> additional_samples)
+{/*{{{*/
+  initialise(pos, vel, goal, limits, vsamples);
   // add static samples if any
   sample_params_.insert(sample_params_.end(), additional_samples.begin(), additional_samples.end());
-}
+}/*}}}*/
 
 
 void SimpleTrajectoryGeneratorKai::initialise(
@@ -25,14 +25,13 @@ void SimpleTrajectoryGeneratorKai::initialise(
     const Eigen::Vector3f& vel,
     const Eigen::Vector3f& goal,
     base_local_planner::LocalPlannerLimits* limits,
-    const Eigen::Vector3f& vsamples,
-    bool discretize_by_time) {
+    const Eigen::Vector3f& vsamples)
+{/*{{{*/
   /*
    * We actually generate all velocity sample vectors here, from which to generate trajectories later on
    */
   double max_vel_th = limits->max_rot_vel;
   double min_vel_th = -1.0 * max_vel_th;
-  discretize_by_time_ = discretize_by_time;
   Eigen::Vector3f acc_lim = limits->getAccLimits();
   pos_ = pos;
   vel_ = vel;
@@ -77,30 +76,33 @@ void SimpleTrajectoryGeneratorKai::initialise(
       y_it.reset();
     }
   }
-}
+}/*}}}*/
 
 void SimpleTrajectoryGeneratorKai::setParameters(
     double sim_time,
     double sim_granularity,
     double angular_sim_granularity,
-    double sim_period) {
+    double sim_period)
+{/*{{{*/
   sim_time_ = sim_time;
   sim_granularity_ = sim_granularity;
   angular_sim_granularity_ = angular_sim_granularity;
   sim_period_ = sim_period;
-}
+}/*}}}*/
 
 /**
  * Whether this generator can create more trajectories
  */
-bool SimpleTrajectoryGeneratorKai::hasMoreTrajectories() {
+bool SimpleTrajectoryGeneratorKai::hasMoreTrajectories()
+{/*{{{*/
   return next_sample_index_ < sample_params_.size();
-}
+}/*}}}*/
 
 /**
  * Create and return the next sample trajectory
  */
-bool SimpleTrajectoryGeneratorKai::nextTrajectory(Trajectory &comp_traj) {
+bool SimpleTrajectoryGeneratorKai::nextTrajectory(Trajectory &comp_traj)
+{/*{{{*/
   bool result = false;
   if (hasMoreTrajectories()) {
     if (generateTrajectory(
@@ -113,7 +115,7 @@ bool SimpleTrajectoryGeneratorKai::nextTrajectory(Trajectory &comp_traj) {
   }
   next_sample_index_++;
   return result;
-}
+}/*}}}*/
 
 /**
  * @param pos current position of robot
@@ -123,7 +125,8 @@ bool SimpleTrajectoryGeneratorKai::generateTrajectory(
       Eigen::Vector3f pos,
       Eigen::Vector3f vel,
       Eigen::Vector3f sample_target_vel,
-      base_local_planner::Trajectory& traj) {
+      base_local_planner::Trajectory& traj)
+{/*{{{*/
   double vmag = hypot(sample_target_vel[0], sample_target_vel[1]);
   double eps = 1e-4;
   traj.cost_   = -1.0; // placed here in case we return early
@@ -142,7 +145,7 @@ bool SimpleTrajectoryGeneratorKai::generateTrajectory(
   }
 
   int num_steps;
-  if (discretize_by_time_) {
+  if (angular_sim_granularity_ < 0.0) {
     num_steps = ceil(sim_time_ / sim_granularity_);
   } else {
     //compute the number of steps we must take along this trajectory to be "safe"
@@ -175,22 +178,24 @@ bool SimpleTrajectoryGeneratorKai::generateTrajectory(
   } // end for simulation steps
 
   return num_steps > 0; // true if trajectory has at least one point
-}
+}/*}}}*/
 
 Eigen::Vector3f SimpleTrajectoryGeneratorKai::computeNewPositions(const Eigen::Vector3f& pos,
-    const Eigen::Vector3f& vel, double dt) {
+    const Eigen::Vector3f& vel, double dt)
+{/*{{{*/
   Eigen::Vector3f new_pos = Eigen::Vector3f::Zero();
   new_pos[0] = pos[0] + (vel[0] * cos(pos[2]) + vel[1] * cos(M_PI_2 + pos[2])) * dt;
   new_pos[1] = pos[1] + (vel[0] * sin(pos[2]) + vel[1] * sin(M_PI_2 + pos[2])) * dt;
   new_pos[2] = pos[2] + vel[2] * dt;
   return new_pos;
-}
+}/*}}}*/
 
 /**
  * cheange vel using acceleration limits to converge towards sample_target-vel
  */
 Eigen::Vector3f SimpleTrajectoryGeneratorKai::computeNewVelocities(const Eigen::Vector3f& sample_target_vel,
-    const Eigen::Vector3f& vel, Eigen::Vector3f acclimits, double dt) {
+    const Eigen::Vector3f& vel, Eigen::Vector3f acclimits, double dt)
+{/*{{{*/
   Eigen::Vector3f new_vel = Eigen::Vector3f::Zero();
   for (int i = 0; i < 3; ++i) {
     if (vel[i] < sample_target_vel[i]) {
@@ -200,6 +205,6 @@ Eigen::Vector3f SimpleTrajectoryGeneratorKai::computeNewVelocities(const Eigen::
     }
   }
   return new_vel;
-}
+}/*}}}*/
 
 } /* namespace base_local_planner */
