@@ -243,8 +243,12 @@ namespace ymglp {
 		std::cout<<"plan_size, closest_index, local_goal_index = "<<global_plan_.size()<<", "<<closest_index<<", "<<local_goal_index<<std::endl;
 
 		std::vector<geometry_msgs::PoseStamped> shortened_plan;
-		for (int i=closest_index; i<local_goal_index; ++i) {
-			shortened_plan.push_back(global_plan_[i]);
+		if (local_goal_index == -1) {
+			shortened_plan = global_plan_;
+		} else {
+			for (int i=closest_index; i<local_goal_index; ++i) {
+				shortened_plan.push_back(global_plan_[i]);
+			}
 		}
 
 		geometry_msgs::PoseStamped local_goal_msg = shortened_plan.back();
