@@ -8,6 +8,11 @@
 
 
 
+### Subscribed Topics
+~/YmgGPHybROS/reset_flag (std_msgs/Empty)  
+
+
+
 ### Parameters
 (move base param) ~/base_global_planner: "ymggp/YmgGPHybROS"  
 
