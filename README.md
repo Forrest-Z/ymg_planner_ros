@@ -3,7 +3,7 @@ global and local planner plugins
 
 
 ## ymg_global_planner
-Simple global planner using straight-line interpolation  
+Simple global planner using straight-line interpolation.  
 
 
 ## ymg_global_planner_hybrid
