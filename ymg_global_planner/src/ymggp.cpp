@@ -23,6 +23,19 @@ void YmgGP::initialize (std::string global_frame, double path_resolution)
 }/*}}}*/
 
 /**
+ * @brief clear the plan 
+ */
+void YmgGP::clearPlan ()
+{/*{{{*/
+	if (!initialized_) {
+		std::cout<<"YmgGP has not initialized yet."<<std::endl;
+		return;
+	}
+
+	plan_.clear();
+}/*}}}*/
+
+/**
  * @brief Given a goal pose in the world, compute a plan
  * @param start The start pose 
  * @param goal The goal pose 

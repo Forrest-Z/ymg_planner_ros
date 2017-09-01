@@ -20,6 +20,7 @@ namespace ymggp
 		public:
 			YmgGP() : initialized_(false){};
 			void initialize(std::string global_frame, double path_resolution);
+			void clearPlan();
 			bool makePlan(const geometry_msgs::PoseStamped& start, 
 					const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);
 

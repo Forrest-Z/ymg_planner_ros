@@ -64,6 +64,7 @@ namespace ymggp {
 			ymg_global_planner_.initialize(global_frame, path_resolution_);
 			odom_helper_.setOdomTopic("odom");
 			last_move_time_ = ros::Time::now();
+			reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
 
       initialized_ = true;
     }
@@ -75,6 +76,12 @@ namespace ymggp {
 	{/*{{{*/
     initialize(name, costmap_ros->getCostmap(), costmap_ros->getGlobalFrameID());
   }/*}}}*/
+
+	 void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& flag)
+	{/*{{{*/
+		ymg_global_planner_.clearPlan();
+		use_navfn_ = false;
+	}/*}}}*/
 
   bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point)
 	{/*{{{*/

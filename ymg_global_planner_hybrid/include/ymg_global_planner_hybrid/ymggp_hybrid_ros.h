@@ -186,6 +186,9 @@ namespace ymggp {
 			double recovery_dist_;
 			ros::Time last_move_time_;
 			double stuck_timeout_;
+
+			void resetFlagCallback (const std_msgs::Empty& flag);
+			ros::Subscriber reset_flag_sub_;
   };
 };
 
