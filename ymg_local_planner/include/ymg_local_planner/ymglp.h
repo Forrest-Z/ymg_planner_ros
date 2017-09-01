@@ -19,7 +19,6 @@
 #include <base_local_planner/local_planner_util.h>
 #include <ymg_local_planner/simple_trajectory_generator_kai.h>
 
-#include <base_local_planner/oscillation_cost_function.h>
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 // #include <base_local_planner/obstacle_cost_function.h>
@@ -132,7 +131,6 @@ namespace ymglp {
 
       // see constructor body for explanations
       base_local_planner::SimpleTrajectoryGeneratorKai generator_;
-      base_local_planner::OscillationCostFunction oscillation_costs_;
       base_local_planner::ObstacleCostFunctionKai obstacle_costs_;
       base_local_planner::MapGridCostFunctionKai path_costs_;
       base_local_planner::MapGridCostFunctionKai goal_costs_;
