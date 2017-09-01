@@ -3,7 +3,7 @@
 
 #include <geometry_msgs/PoseStamped.h>
 
-namespace ymglp {
+namespace ymggp {
 
 inline double sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
 {/*{{{*/

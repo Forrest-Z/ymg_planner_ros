@@ -6,6 +6,7 @@
  */
 
 #include <ymg_global_planner/ymggp.h>
+#include <ymg_global_planner/util_function.h>
 
 using namespace ymggp;
 
@@ -60,17 +61,11 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 	
 	// get nearest plan index and shorten trajectory
 	double min_dist = 1000.0;
-	int min_dist_path_index = 0;
-	for (int i=0; i<plan_.size(); ++i) {
-		double dist = sqDistance(start, plan_[i]);
-		if (dist < min_dist) {
-			min_dist = dist;
-			min_dist_path_index = i;
-		}
-	}
+	int closest_index = getClosestIndexOfPath(start, plan_);
+	if (closest_index < 0) closest_index = 0;
 
 	std::vector<geometry_msgs::PoseStamped> new_plan;
-	for (int i=min_dist_path_index; i<plan_.size(); ++i) {
+	for (int i=closest_index; i<plan_.size(); ++i) {
 		new_plan.push_back(plan_[i]);
 	}
 
@@ -102,17 +97,5 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 	plan = new_plan;
 
 	return !plan.empty();
-}/*}}}*/
-
-/**
- * @brief calc distance between two poses
- * @param p1 pose1
- * @param p2 pose2
- */
-inline double YmgGP::sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
-{/*{{{*/
-	double dx = p1.pose.position.x - p2.pose.position.x;
-	double dy = p1.pose.position.y - p2.pose.position.y;
-	return sqrt(dx*dx + dy*dy);
 }/*}}}*/
 

@@ -25,7 +25,7 @@ generate_dynamic_reconfigure_options(
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES ymg_local_planner
 #  CATKIN_DEPENDS costmap_2d geometry_msgs nav_core nav_msgs pluginlib roscpp tf
 #  DEPENDS system_lib

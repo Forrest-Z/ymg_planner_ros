@@ -130,7 +130,7 @@ namespace ymglp {
     // set up all the cost functions that will be applied in order
     // (any function returning negative values will abort scoring, so the order can improve performance)
     std::vector<base_local_planner::TrajectoryCostFunction*> critics;
-    critics.push_back(&oscillation_costs_); // discards oscillating motions (assisgns cost -1)
+    // critics.push_back(&oscillation_costs_); // discards oscillating motions (assisgns cost -1)
     // critics.push_back(&goal_front_costs_); // prefers trajectories that make the nose go towards (local) nose goal
     // critics.push_back(&alignment_costs_); // prefers trajectories that keep the robot nose on nose path
     critics.push_back(&path_costs_); // prefers trajectories on global path
@@ -218,15 +218,8 @@ namespace ymglp {
 		current_pose.pose.position.y = global_pose.getOrigin().getY();
 
 		// find closest point in the global plan
-		int closest_index = global_plan_.size();
-		double closest_dist = 1000.0;
-		for (int i=0; i<global_plan_.size(); ++i) {
-			double dist = sqDistance(current_pose, global_plan_[i]);
-			if (dist < closest_dist) {
-				closest_dist = dist;
-				closest_index = i;
-			}
-		}
+		int closest_index = getClosestIndexOfPath(current_pose, global_plan_);
+		if (closest_index < 0) return;
 
 		// calc local goal and shorten the global plan
 		double now_distance = 0.0;

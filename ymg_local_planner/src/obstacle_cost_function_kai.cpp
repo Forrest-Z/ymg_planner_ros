@@ -7,37 +7,43 @@ namespace base_local_planner {
 
 ObstacleCostFunctionKai::ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
 		double additional_sim_time, double sim_granularity) 
-    : costmap_(costmap), sum_scores_(false),
-		additional_sim_time_(additional_sim_time), sim_granularity_(sim_granularity) {
+    :/*{{{*/
+			costmap_(costmap), sum_scores_(false),
+		additional_sim_time_(additional_sim_time), sim_granularity_(sim_granularity)
+	{
   if (costmap != NULL) {
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
   }
-}
+}/*}}}*/
 
-ObstacleCostFunctionKai::~ObstacleCostFunctionKai() {
+ObstacleCostFunctionKai::~ObstacleCostFunctionKai()
+{/*{{{*/
   if (world_model_ != NULL) {
     delete world_model_;
   }
-}
+}/*}}}*/
 
 
-void ObstacleCostFunctionKai::setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed) {
+void ObstacleCostFunctionKai::setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed)
+{/*{{{*/
   // TODO: move this to prepare if possible
   max_trans_vel_ = max_trans_vel;
   max_scaling_factor_ = max_scaling_factor;
   scaling_speed_ = scaling_speed;
-}
+}/*}}}*/
 
-void ObstacleCostFunctionKai::setFootprint(std::vector<geometry_msgs::Point> footprint_spec) {
+void ObstacleCostFunctionKai::setFootprint(std::vector<geometry_msgs::Point> footprint_spec)
+{/*{{{*/
   footprint_spec_ = footprint_spec;
-}
+}/*}}}*/
 
-bool ObstacleCostFunctionKai::prepare() {
+bool ObstacleCostFunctionKai::prepare()
+{/*{{{*/
   return true;
-}
+}/*}}}*/
 
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
-{
+{/*{{{*/
 	// Trajectory traj = orig_traj;
 	if (0.0 < additional_sim_time_) {
 		double additional_length = traj.xv_ * additional_sim_time_;
@@ -76,9 +82,10 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
         cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
   return cost;
-}
+}/*}}}*/
 
-double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor) {
+double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor)
+{/*{{{*/
   double vmag = hypot(traj.xv_, traj.yv_);
 
   //if we're over a certain speed threshold, we'll scale the robot's
@@ -90,7 +97,7 @@ double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scalin
     scale = max_scaling_factor * ratio + 1.0;
   }
   return scale;
-}
+}/*}}}*/
 
 double ObstacleCostFunctionKai::footprintCost (
     const double& x,
@@ -99,7 +106,8 @@ double ObstacleCostFunctionKai::footprintCost (
     double scale,
     std::vector<geometry_msgs::Point> footprint_spec,
     costmap_2d::Costmap2D* costmap,
-    base_local_planner::WorldModel* world_model) {
+    base_local_planner::WorldModel* world_model)
+{/*{{{*/
 
   //check if the footprint is legal
   // TODO: Cache inscribed radius
@@ -118,6 +126,6 @@ double ObstacleCostFunctionKai::footprintCost (
   double occ_cost = std::max(std::max(0.0, footprint_cost), double(costmap->getCost(cell_x, cell_y)));
 
   return occ_cost;
-}
+}/*}}}*/
 
 } /* namespace base_local_planner */

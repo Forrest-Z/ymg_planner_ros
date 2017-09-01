@@ -28,7 +28,6 @@ namespace ymggp
 			std::vector<geometry_msgs::PoseStamped> plan_;
 			std::string global_frame_;
 			double path_resolution_;   //**< path resolution in point/m */
-      inline double sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
 	};
 };   // namespace ymggp
 
