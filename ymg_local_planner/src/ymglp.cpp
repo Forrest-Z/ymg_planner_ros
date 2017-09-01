@@ -3,6 +3,7 @@
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
+#include <ymg_local_planner/util_function.h>
 #include <cmath>
 
 //for computing path distance
@@ -260,14 +261,6 @@ namespace ymglp {
     // goal_costs_.setTargetPoses(global_plan_);
 
   }/*}}}*/
-
-	inline double YmgLP::sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
-	{/*{{{*/
-		double dx = p1.pose.position.x - p2.pose.position.x;
-		double dy = p1.pose.position.y - p2.pose.position.y;
-		return sqrt(dx*dx + dy*dy);
-	}/*}}}*/
-
 
   /*
    * given the current state of the robot, find a good trajectory
