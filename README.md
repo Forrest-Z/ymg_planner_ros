@@ -3,16 +3,17 @@ global and local planner plugins
 
 
 ## ymg_global_planner
-waypointを直線で結ぶだけのシンプルなglobal planner  
+Simple global planner using straight-line interpolation  
 
 
 ## ymg_global_planner_hybrid
-ymg_global_plannerとnavfnを組み合わせたglobal planner  
-基本はymg_global_plannerを用いるが，スタックした場合にnavfn(dijkstra)に切り替える
+Hybrid planner (ymg_global_planner and navfn)  
+Main method is ymg_global_planner.  
+When the robot stucks, this planner uses navfn(dijkstra).  
 
 
 ## ymg_local_planner
-global planに極力沿うように設計したlocal planner  
-dwa_local_plannerを元にしている  
+Local planner based on dwa_local_planner.  
+This planner is designed to follow global plan well.  
 
 
