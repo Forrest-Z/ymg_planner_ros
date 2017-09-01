@@ -473,7 +473,7 @@ namespace ymggp {
       gui_path.poses[i] = path[i];
     }
 
-    navfn_plan_pub_.publish(gui_path);
+    ymggp_plan_pub_.publish(gui_path);
   }/*}}}*/
 
   bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
