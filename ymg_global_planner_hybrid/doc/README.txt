@@ -19,7 +19,7 @@
 ~/YmgGPROS/path_resolution (double[points/m], default: 10.0)
 
 ~/YmgGPROS/stuck_timeout (double[sec], default: 10.0)
-When the robot stop while this time, this planner changes algorithm to dijkstra.
+When the robot stops while this time, this planner changes algorithm to dijkstra.
 
 ~/YmgGPROS/navfn_goal_dist (double[m], default: 5.0)
 
