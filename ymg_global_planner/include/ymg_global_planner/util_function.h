@@ -5,7 +5,14 @@
 
 namespace ymggp {
 
-inline double sqDistance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
+inline double calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
+{/*{{{*/
+	double dx = p1.pose.position.x - p2.pose.position.x;
+	double dy = p1.pose.position.y - p2.pose.position.y;
+	return dx*dx + dy*dy;
+}/*}}}*/
+
+inline double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
 {/*{{{*/
 	double dx = p1.pose.position.x - p2.pose.position.x;
 	double dy = p1.pose.position.y - p2.pose.position.y;
@@ -17,7 +24,7 @@ inline int getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose, const s
 	int closest_index = -1;
 	double dist, min_dist = -1.0;
 	for (int i=0; i<path.size(); ++i) {
-		dist = sqDistance(pose, path[i]);
+		dist = calcSqDist(pose, path[i]);
 		if (dist < min_dist || min_dist < 0) {
 			min_dist = dist;
 			closest_index = i;
