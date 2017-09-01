@@ -201,7 +201,6 @@ namespace ymglp {
     return false;
   }/*}}}*/
 
-
   void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
       const std::vector<geometry_msgs::PoseStamped>& new_plan)
 	{/*{{{*/
@@ -210,8 +209,6 @@ namespace ymglp {
       global_plan_[i] = new_plan[i];
     }
 
-    // costs for going away from path
-    path_costs_.setTargetPoses(global_plan_);
 
 		geometry_msgs::PoseStamped current_pose;
 		current_pose.pose.position.x = global_pose.getOrigin().getX();
@@ -224,8 +221,7 @@ namespace ymglp {
 		// calc local goal and shorten the global plan
 		double now_distance = 0.0;
 		int local_goal_index = -1;
-		// for (int i=closest_index+1; i<global_plan_.size(); ++i) {
-		for (int i=1; i<global_plan_.size(); ++i) {
+		for (int i=closest_index+1; i<global_plan_.size(); ++i) {
 			now_distance += sqDistance(global_plan_[i-1], global_plan_[i]);
 			if (local_goal_distance_ < now_distance) {
 				local_goal_index = i;
@@ -249,6 +245,11 @@ namespace ymglp {
 		local_goal_msg.point.y = shortened_plan.back().pose.position.y;
 		local_goal_msg.point.z = 0.0;
 		local_goal_pub_.publish(local_goal_msg);
+
+
+    // costs for going away from path
+    path_costs_.setTargetPoses(shortened_plan);
+    // path_costs_.setTargetPoses(global_plan_);
 
     // costs for not going towards the local goal as much as possible
     goal_costs_.setTargetPoses(shortened_plan);

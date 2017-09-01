@@ -1,12 +1,17 @@
-Original local planner based on dwa_local_planner
+### Original local planner based on dwa_local_planner
+
+
 
 ### Published Topics
 ~/YmgLPROS/global_plan (nav_msgs/Path)  
 ~/YmgLPROS/local_plan (nav_msgs/Path)  
 ~/YmgLPROS/local_goal (geometry_msgs/PointStamped)  
 
+
+
 ### Parameters
 (move base param) ~/base_local_planner: "ymglp/YmgLPROS"  
+
 
 ~/YmgLPROS/max_trans_vel (double[m/s], default: 0.55)  
 The absolute value of the maximum translational velocity for the robot in m/s  
@@ -44,8 +49,7 @@ The acceleration limit of the robot in the theta direction
 ~/YmgLPROS/acc_limit_trans (double[m/s^2], default: 0.1)  
 The absolute value of the maximum translational acceleration for the robot in m/s^2  
 
-~/YmgLPROS/prune_plan (bool, default: false)  
-Start following closest point of global plan, not first point (if different).  
+
 
 ~/YmgLPROS/xy_goal_tolerance (double[m], default: 0.1)  
 Within what maximum distance we consider the robot to be in goal  
@@ -53,23 +57,29 @@ Within what maximum distance we consider the robot to be in goal
 ~/YmgLPROS/yaw_goal_tolerance (double[rad], default: 0.1)  
 Within what maximum angle difference we consider the robot to face goal direction  
 
+
+
 ~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.1)  
 Below what maximum velocity we consider the robot to be stopped in translation  
 
 ~/YmgLPROS/rot_stopped_vel (double[m/s], default: 0.1)  
 Below what maximum rotation velocity we consider the robot to be stopped in rotation  
 
-~/YmgLPROS/sim_time_obstacle (double[sec], defalut: 1.7)  
+
+
+~/YmgLPROS/sim_time (double[sec], defalut: 1.7)  
 The amount of time to roll trajectories out for in seconds  
 
-~/YmgLPROS/sim_time_trajectory (double[sec], default: 1.7)  
-The amount of time to roll trajectories out for in seconds  
+~/YmgLPROS/additional_sim_time (double[sec], default: 1.7)  
+The amount of time for calc obstacle costs in seconds  
 
 ~/YmgLPROS/sim_granularity (double[m], default: 0.025)  
 The granularity with which to check for collisions along each trajectory in meters  
 
 ~/YmgLPROS/angular_sim_granularity (double[rad], default: 0.1)  
 The granularity with which to check for collisions for rotations in radians  
+
+
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  
@@ -80,14 +90,12 @@ The weight for the goal distance part of the cost function
 ~/YmgLPROS/occdist_scale (double, default: 0.01)  
 The weight for the obstacle distance part of the cost function  
 
+~/YmgLPROS/local_goal_distance (double, default: 2.0)
+The distance to the local goal
+
+
 ~/YmgLPROS/stop_time_buffer (double[sec], default: 0.2)  
 The amount of time that the robot must stop before a collision in order for a trajectory to be considered valid in seconds  
-~/YmgLPROS/oscillation_reset_dist (double[m], default: 0.05)  
-The distance the robot must travel before oscillation flags are reset, in meters  
-
-~/YmgLPROS/oscillation_reset_angle (double[rad], default: 0.2)  
-The angle the robot must turn before oscillation flags are reset, in radians  
-
 ~/YmgLPROS/forward_point_distance (double[m], default: 0.325)  
 The distance from the center point of the robot to place an additional scoring point, in meters  
 
