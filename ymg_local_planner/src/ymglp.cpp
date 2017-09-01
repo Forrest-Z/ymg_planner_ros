@@ -224,7 +224,8 @@ namespace ymglp {
 		// calc local goal and shorten the global plan
 		double now_distance = 0.0;
 		int local_goal_index = -1;
-		for (int i=closest_index+1; i<global_plan_.size(); ++i) {
+		// for (int i=closest_index+1; i<global_plan_.size(); ++i) {
+		for (int i=0; i<global_plan_.size(); ++i) {
 			now_distance += sqDistance(global_plan_[i-1], global_plan_[i]);
 			if (local_goal_distance_ < now_distance) {
 				local_goal_index = i;

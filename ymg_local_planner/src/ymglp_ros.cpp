@@ -42,7 +42,7 @@ namespace ymglp {
       limits.acc_limit_trans = config.acc_limit_trans;
       limits.xy_goal_tolerance = config.xy_goal_tolerance;
       limits.yaw_goal_tolerance = config.yaw_goal_tolerance;
-      limits.prune_plan = config.prune_plan;
+      limits.prune_plan = true;   // XXX ymglp must be set true
       limits.trans_stopped_vel = config.trans_stopped_vel;
       limits.rot_stopped_vel = config.rot_stopped_vel;
       planner_util_.reconfigureCB(limits, config.restore_defaults);

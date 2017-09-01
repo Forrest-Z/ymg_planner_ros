@@ -1,12 +1,12 @@
-
-## Local Planner
+Original local planner based on dwa_local_planner
 
 ### Published Topics
 ~/YmgLPROS/global_plan (nav_msgs/Path)  
 ~/YmgLPROS/local_plan (nav_msgs/Path)  
+~/YmgLPROS/local_goal (geometry_msgs/PointStamped)  
 
 ### Parameters
-(move base param) ~/base_local_planner: "ymglp/YmglPROS"  
+(move base param) ~/base_local_planner: "ymglp/YmgLPROS"  
 
 ~/YmgLPROS/max_trans_vel (double[m/s], default: 0.55)  
 The absolute value of the maximum translational velocity for the robot in m/s  
