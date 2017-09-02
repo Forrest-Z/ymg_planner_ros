@@ -44,10 +44,10 @@ add_library(ymglp
 	src/simple_scored_sampling_planner_kai.cpp
 	src/simple_trajectory_generator_kai.cpp
 	)
-target_link_libraries(ymglp
-	${catkin_LIBRARIES}
-	)
 add_dependencies(ymglp
 	ymg_local_planner_gencfg
+	)
+target_link_libraries(ymglp
+	${catkin_LIBRARIES}
 	)
 
