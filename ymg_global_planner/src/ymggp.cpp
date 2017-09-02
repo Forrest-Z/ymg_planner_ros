@@ -6,7 +6,7 @@
  */
 
 #include <ymg_global_planner/ymggp.h>
-#include <ymg_global_planner/util_function.h>
+#include <ymg_local_planner/util_function.h>
 
 using namespace ymggp;
 
@@ -74,7 +74,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 	
 	// get nearest plan index and shorten trajectory
 	double min_dist = 1000.0;
-	int closest_index = getClosestIndexOfPath(start, plan_);
+	int closest_index = ymglp::getClosestIndexOfPath(start, plan_);
 	if (closest_index < 0) closest_index = 0;
 
 	std::vector<geometry_msgs::PoseStamped> new_plan;
@@ -84,7 +84,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 
 
 	geometry_msgs::PoseStamped endpoint = plan_.back();
-	int points = calcDist(endpoint, goal) * path_resolution_;
+	int points = ymglp::calcDist(endpoint, goal) * path_resolution_;
 	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
 	if (1 <= points) {
 		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
