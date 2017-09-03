@@ -2,7 +2,7 @@
 #include <pluginlib/class_list_macros.h>
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
-#include <costmap_2d/costmap_2d.h>
+#include <ymg_local_planner/util_function.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 
@@ -12,19 +12,23 @@ PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner)
 namespace ymggp {
 
 YmgGPHybROS::YmgGPHybROS() 
+/*{{{*/
 	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {}
+/*}}}*/
 
 YmgGPHybROS::YmgGPHybROS(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
-	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {
-		//initialize the planner
+/*{{{*/
+	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true)
+{
 		initialize(name, costmap_ros);
-	}
+}/*}}}*/
 
 YmgGPHybROS::YmgGPHybROS(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
-	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {
-		//initialize the planner
+/*{{{*/
+	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true)
+{
 		initialize(name, costmap, global_frame);
-	}
+}/*}}}*/
 
 void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
 {/*{{{*/
@@ -284,7 +288,7 @@ bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const 
 		p.pose.position.x = goal.pose.position.x - tolerance;
 		while(p.pose.position.x <= goal.pose.position.x + tolerance){
 			double potential = getPointPotential(p.pose.position);
-			double sdist = sq_distance(p, goal);
+			double sdist = ymglp::calcSqDist(p, goal);
 			if(potential < POT_HIGH && sdist < best_sdist){
 				best_sdist = sdist;
 				best_pose = p;
@@ -367,6 +371,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	bool result = makeYmggpPlan(start, goal, plan);
 
 	if (isStuck()) {
+		ROS_INFO("Robot stacks. Global planner changes algorithm to dijkster.");
 		use_navfn_ = true;
 		setNavfnGoal(plan);
 	}
@@ -374,11 +379,13 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	if (use_navfn_)
 	{
 		plan.clear();
-		if (sq_distance(start, navfn_goal_) < recovery_dist_) {
+		if (ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
+			ROS_INFO("Robot recovers. Global planner changes algorithm to ymggp.");
 			use_navfn_ = false;
 			publishNavfnPlan(plan);
 		}
 		else {
+			updateNavfnGoal(start, plan);
 			result = makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		}
 	}
@@ -388,26 +395,53 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 
 bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
-	double dist_step = 1.0 / path_resolution_;
-	double dist = 0.0;
+	if (plan.empty())
+		return false;
+
+	int forward_index = navfn_goal_dist_ * path_resolution_;
+	setValidGoal(plan, forward_index);
+
+	return true;
+}/*}}}*/
+
+bool YmgGPHybROS::updateNavfnGoal (const geometry_msgs::PoseStamped robot_pos,
+		const std::vector<geometry_msgs::PoseStamped>& plan)
+{/*{{{*/
+	unsigned int cell_x, cell_y;
+	double px = navfn_goal_.pose.position.x;
+	double py = navfn_goal_.pose.position.y;
+
+	// in the costmap and not free space
+	if (!costmap_->worldToMap(px, py, cell_x, cell_y)
+			&& costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
+	{
+		int goal_closest_index = ymglp::getClosestIndexOfPath(navfn_goal_, plan);
+		setValidGoal(plan, goal_closest_index);
+		return true;
+	}
+
+	return false;
+}/*}}}*/
+
+bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index)
+{/*{{{*/
 	double px, py;
 	unsigned int cell_x, cell_y;
 
-	for (int i=0; i<plan.size(); ++i) {
-		dist += dist_step;
-		if (navfn_goal_dist_ < dist) {
-			px = plan[i].pose.position.x;
-			py = plan[i].pose.position.y;
-			if (costmap_->worldToMap(px, py, cell_x, cell_y)
-					&& costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
-				navfn_goal_ = plan[i];
-				return true;
-			}
+	for (int i=start_index; i<plan.size(); ++i) {
+		px = plan[i].pose.position.x;
+		py = plan[i].pose.position.y;
+		// out of the costmap or free space
+		if (!costmap_->worldToMap(px, py, cell_x, cell_y)
+				|| costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
+			navfn_goal_ = plan[i];
+			return true;
 		}
 	}
 
-	ROS_INFO("setNavfnGoal() cannot find valid goal");
+	ROS_INFO("setValidGoal function cannot find valid goal. Set navfn goal to the end point of ymggp path.");
 	navfn_goal_ = plan.back();
+
 	return false;
 }/*}}}*/
 

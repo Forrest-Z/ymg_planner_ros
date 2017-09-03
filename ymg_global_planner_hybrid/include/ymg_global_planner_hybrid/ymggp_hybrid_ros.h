@@ -161,13 +161,6 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 
 	private:
-		inline double sq_distance(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2){
-			double dx = p1.pose.position.x - p2.pose.position.x;
-			double dy = p1.pose.position.y - p2.pose.position.y;
-			return dx*dx +dy*dy;
-		}
-
-
 		void mapToWorld(double mx, double my, double& wx, double& wy);
 		void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
 		double planner_window_x_, planner_window_y_, default_tolerance_;
@@ -176,17 +169,20 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 		ros::ServiceServer make_plan_srv_;
 		std::string global_frame_;
 
-		bool use_navfn_;
 		YmgGP ymg_global_planner_;
 		base_local_planner::OdometryHelperRos odom_helper_;
-		bool isStuck();
-		bool setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan);
-		geometry_msgs::PoseStamped navfn_goal_;
 		double path_resolution_;
 		double navfn_goal_dist_;
 		double recovery_dist_;
 		ros::Time last_move_time_;
 		double stuck_timeout_;
+
+		bool use_navfn_;
+		geometry_msgs::PoseStamped navfn_goal_;
+		bool isStuck();
+		bool setNavfnGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
+		bool updateNavfnGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);
+		bool setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index = 0);
 
 		void resetFlagCallback (const std_msgs::Empty& flag);
 		ros::Subscriber reset_flag_sub_;

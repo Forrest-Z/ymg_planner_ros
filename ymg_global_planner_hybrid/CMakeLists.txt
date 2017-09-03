@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   navfn
   base_local_planner
+  ymg_local_planner
   ymg_global_planner
 	pluginlib
   roscpp
