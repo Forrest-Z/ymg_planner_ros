@@ -17,7 +17,7 @@ class ObstacleCostFunctionKai : public TrajectoryCostFunction {
 
 public:
   ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
-			double additional_sim_time = -1.0, double sim_granularity = 0.025);
+			double additional_sim_time = -1.0, double forward_point_dist = -1.0, double sim_granularity = 0.025);
   ~ObstacleCostFunctionKai();
 
   bool prepare();
@@ -29,6 +29,7 @@ public:
   void setFootprint(std::vector<geometry_msgs::Point> footprint_spec);
 	void setAdditionalSimTime (double additional_sim_time) { additional_sim_time_ = additional_sim_time; }
 	void setSimGranularity (double sim_granularity) { sim_granularity_ = sim_granularity; }
+	void setForwardPointDist (double forward_point_dist) { forward_point_dist_ = forward_point_dist; }
 
   // helper functions, made static for easy unit testing
   static double getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor);
@@ -49,8 +50,8 @@ private:
   bool sum_scores_;
   //footprint scaling with velocity;
   double max_scaling_factor_, scaling_speed_;
-
-	double additional_sim_time_, sim_granularity_;
+	double additional_sim_time_, sim_granularity_, forward_point_dist_;
+	bool isZero(double x);
 };
 
 } /* namespace base_local_planner */

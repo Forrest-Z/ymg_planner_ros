@@ -35,7 +35,7 @@ public:
    */
   void setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses);
   
-  void setForwardPointDistance(double forward_point_distance) {forward_point_distance_ = forward_point_distance;}
+  void setForwardPointDist(double forward_point_dist) {forward_point_dist_ = forward_point_dist;}
   
 	void setValidTrajRatio(double valid_traj_ratio) {valid_traj_ratio_ = valid_traj_ratio;}
 
@@ -75,7 +75,7 @@ private:
 
   base_local_planner::MapGrid map_;
 
-  double forward_point_distance_;
+  double forward_point_dist_;
   // if true, we look for a suitable local goal on path, else we use the full path for costs
   bool is_local_goal_function_;
   bool stop_on_failure_;

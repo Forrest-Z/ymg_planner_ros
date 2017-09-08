@@ -32,16 +32,17 @@ namespace ymglp {
 
     pdist_scale_ = config.path_distance_bias;
     path_costs_.setScale(resolution * pdist_scale_);
-    path_costs_.setForwardPointDistance(config.forward_point_distance);
+    path_costs_.setForwardPointDist(config.forward_point_dist);
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
-    goal_costs_.setForwardPointDistance(config.forward_point_distance);
+    goal_costs_.setForwardPointDist(config.forward_point_dist);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);
 		obstacle_costs_.setAdditionalSimTime(config.additional_sim_time);
 		obstacle_costs_.setSimGranularity(config.sim_granularity);
+		obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
 
     stop_time_buffer_ = config.stop_time_buffer;
 
@@ -80,14 +81,14 @@ namespace ymglp {
 
   }/*}}}*/
 
-  YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util) :
+  YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util)
 /*{{{*/
-      planner_util_(planner_util),
-      obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
-      // obstacle_costs_(planner_util->getCostmap()),
-      path_costs_(planner_util->getCostmap(), false),
-      goal_costs_(planner_util->getCostmap(), true)
-  {
+		: planner_util_(planner_util),
+		obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
+		// obstacle_costs_(planner_util->getCostmap()),
+		path_costs_(planner_util->getCostmap(), false),
+		goal_costs_(planner_util->getCostmap(), true)
+	{
     ros::NodeHandle private_nh("~/" + name);
 
     //Assuming this planner is being run within the navigation stack, we can

@@ -6,10 +6,10 @@
 namespace base_local_planner {
 
 ObstacleCostFunctionKai::ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
-		double additional_sim_time, double sim_granularity) 
-    :/*{{{*/
-			costmap_(costmap), sum_scores_(false),
-		additional_sim_time_(additional_sim_time), sim_granularity_(sim_granularity)
+		double additional_sim_time, double forward_point_dist, double sim_granularity)
+	/*{{{*/
+	: costmap_(costmap), sum_scores_(false), additional_sim_time_(additional_sim_time),
+		forward_point_dist_(forward_point_dist), sim_granularity_(sim_granularity)
 	{
   if (costmap != NULL) {
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
@@ -42,11 +42,21 @@ bool ObstacleCostFunctionKai::prepare()
   return true;
 }/*}}}*/
 
+// XXX new function and has not tested yet.
+bool ObstacleCostFunctionKai::isZero(double x)
+{/*{{{*/
+	return (0<=x && x<DBL_MIN*100);
+}/*}}}*/
+
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
 	// Trajectory traj = orig_traj;
 	if (0.0 < additional_sim_time_) {
 		double additional_length = traj.xv_ * additional_sim_time_;
+		// XXX added but has not tested yet.
+		if (!isZero(traj.xv_)) {
+			additional_length += forward_point_dist_;
+		}
 		double additional_points = additional_length / sim_granularity_;
 
 		double ep_x, ep_y, ep_th;
