@@ -58,6 +58,9 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
 		private_nh.param("recovery_dist", recovery_dist_, 2.0);
 
+		private_nh.param("stuck_vel", stuck_vel_, 0.05);
+		private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
+
 		//get the tf prefix
 		ros::NodeHandle prefix_nh;
 		tf_prefix_ = tf::getPrefixParam(prefix_nh);
@@ -450,7 +453,11 @@ bool YmgGPHybROS::isStuck()
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);
 
-	if (0.05 < robot_vel.getOrigin().getX()) {
+	// XXX this function was changed but has not tested yet.
+	double robot_v = robot_vel.getOrigin().getX();
+	double robot_w = tf::getYaw(robot_vel.getRotation());
+
+	if (stuck_vel_ < fabs(robot_v) || stuck_rot_vel_ < fabs(robot_w)) {
 		last_move_time_ = ros::Time::now();
 	}
 	else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time_) {
