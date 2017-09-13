@@ -371,7 +371,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 
 	plan.clear();
-	bool result = makeYmggpPlan(start, goal, plan);
+	makeYmggpPlan(start, goal, plan);
 
 	if (isStuck()) {
 		ROS_INFO("Robot stacks. Global planner changes algorithm to dijkster.");
@@ -389,11 +389,11 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		}
 		else {
 			updateNavfnGoal(start, plan);
-			result = makeNavfnPlan(start, navfn_goal_, tolerance, plan);
+			makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		}
 	}
 
-	return result;
+	return !plan.empty();
 }/*}}}*/
 
 bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan)
