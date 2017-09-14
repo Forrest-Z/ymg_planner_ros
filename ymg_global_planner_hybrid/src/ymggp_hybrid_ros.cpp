@@ -450,6 +450,10 @@ bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& pl
 
 bool YmgGPHybROS::isStuck()
 {/*{{{*/
+	if (stuck_vel_ < 0.0) {
+		return false;
+	}
+
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);
 
@@ -457,16 +461,12 @@ bool YmgGPHybROS::isStuck()
 	double robot_v = robot_vel.getOrigin().getX();
 	double robot_w = tf::getYaw(robot_vel.getRotation());
 
-	if (stuck_vel_ < fabs(robot_v) || stuck_rot_vel_ < fabs(robot_w)) {
+	if (stuck_vel_ < fabs(robot_v) || (0.0 < stuck_rot_vel_ && stuck_rot_vel_ < fabs(robot_w))) {
 		ROS_INFO("robot moving. now vel = %f", fabs(robot_v));
 		last_move_time_ = ros::Time::now();
 	}
 	else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time_) {
-		ROS_INFO("robot stopping");
 		if (!use_navfn_) return true;
-	}
-	else {
-		ROS_INFO("robot stopping");
 	}
 
 	return false;
