@@ -57,9 +57,6 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		if (!isZero(traj.xv_)) {
 			additional_length += forward_point_dist_;
 		}
-		else {
-			ROS_INFO("vel is zero");
-		}
 
 		double additional_points = additional_length / sim_granularity_;
 
