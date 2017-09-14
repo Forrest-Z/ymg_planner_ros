@@ -2,7 +2,7 @@
 
 YmgGPHybROS:
   path_resolution: 10.0
-  stuck_timeout: 10.0
+  stuck_timeout: 7.0
   navfn_goal_dist: 5.0
   recovery_dist: 2.0
   
