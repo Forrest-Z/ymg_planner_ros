@@ -45,7 +45,7 @@ bool ObstacleCostFunctionKai::prepare()
 // XXX new function and has not tested yet.
 bool ObstacleCostFunctionKai::isZero(double x)
 {/*{{{*/
-	return (0<=x && x<DBL_MIN*100);
+	return (0<=x && x<DBL_MIN*128);
 }/*}}}*/
 
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
@@ -55,6 +55,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		double additional_length = traj.xv_ * additional_sim_time_;
 		// XXX added but has not tested yet.
 		if (!isZero(traj.xv_)) {
+			ROS_INFO("velocity is NOT zero");
 			additional_length += forward_point_dist_;
 		}
 		double additional_points = additional_length / sim_granularity_;
