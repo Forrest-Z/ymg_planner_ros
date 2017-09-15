@@ -85,7 +85,7 @@ namespace ymglp {
 		obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
 		// obstacle_costs_(planner_util->getCostmap()),
 		path_costs_(planner_util->getCostmap(), false),
-		goal_costs_(planner_util->getCostmap(), true)
+		goal_costs_(planner_util->getCostmap(), false)
 	{
     ros::NodeHandle private_nh("~/" + name);
 

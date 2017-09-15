@@ -9,8 +9,7 @@ MapGridCostFunctionKai::MapGridCostFunctionKai (costmap_2d::Costmap2D* costmap,
     map_(costmap->getSizeInCellsX(), costmap->getSizeInCellsY()),
     forward_point_dist_(forward_point_dist),
     is_local_goal_function_(is_local_goal_function),
-    stop_on_failure_(true),
-		valid_traj_ratio_(1.0)
+    stop_on_failure_(false)
 	{}/*}}}*/
 
 void MapGridCostFunctionKai::setTargetPoses(std::vector<geometry_msgs::PoseStamped> target_poses)
@@ -49,9 +48,6 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 		return -6.0;
 	}
 
-	// int score_traj_index = (traj.getPointsSize()-1) * valid_traj_ratio_; 
-	// std::cout<<"traj_size - score_traj_index = "<<traj.getPointsSize()<<" - "<<score_traj_index<<std::endl;
-	// traj.getPoint(score_traj_index, foot_x, foot_y, foot_th);
 	traj.getEndpoint(foot_x, foot_y, foot_th);
 
 	if ( ! costmap_->worldToMap(foot_x, foot_y, foot_cell_x, foot_cell_y)) {
