@@ -15,6 +15,8 @@
 #include <navfn/potarr_point.h>
 #include <pcl_ros/publisher.h>
 #include <base_local_planner/odometry_helper_ros.h>
+#include <std_msgs/Empty.h>
+#include <std_msgs/Int32.h>
 
 namespace ymggp {
 
@@ -187,6 +189,10 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 		void resetFlagCallback (const std_msgs::Empty& flag);
 		ros::Subscriber reset_flag_sub_;
+
+		void useYmggpForceCallback (const std_msgs::Int32& msg);
+		ros::Subscriber use_ymggp_force_sub_;
+		bool use_ymggp_force_;
 
 };   // class YmgGPHybROS
 

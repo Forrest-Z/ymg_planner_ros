@@ -72,6 +72,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		odom_helper_.setOdomTopic("odom");
 		last_move_time_ = ros::Time::now();
 		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
+		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPHybROS::useYmggpForceCallback, this);
 
 		initialized_ = true;
 	}
@@ -88,6 +89,23 @@ void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& flag)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	use_navfn_ = false;
+}/*}}}*/
+
+// XXX this callback function has not checked yet
+void YmgGPHybROS::useYmggpForceCallback (const std_msgs::Int32& msg)
+{/*{{{*/
+	switch (msg.data) {
+		case 0:
+			use_ymggp_force_ = false;
+			break;
+		case 1:
+			use_ymggp_force_ = true;
+			break;
+		case 2:
+			use_ymggp_force_ = true;
+			use_navfn_ = false;
+			break;
+	}
 }/*}}}*/
 
 bool YmgGPHybROS::validPointPotential(const geometry_msgs::Point& world_point)
@@ -343,15 +361,12 @@ bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const 
 		potarr_pub_.publish(pot_area);
 	}
 
-	publishNavfnPlan(plan);
-
 	return !plan.empty();
 }/*}}}*/
 
 bool YmgGPHybROS::makeYmggpPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	ymg_global_planner_.makePlan(start, goal, plan);
-	publishYmggpPlan(plan);
 
 	return !plan.empty();
 }/*}}}*/
@@ -372,25 +387,36 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 
 	plan.clear();
 	makeYmggpPlan(start, goal, plan);
+	publishYmggpPlan(plan);
 
-	if (isStuck()) {
+	// check whether the robot stacks and change algorithm
+	if (isStuck() && !use_ymggp_force_) {
 		ROS_INFO("Robot stacks. Global planner changes algorithm to dijkster.");
 		use_navfn_ = true;
 		setNavfnGoal(plan);
 	}
 
-	if (use_navfn_)
-	{
+	if (use_navfn_) {
 		plan.clear();
+
+		// If the robot get to navfn goal, this planner changes algorithm to ymggp.
 		if (ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
 			ROS_INFO("Robot recovers. Global planner changes algorithm to ymggp.");
 			use_navfn_ = false;
-			publishNavfnPlan(plan);
 		}
+		// calc navfn plan
 		else {
 			updateNavfnGoal(start, plan);
 			makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		}
+
+		publishNavfnPlan(plan);
+	}
+
+	// publish empty navfn plan 
+	else {
+		std::vector<geometry_msgs::PoseStamped> empty_plan;
+		publishNavfnPlan(empty_plan);
 	}
 
 	return !plan.empty();
