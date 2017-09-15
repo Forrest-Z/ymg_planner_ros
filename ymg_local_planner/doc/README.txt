@@ -127,9 +127,12 @@ The distance from the center point of the robot to place an additional scoring p
 
 ~/YmgLPROS/scaling_speed (double[m/s], default: 0.25)  
 The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  
+速度の閾値．ロボットの速度がこの値を超えると，footprintがスケーリングされる．
 
-~/YmgLPROS/max_scaling_factor (double, default: 0.2)  
+~/YmgLPROS/max_scaling_factor (double, default: 1.5)  
 The maximum factor to scale the robot's footprint by  
+footprintのスケーリングの割合の上限．
+デフォルト値を用い，ロボットがmax_trans_velで走行するとfootprintが1.5倍にスケーリングされる．
 
 ~/YmgLPROS/vx_samples (int, default: 3)  
 The number of samples to use when exploring the x velocity space  

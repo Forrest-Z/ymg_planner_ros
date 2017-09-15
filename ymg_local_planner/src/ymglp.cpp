@@ -44,8 +44,6 @@ namespace ymglp {
 		obstacle_costs_.setSimGranularity(config.sim_granularity);
 		obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
 
-    stop_time_buffer_ = config.stop_time_buffer;
-
     // obstacle costs can vary due to scaling footprint feature
     obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
 
