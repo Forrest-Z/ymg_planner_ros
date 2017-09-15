@@ -73,7 +73,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 	
 	// get nearest plan index and shorten trajectory
-	double min_dist = 1000.0;
+	double min_dist = DBL_MAX;
 	int closest_index = ymglp::getClosestIndexOfPath(start, plan_);
 	if (closest_index < 0) closest_index = 0;
 

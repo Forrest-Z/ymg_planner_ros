@@ -105,7 +105,7 @@ double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scalin
   if (vmag > scaling_speed) {
     //scale up to the max scaling factor linearly... this could be changed later
     double ratio = (vmag - scaling_speed) / (max_trans_vel - scaling_speed);
-    scale = max_scaling_factor * ratio + 1.0;
+    scale = (max_scaling_factor - 1.0) * ratio + 1.0;
   }
   return scale;
 }/*}}}*/
@@ -122,6 +122,15 @@ double ObstacleCostFunctionKai::footprintCost (
 
   //check if the footprint is legal
   // TODO: Cache inscribed radius
+	
+	// scaling footprint
+	if (1.0 < scale) {
+		for (int i=0; i<footprint_spec.size(); ++i) {
+			footprint_spec[i].x *= scale;
+			footprint_spec[i].y *= scale;
+		}
+	}
+
   double footprint_cost = world_model->footprintCost(x, y, th, footprint_spec);
 
   if (footprint_cost < 0) {
