@@ -24,7 +24,8 @@ bool MapGridCostFunctionKai::prepare ()
 
   if (is_local_goal_function_) {
     map_.setLocalGoal(*costmap_, target_poses_);
-  } else {
+  }
+	else {
     map_.setTargetCells(*costmap_, target_poses_);
   }
   return true;
@@ -82,8 +83,10 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 	//if a point on this trajectory has no clear path to the goal... it may be invalid
 	if (stop_on_failure_) {
 		if (foot_grid_dist == map_.obstacleCosts()) {
+			ROS_INFO("stop on failure. obstacle.");
 			return -3.0;
 		} else if (foot_grid_dist == map_.unreachableCellCosts()) {
+			ROS_INFO("stop on failure. unreachable.");
 			return -2.0;
 		}
 	}
