@@ -390,7 +390,6 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	publishYmggpPlan(plan);
 
 	if (use_navfn_) {
-		plan.clear();
 
 		// If the robot get to navfn goal, this planner changes algorithm to ymggp.
 		if (ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
@@ -400,6 +399,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		// calc navfn plan
 		else {
 			updateNavfnGoal(start, plan);
+			plan.clear();
 			makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		}
 
