@@ -71,7 +71,6 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		use_navfn_ = false;
 		ymg_global_planner_.initialize(global_frame, path_resolution_);
 		odom_helper_.setOdomTopic("odom");
-		last_move_time_ = ros::Time::now();
 		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
 		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPHybROS::useYmggpForceCallback, this);
 

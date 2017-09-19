@@ -14,7 +14,7 @@ YmgLPROS:
   min_rot_vel: 0.0
 
   yaw_goal_tolerance: 0.3
-  xy_goal_tolerance: 0.4
+  xy_goal_tolerance: 0.3
 
   sim_time: 1.5
   additional_sim_time: 0.0

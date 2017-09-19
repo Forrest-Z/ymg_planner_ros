@@ -176,7 +176,6 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 		double path_resolution_;
 		double navfn_goal_dist_;
 		double recovery_dist_;
-		ros::Time last_move_time_;
 		double stuck_timeout_;
 		double stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
