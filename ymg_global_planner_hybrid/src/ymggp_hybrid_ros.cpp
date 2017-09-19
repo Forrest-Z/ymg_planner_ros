@@ -60,6 +60,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 
 		private_nh.param("stuck_vel", stuck_vel_, 0.05);
 		private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
+		private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
 
 		//get the tf prefix
 		ros::NodeHandle prefix_nh;
@@ -492,7 +493,8 @@ bool YmgGPHybROS::isStuck()
 		last_move_time_ = ros::Time::now();
 	}
 	else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time_) {
-		if (!use_navfn_) return true;
+		// if (!use_navfn_) return true;
+		return true;
 	}
 
 	return false;

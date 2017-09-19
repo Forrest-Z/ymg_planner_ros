@@ -178,7 +178,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 		double recovery_dist_;
 		ros::Time last_move_time_;
 		double stuck_timeout_;
-		double stuck_vel_, stuck_rot_vel_;
+		double stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
 		bool use_navfn_;
 		geometry_msgs::PoseStamped navfn_goal_;

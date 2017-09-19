@@ -106,6 +106,9 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 		}
 	}
 
+	// set direction of the end point
+	new_plan.back().pose.orientation = goal.pose.orientation;
+
 	plan_ = new_plan;
 	plan = new_plan;
 
