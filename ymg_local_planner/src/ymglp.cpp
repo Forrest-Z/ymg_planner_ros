@@ -36,7 +36,8 @@ namespace ymglp {
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
-    goal_costs_.setForwardPointDist(config.forward_point_dist);
+		// XXX changed. goal cost function dose not consider forward point
+    // goal_costs_.setForwardPointDist(config.forward_point_dist);
 
     occdist_scale_ = config.occdist_scale;
     obstacle_costs_.setScale(resolution * occdist_scale_);

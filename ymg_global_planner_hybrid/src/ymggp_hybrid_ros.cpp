@@ -491,6 +491,7 @@ bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start,
 
 	// if the robot is near the goal, return false
 	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
+		ROS_INFO("isStack fcn. robot is near the goal.");
 		last_move_time = ros::Time::now();
 		goal_reached = true;
 		return false;

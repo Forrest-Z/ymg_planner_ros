@@ -124,6 +124,7 @@ The distance to the local goal
 The distance from the center point of the robot to place an additional scoring point, in meters  
 グローバルパスとの距離，ローカルゴールまでの距離からコストを算出する際にロボットの前方に追加の点を置くことができる．
 その際，算出されるコストはロボットの中心と追加の点で算出されたコストの平均値となる．
+設定値を大きくし過ぎるとゴールにたどり着くのが困難になる可能性があるため，xy_goal_toleranceを大きめに取ること．
 
 ~/YmgLPROS/scaling_speed (double[m/s], default: 0.25)  
 The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  
