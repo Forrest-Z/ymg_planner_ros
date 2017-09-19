@@ -391,7 +391,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	publishYmggpPlan(plan);
 
 	// check whether the robot stacks and change algorithm
-	if (isStuck() && !use_ymggp_force_) {
+	if (isStuck(start, goal) && !use_ymggp_force_) {
 		ROS_INFO("Robot stacks. Global planner changes algorithm to dijkster.");
 		use_navfn_ = true;
 		setNavfnGoal(plan);
@@ -475,9 +475,16 @@ bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& pl
 	return false;
 }/*}}}*/
 
-bool YmgGPHybROS::isStuck()
+bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start, 
+		const geometry_msgs::PoseStamped& goal)
 {/*{{{*/
 	if (stuck_vel_ < 0.0) {
+		return false;
+	}
+
+	// if the robot is near the goal, return false
+	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
+		last_move_time_ = ros::Time::now();
 		return false;
 	}
 
@@ -487,10 +494,10 @@ bool YmgGPHybROS::isStuck()
 	// XXX this function was changed but has not tested yet.
 	double robot_v = robot_vel.getOrigin().getX();
 	double robot_w = tf::getYaw(robot_vel.getRotation());
-
 	if (stuck_vel_ < fabs(robot_v) || (0.0 < stuck_rot_vel_ && stuck_rot_vel_ < fabs(robot_w))) {
 		// ROS_INFO("robot moving. now vel = %f", fabs(robot_v));
 		last_move_time_ = ros::Time::now();
+		return false;
 	}
 	else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time_) {
 		// if (!use_navfn_) return true;

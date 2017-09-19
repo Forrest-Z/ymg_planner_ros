@@ -182,7 +182,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 		bool use_navfn_;
 		geometry_msgs::PoseStamped navfn_goal_;
-		bool isStuck();
+		bool isStuck(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal);
 		bool setNavfnGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool updateNavfnGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index = 0);
