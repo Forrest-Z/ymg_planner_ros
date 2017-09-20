@@ -486,16 +486,16 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 	odom_helper_.getRobotVel(robot_vel);
 	double robot_v = robot_vel.getOrigin().getX();
 	double robot_w = tf::getYaw(robot_vel.getRotation());
-	bool v_stuck = false, omega_stuck = false;
+	bool v_is_zero = false, omega_is_zero = false;
 
-	if (0.0 < stuck_vel_ && fabs(robot_v) < stuck_vel_) {
-		v_stuck = true;
+	if (fabs(robot_v) < stuck_vel_) {
+		v_is_zero = true;
 	}
-	if (0.0 < stuck_rot_vel_ && fabs(robot_w) < stuck_rot_vel_) {
-		omega_stuck = true;
+	if (fabs(robot_w) < stuck_rot_vel_ || stuck_rot_vel_ < 0.0) {
+		omega_is_zero = true;
 	}
 
-	if (v_stuck && omega_stuck) {
+	if (v_is_zero && omega_is_zero) {
 		ROS_INFO("[YmgGPHybROS] robot status : stopped");
 		if (robot_status_ != stopped) {
 			stop_time_ = ros::Time::now();
