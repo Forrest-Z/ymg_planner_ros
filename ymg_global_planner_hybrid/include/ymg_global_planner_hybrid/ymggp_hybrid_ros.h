@@ -179,6 +179,13 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 		double stuck_timeout_;
 		double stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
+		enum RobotStatus {moving, stopped, goal_reached};
+		RobotStatus robot_status_;
+		ros::Time stop_time_;
+		void updateRobotStatus(const geometry_msgs::PoseStamped& start,
+				const geometry_msgs::PoseStamped& goal,
+				const std::vector<geometry_msgs::PoseStamped>& plan);
+
 		bool use_navfn_;
 		geometry_msgs::PoseStamped navfn_goal_;
 		bool isStuck(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal);

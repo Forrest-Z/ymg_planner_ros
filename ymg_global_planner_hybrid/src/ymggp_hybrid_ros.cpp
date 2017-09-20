@@ -73,6 +73,8 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		odom_helper_.setOdomTopic("odom");
 		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
 		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPHybROS::useYmggpForceCallback, this);
+		robot_status_ = goal_reached;
+		stop_time_ = ros::Time::now();
 
 		initialized_ = true;
 	}
@@ -366,6 +368,7 @@ bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const 
 
 bool YmgGPHybROS::makeYmggpPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
+	plan.clear();
 	ymg_global_planner_.makePlan(start, goal, plan);
 
 	return !plan.empty();
@@ -385,38 +388,33 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		return false;
 	}
 
-	plan.clear();
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
 
-	if (use_navfn_) {
+	updateRobotStatus(start, goal, plan);
 
-		// If the robot get to navfn goal, this planner changes algorithm to ymggp.
-		if (ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
-			ROS_INFO("Robot recovers. Global planner changes algorithm to ymggp.");
-			use_navfn_ = false;
-		}
-		// calc navfn plan
-		else {
-			updateNavfnGoal(start, plan);
-			plan.clear();
-			makeNavfnPlan(start, navfn_goal_, tolerance, plan);
-		}
-
-		publishNavfnPlan(plan);
+	// changes algorithm to navfn
+	if (use_navfn_ && ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
+		ROS_INFO("[YmgGPHybROS] Changes planner to ymggp.");
+		use_navfn_ = false;
 	}
 
-	// publish empty navfn plan 
+	if (use_navfn_) {
+		updateNavfnGoal(start, plan);
+		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
+		publishNavfnPlan(plan);
+	}
+	else if (!use_ymggp_force_ && robot_status_ == stopped
+			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_) {
+		ROS_INFO("[YmgGPHybROS] Changes planner to navfn.");
+		use_navfn_ = true;
+		setNavfnGoal(plan);
+		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
+		publishNavfnPlan(plan);
+	}
 	else {
 		std::vector<geometry_msgs::PoseStamped> empty_plan;
 		publishNavfnPlan(empty_plan);
-	}
-
-	// check whether the robot stacks and change algorithm
-	if (isStuck(start, goal) && !use_ymggp_force_) {
-		ROS_INFO("Robot stacks. Global planner changes algorithm to dijkster.");
-		use_navfn_ = true;
-		setNavfnGoal(plan);
 	}
 
 	return !plan.empty();
@@ -472,6 +470,43 @@ bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& pl
 	navfn_goal_ = plan.back();
 
 	return false;
+}/*}}}*/
+
+void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
+				const geometry_msgs::PoseStamped& goal,
+				const std::vector<geometry_msgs::PoseStamped>& plan)
+{/*{{{*/
+	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
+		ROS_INFO("[YmgGPHybROS] robot status : goal_reached");
+		robot_status_ = goal_reached;
+		return;
+	}
+
+	tf::Stamped<tf::Pose> robot_vel;
+	odom_helper_.getRobotVel(robot_vel);
+	double robot_v = robot_vel.getOrigin().getX();
+	double robot_w = tf::getYaw(robot_vel.getRotation());
+	bool v_stuck = false, omega_stuck = false;
+
+	if (fabs(robot_v) < stuck_vel_) {
+		v_stuck = true;
+	}
+	if (fabs(robot_w) < stuck_rot_vel_) {
+		omega_stuck = true;
+	}
+
+	if (v_stuck && omega_stuck) {
+		ROS_INFO("[YmgGPHybROS] robot status : stopped");
+		if (robot_status_ != stopped) {
+			stop_time_ = ros::Time::now();
+		}
+		robot_status_ = stopped;
+	}
+	else {
+		ROS_INFO("[YmgGPHybROS] robot status : moving");
+		robot_status_ = moving;
+	}
+
 }/*}}}*/
 
 bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start, 
