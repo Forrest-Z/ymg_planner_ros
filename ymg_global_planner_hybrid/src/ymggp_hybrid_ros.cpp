@@ -488,10 +488,10 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 	double robot_w = tf::getYaw(robot_vel.getRotation());
 	bool v_stuck = false, omega_stuck = false;
 
-	if (fabs(robot_v) < stuck_vel_) {
+	if (0.0 < stuck_vel_ && fabs(robot_v) < stuck_vel_) {
 		v_stuck = true;
 	}
-	if (fabs(robot_w) < stuck_rot_vel_) {
+	if (0.0 < stuck_rot_vel_ && fabs(robot_w) < stuck_rot_vel_) {
 		omega_stuck = true;
 	}
 
