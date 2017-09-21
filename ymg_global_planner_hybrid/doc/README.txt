@@ -4,22 +4,22 @@
 
 ### Published Topics
 ~/YmgGPHybROS/ymggp_plan (nav_msgs/Path)  
-ymggp$B$G;;=P$5$l$k%0%m!<%P%k%Q%9!%(B
+ymggpで算出されるグローバルパス．
 ~/YmgGPHybROS/navfn_plan (nav_msgs/Path)  
-navfn$B$G;;=P$5$l$k%0%m!<%P%k%Q%9!%(Bymggp$B$rMQ$$$F$$$k$H$-$O6u$NG[Ns$H$J$k!%(B
+navfnで算出されるグローバルパス．ymggpを用いているときは空の配列となる．
 
 
 
 ### Subscribed Topics
 ~/YmgGPHybROS/reset_flag (std_msgs/Empty)  
-$B$3$N%U%i%0$r<u$1<h$k$H!$%0%m!<%P%k%Q%9$,6u$K$J$k!%(B
-navfn$B%b!<%I$K@Z$jBX$o$C$F$$$k$H$-$O!$6/@)E*$K(Bymggp$B%b!<%I$K@Z$jBX$o$k!%(B
+このフラグを受け取ると，グローバルパスが空になる．
+navfnモードに切り替わっているときは，強制的にymggpモードに切り替わる．
 
 ~/YmgGPHybROS/use_ymggp_force (std_msgs/Int32)  
-$BCM$NFbMF$O(B0,1,2$B$N$_!%(B
-$B$3$NCM$r@_Dj$9$k$3$H$G!$%9%?%C%/;~$K(Bnavfn$B%b!<%I$K@Z$jBX$o$k$N$rKI$0$3$H$,$G$-$k!%(B
-navfn$B%b!<%I$N>uBV$G(B1$B$r<u$1<h$k$H(Bnavfn$B$N%4!<%k$KE~C#$7$?8e(Bymggp$B%b!<%I$K@Z$jBX$o$k!%(B
-2$B$r<u$1<h$k$H!$8=:_(Bnavfn$B%b!<%I$G$b6/@)E*$K(Bymggp$B%b!<%I$K@Z$jBX$o$k!%(B
+値の内容は0,1,2のみ．
+この値を設定することで，スタック時にnavfnモードに切り替わるのを防ぐことができる．
+navfnモードの状態で1を受け取るとnavfnのゴールに到達した後ymggpモードに切り替わる．
+2を受け取ると，現在navfnモードでも強制的にymggpモードに切り替わる．
 
 
 
@@ -27,25 +27,25 @@ navfn$B%b!<%I$N>uBV$G(B1$B$r<u$1<h$k$H(Bnavfn$B$N%4!<%k$KE~C#$7$?8e(Bymggp
 (move base param) ~/base_global_planner: "ymggp/YmgGPHybROS"  
 
 ~/YmgGPROS/path_resolution (double[points/m], default: 10.0)
-$BE@$N=89g$GI=$5$l$k%0%m!<%P%k%Q%9$NL)EY!%(B
+点の集合で表されるグローバルパスの密度．
 
 ~/YmgGPROS/stuck_timeout (double[sec], default: 10.0)
 When the robot stops while this time, this planner changes algorithm to dijkstra.
-$B$3$NIC?t4V%m%\%C%H$,%9%?%C%/$7$?$i!$%0%m!<%P%k%Q%9$N;;=P%"%k%4%j%:%`$r(Bnavfn(dijkstra$BK!(B)$B$K@Z$jBX$($k!%(B
+この秒数間ロボットがスタックしたら，グローバルパスの算出アルゴリズムをnavfn(dijkstra法)に切り替える．
 
 ~/YmgGPROS/stuck_vel (double[m/s], default: 0.05)
-$B%m%\%C%H$NB.EY$N@dBPCM$,$3$NB.EY0J2<$H$J$C$?>l9g$K%m%\%C%H$,%9%?%C%/$7$?$H$_$J$9!%(B
-$B%^%$%J%9$K%;%C%H$7$?>l9g$O!$%9%?%C%/H=Dj$r9T$o$J$$!%(B(navfn$B$K@Z$jBX$o$i$J$$(B)
+ロボットの速度の絶対値がこの速度以下となった場合にロボットがスタックしたとみなす．
+マイナスにセットした場合は，スタック判定を行わない．(navfnに切り替わらない)
 
 ~/YmgGPROS/stuck_rot_vel (double[rad/s], default: -1.0)
-$B%m%\%C%H$N3QB.EY$N@dBPCM$,$3$NB.EY0J2<$H$J$C$?>l9g$K%m%\%C%H$,%9%?%C%/$7$?$H$_$J$9!%(B
-$B%^%$%J%9$K%;%C%H$7$?>l9g$O3QB.EY$O%9%?%C%/H=Dj$KMQ$$$i$l$J$$!%(B
+ロボットの角速度の絶対値がこの速度以下となった場合にロボットがスタックしたとみなす．
+マイナスにセットした場合は角速度はスタック判定に用いられない．
 
 ~/YmgGPROS/navfn_goal_dist (double[m], default: 5.0)
-navfn$B$K%"%k%4%j%:%`$,@Z$jBX$o$C$?;~!$8=:_CO$+$i(B(ymggp$B$G;;=P$5$l$?%Q%9>e$N(B)$B2?%a!<%H%k@h$K(Bnavfn$B$N%4!<%k$rCV$/$+!%(B
+navfnにアルゴリズムが切り替わった時，現在地から(ymggpで算出されたパス上の)何メートル先にnavfnのゴールを置くか．
 
 ~/YmgGPROS/recovery_dist (double[m], default: 2.0)
-navfn$B%b!<%I;~$K(Bnavfn$B$N%4!<%k$H$N5wN%$,$3$NCM0J2<$H$J$C$?;~!$(Bymggp$B%b!<%I$K@Z$jBX$o$k!%(B
+navfnモード時にnavfnのゴールとの距離がこの値以下となった時，ymggpモードに切り替わる．
 
 ~/YmgGPROS/goal_tolerance (double[m], default: 0.3)
-$B%m%\%C%H$H%4!<%k$N0LCV$,$3$N5wN%0J2<$H$J$C$F;_$^$C$F$$$k;~!$%m%\%C%H$O%9%?%C%/H=Dj$r9T$o$J$$!%(B(navfn$B%b!<%I$K@Z$jBX$o$i$J$$(B)
+ロボットとゴールの位置がこの距離以下となって止まっている時，ロボットはスタック判定を行わない．(navfnモードに切り替わらない)
