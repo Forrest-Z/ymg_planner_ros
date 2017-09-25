@@ -79,7 +79,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
 			double dist = pdist_critic_->scoreTrajectory(comp_traj);
-		ROS_INFO("[ysp] dist = %f", dist);
+			ROS_INFO("[ysp] dist = %f", dist);
 			if (dist < min_dist) {
 				best_traj = comp_traj;
 				min_dist =dist;
@@ -89,6 +89,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		ROS_INFO("[ysp] obstacle = %f", obstacle_cost);
 		if (min_dist < 0.1 && 0<=obstacle_cost && obstacle_cost<=128) {
 			ROS_INFO("found velocity v theta : %f %f", target_vel[0], target_vel[2]);
+			best_traj.cost_ = 10;
 			traj = best_traj;
 			return true;
 		}
