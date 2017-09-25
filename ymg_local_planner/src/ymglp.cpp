@@ -28,6 +28,12 @@ namespace ymglp {
         config.angular_sim_granularity,
         sim_period_);
 
+    ymg_sampling_planner_.setParameters(
+        config.sim_time,
+        config.sim_granularity,
+        config.angular_sim_granularity,
+        sim_period_);
+
     double resolution = planner_util_->getCostmap()->getResolution();
 
     pdist_scale_ = config.path_distance_bias;
@@ -86,7 +92,8 @@ namespace ymglp {
 		obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
 		// obstacle_costs_(planner_util->getCostmap()),
 		path_costs_(planner_util->getCostmap(), false),
-		goal_costs_(planner_util->getCostmap(), true)
+		goal_costs_(planner_util->getCostmap(), true),
+		ymg_sampling_planner_(&path_costs_, &goal_costs_)
 	{
     ros::NodeHandle private_nh("~/" + name);
 
@@ -276,10 +283,13 @@ namespace ymglp {
         &limits,
         vsamples_);
 
+		ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+
     result_traj_.cost_ = -7;
     // find best trajectory by sampling and scoring the samples
     std::vector<base_local_planner::Trajectory> all_explored;
-    scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+    // scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+    ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 
     if(publish_traj_pc_)
     {

@@ -112,10 +112,7 @@ double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scalin
 }/*}}}*/
 
 double ObstacleCostFunctionKai::footprintCost (
-    const double& x,
-    const double& y,
-    const double& th,
-    double scale,
+    const double& x, const double& y, const double& th, double scale,
     std::vector<geometry_msgs::Point> footprint_spec,
     costmap_2d::Costmap2D* costmap,
     base_local_planner::WorldModel* world_model)
