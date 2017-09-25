@@ -69,8 +69,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			target_vel[2] = max_vel_[2] - iw * w_step;
 
 			base_local_planner::Trajectory comp_traj;
-			bool result = generateTrajectory(pos_, vel_, target_vel, comp_traj);
-			ROS_INFO("generate trajectory result : %d", result);
+			generateTrajectory(pos_, vel_, target_vel, comp_traj);
 			double dist = pdist_critics_->scoreTrajectory(comp_traj);
 			ROS_INFO("[ymg_sampling_planner] dist = %f", dist);
 			if (dist < min_dist) {
