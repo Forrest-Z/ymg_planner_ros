@@ -285,7 +285,8 @@ namespace ymglp {
 
 		ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
 
-    result_traj_.cost_ = -7;
+    result_traj_.cost_ = 10;
+    // result_traj_.cost_ = -7;
     // find best trajectory by sampling and scoring the samples
     std::vector<base_local_planner::Trajectory> all_explored;
     // scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
