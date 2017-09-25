@@ -81,6 +81,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 	}
 
+	ROS_INFO("[ymg_sampling_planner] falied to find valid path.");
+
 	base_local_planner::Trajectory stop_traj;
 	Eigen::Vector3f stop_vel;
 	stop_vel[0] = 0.0;
