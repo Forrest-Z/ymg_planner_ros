@@ -135,9 +135,9 @@ namespace ymglp {
       base_local_planner::MapGridCostFunctionKai path_costs_;
       base_local_planner::MapGridCostFunctionKai goal_costs_;
 
+      base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 			YmgSamplingPlanner ymg_sampling_planner_;
 
-      base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 			double local_goal_distance_;
       ros::Publisher local_goal_pub_;
   };
