@@ -57,7 +57,6 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 	
 	foot_grid_dist = getCellCosts(foot_cell_x, foot_cell_y);
 	cost = foot_grid_dist;
-	ROS_INFO("map_grid_cost_function cost = %f", cost);
 
 	// if forward_point_distance set positive, calc heading score
 	if (0.0 < forward_point_dist_) {

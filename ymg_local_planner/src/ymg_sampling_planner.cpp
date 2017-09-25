@@ -61,11 +61,11 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	base_local_planner::Trajectory best_traj;
 
 	if (pdist_critic_->prepare() == false) {
-		ROS_WARN("A scoring function failed to prepare");
+		ROS_WARN("Pdist scoring function failed to prepare");
 		return false;
 	}
 	if (obstacle_critic_->prepare() == false) {
-		ROS_WARN("A scoring function failed to prepare");
+		ROS_WARN("Obstacle scoring function failed to prepare");
 		return false;
 	}
 
@@ -76,19 +76,19 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		double min_dist = DBL_MAX;
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
-			ROS_INFO("target v theta : %f %f", target_vel[0], target_vel[2]);
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
 			double dist = pdist_critic_->scoreTrajectory(comp_traj);
-			ROS_INFO("[ymg_sampling_planner] dist = %f", dist);
+		ROS_INFO("[ysp] dist = %f", dist);
 			if (dist < min_dist) {
 				best_traj = comp_traj;
 				min_dist =dist;
 			}
 		}
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-		ROS_INFO("[ymg_sampling_planner] obstacle = %f", obstacle_cost);
+		ROS_INFO("[ysp] obstacle = %f", obstacle_cost);
 		if (min_dist < 0.1 && 0<=obstacle_cost && obstacle_cost<=128) {
+			ROS_INFO("found velocity v theta : %f %f", target_vel[0], target_vel[2]);
 			traj = best_traj;
 			return true;
 		}
