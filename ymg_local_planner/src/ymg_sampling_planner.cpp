@@ -153,6 +153,10 @@ bool YmgSamplingPlanner::generateTrajectory(
 
 	} // end for simulation steps
 
+  double foot_x, foot_y, foot_th;
+	traj.getEndpoint(foot_x, foot_y, foot_th);
+	ROS_INFO("traj endpoint : %f %f %f", foot_x, foot_y, foot_th);
+
 	return num_steps > 0; // true if trajectory has at least one point
 }/*}}}*/
 
