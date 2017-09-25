@@ -67,7 +67,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		double min_dist = DBL_MAX;
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
-
+			ROS_INFO("target v theta : %f %f", target_vel[0], target_vel[2]);
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
 			double dist = pdist_critics_->scoreTrajectory(comp_traj);
