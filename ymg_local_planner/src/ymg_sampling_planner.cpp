@@ -63,9 +63,11 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	Eigen::Vector3f target_vel;
 	target_vel[1] = 0.0;   // vy must be zero
 	for (int iv=0; iv<=vsamples_[0]; ++iv) {
+		ROS_INFO("[ymg_sampling_planner] v_loop");
 		target_vel[0] = max_vel_[0] - iv * v_step;
 		double min_dist = DBL_MAX;
 		for (int iw=0; iw<=vsamples_[2]; ++iv) {
+			ROS_INFO("[ymg_sampling_planner] w_loop");
 			target_vel[2] = max_vel_[2] - iw * w_step;
 
 			base_local_planner::Trajectory comp_traj;
