@@ -22,11 +22,11 @@ namespace ymglp {
 
     boost::mutex::scoped_lock l(configuration_mutex_);
 
-    generator_.setParameters(
-        config.sim_time,
-        config.sim_granularity,
-        config.angular_sim_granularity,
-        sim_period_);
+    // generator_.setParameters(
+    //     config.sim_time,
+    //     config.sim_granularity,
+    //     config.angular_sim_granularity,
+    //     sim_period_);
 
     ymg_sampling_planner_.setParameters(
         config.sim_time,
@@ -139,10 +139,10 @@ namespace ymglp {
     critics.push_back(&obstacle_costs_); // discards trajectories that move into obstacles
 
     // trajectory generators
-    std::vector<base_local_planner::TrajectorySampleGenerator*> generator_list;
-    generator_list.push_back(&generator_);
+    // std::vector<base_local_planner::TrajectorySampleGenerator*> generator_list;
+    // generator_list.push_back(&generator_);
 
-    scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
+    // scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 		local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);
@@ -183,18 +183,19 @@ namespace ymglp {
     geometry_msgs::PoseStamped goal_pose = global_plan_.back();
     Eigen::Vector3f goal(goal_pose.pose.position.x, goal_pose.pose.position.y, tf::getYaw(goal_pose.pose.orientation));
     base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
-    generator_.initialise(pos,
-        vel,
-        goal,
-        &limits,
-        vsamples_);
-    generator_.generateTrajectory(pos, vel, vel_samples, traj);
-    double cost = scored_sampling_planner_.scoreTrajectory(traj, -1);
+    // generator_.initialise(pos,
+    //     vel,
+    //     goal,
+    //     &limits,
+    //     vsamples_);
+    // generator_.generateTrajectory(pos, vel, vel_samples, traj);
+    // double cost = scored_sampling_planner_.scoreTrajectory(traj, -1);
     //if the trajectory is a legal one... the check passes
-    if(cost >= 0) {
+    // if(cost >= 0) {
+    if(1) {
       return true;
     }
-    ROS_WARN("Invalid Trajectory %f, %f, %f, cost: %f", vel_samples[0], vel_samples[1], vel_samples[2], cost);
+    // ROS_WARN("Invalid Trajectory %f, %f, %f, cost: %f", vel_samples[0], vel_samples[1], vel_samples[2], cost);
 
     //otherwise the check fails
     return false;
