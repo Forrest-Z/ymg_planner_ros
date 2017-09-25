@@ -54,6 +54,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
+	ROS_INFO("[ymg_sampling_planner] find_best_trajectory_fcn_running.");
+
 	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
 	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
 	base_local_planner::Trajectory best_traj;
