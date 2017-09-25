@@ -5,11 +5,11 @@
 namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
-		base_local_planner::TrajectoryCostFunction* pdist_critics,
-		base_local_planner::TrajectoryCostFunction* obstacle_critics)
+		base_local_planner::TrajectoryCostFunction* pdist_critic,
+		base_local_planner::TrajectoryCostFunction* obstacle_critic)
 {/*{{{*/
-	pdist_critics_ = pdist_critics;
-	obstacle_critics_ = obstacle_critics;
+	pdist_critic_ = pdist_critic;
+	obstacle_critic_ = obstacle_critic;
 }/*}}}*/
 
 void YmgSamplingPlanner::initialize(
@@ -60,6 +60,15 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
 	base_local_planner::Trajectory best_traj;
 
+	if (pdist_critic_->prepare() == false) {
+		ROS_WARN("A scoring function failed to prepare");
+		return false;
+	}
+	if (obstacle_critic_->prepare() == false) {
+		ROS_WARN("A scoring function failed to prepare");
+		return false;
+	}
+
 	Eigen::Vector3f target_vel;
 	target_vel[1] = 0.0;   // vy must be zero
 	for (int iv=0; iv<=vsamples_[0]; ++iv) {
@@ -70,14 +79,14 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			ROS_INFO("target v theta : %f %f", target_vel[0], target_vel[2]);
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
-			double dist = pdist_critics_->scoreTrajectory(comp_traj);
+			double dist = pdist_critic_->scoreTrajectory(comp_traj);
 			ROS_INFO("[ymg_sampling_planner] dist = %f", dist);
 			if (dist < min_dist) {
 				best_traj = comp_traj;
 				min_dist =dist;
 			}
 		}
-		double obstacle_cost = obstacle_critics_->scoreTrajectory(best_traj);
+		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
 		ROS_INFO("[ymg_sampling_planner] obstacle = %f", obstacle_cost);
 		if (min_dist < 0.1 && 0<=obstacle_cost && obstacle_cost<=128) {
 			traj = best_traj;

@@ -26,8 +26,8 @@ public:
   ~YmgSamplingPlanner() {}
   YmgSamplingPlanner() {}
   YmgSamplingPlanner(
-			base_local_planner::TrajectoryCostFunction* pdist_critics,
-			base_local_planner::TrajectoryCostFunction* obstacle_critics);
+			base_local_planner::TrajectoryCostFunction* pdist_critic,
+			base_local_planner::TrajectoryCostFunction* obstacle_critic);
 
   void initialize(
       base_local_planner::LocalPlannerLimits* limits,
@@ -67,8 +67,8 @@ private:
 	Eigen::Vector3f max_vel_, min_vel_;
 	double pdist_tolerance_;
 
-	base_local_planner::TrajectoryCostFunction* pdist_critics_;
-	base_local_planner::TrajectoryCostFunction* obstacle_critics_;
+	base_local_planner::TrajectoryCostFunction* pdist_critic_;
+	base_local_planner::TrajectoryCostFunction* obstacle_critic_;
 
   int max_samples_;
 };
