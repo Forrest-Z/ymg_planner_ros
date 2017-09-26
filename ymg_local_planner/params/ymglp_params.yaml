@@ -39,7 +39,7 @@ YmgLPROS:
   forward_point_dist: 0.325
   forward_point_dist_obstacle: 0.2
 
-  scaling_speed: 0.25
+  scaling_speed: 0.3
   max_scaling_factor: 2.5
 
 
