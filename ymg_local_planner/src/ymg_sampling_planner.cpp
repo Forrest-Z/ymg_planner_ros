@@ -70,7 +70,9 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
 			base_local_planner::Trajectory comp_traj;
-			generateTrajectory(pos_, vel_, target_vel, comp_traj);
+			if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
+				continue;
+			}
 			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
 			// ROS_INFO("comt_traj.cost_ = %f", comp_traj.cost_);
 			if (0.0<=comp_traj.cost_
