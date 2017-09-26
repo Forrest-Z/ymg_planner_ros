@@ -134,8 +134,6 @@ double ObstacleCostFunctionKai::footprintCost (
 	else {
 		footprint_cost = world_model->footprintCost(x, y, th, footprint_spec);
 	}
-	ROS_INFO("footprint_cost = %f", footprint_cost);
-
 
   if (footprint_cost < 0) {
     return -6.0;
