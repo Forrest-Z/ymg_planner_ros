@@ -54,12 +54,6 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
-	ROS_INFO("[ymg_sampling_planner] find_best_trajectory_fcn_running.");
-
-	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
-	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
-	base_local_planner::Trajectory best_traj;
-
 	if (pdist_critic_->prepare() == false) {
 		ROS_WARN("Pdist scoring function failed to prepare");
 		return false;
@@ -68,31 +62,45 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		ROS_WARN("Obstacle scoring function failed to prepare");
 		return false;
 	}
+	
+	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
+	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
+	base_local_planner::Trajectory better_traj;
+	better_traj.cost_ = -1.0;
 
+	// trajectory.cost_ is the distance from global path.
 	Eigen::Vector3f target_vel;
 	target_vel[1] = 0.0;   // vy must be zero
 	for (int iv=0; iv<=vsamples_[0]; ++iv) {
 		target_vel[0] = max_vel_[0] - iv * v_step;
-		double min_dist = DBL_MAX;
+		base_local_planner::Trajectory best_traj;
+		best_traj.cost_ = DBL_MAX;
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
-			// cell * meter/cell = meter
-			double dist = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
-			if (dist < min_dist) {
+			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
+			if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
 				best_traj = comp_traj;
-				min_dist =dist;
 			}
 		}
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-		ROS_INFO("[ysp] dist obstacle = %f %f", min_dist, obstacle_cost);
-		if (min_dist < 0.1 && 0<=obstacle_cost && obstacle_cost<=128) {
-			ROS_INFO("found velocity v theta : %f %f", target_vel[0], target_vel[2]);
-			best_traj.cost_ = 10;
-			traj = best_traj;
-			return true;
+		ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
+		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
+			if (best_traj.cost_ < path_tolerance_) {
+				ROS_INFO("found velocity v theta : %f %f", target_vel[0], target_vel[2]);
+				traj = best_traj;
+				return true;
+			}
+			else if (better_traj.cost_<0 || best_traj.cost_<better_traj.cost_) {
+				better_traj = best_traj;
+			}
 		}
+	}
+
+	if (0.0<=better_traj.cost_) {
+		traj = better_traj;
+		return true;
 	}
 
 	ROS_INFO("[ymg_sampling_planner] falied to find valid path.");

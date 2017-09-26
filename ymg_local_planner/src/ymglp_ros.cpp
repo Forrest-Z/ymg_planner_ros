@@ -140,7 +140,7 @@ namespace ymglp {
     delete dsrv_;
   }/*}}}*/
 
-  bool YmgLPROS::dwaComputeVelocityCommands(tf::Stamped<tf::Pose> &global_pose, geometry_msgs::Twist& cmd_vel)
+  bool YmgLPROS::ymglpComputeVelocityCommands(tf::Stamped<tf::Pose> &global_pose, geometry_msgs::Twist& cmd_vel)
 	{/*{{{*/
     // dynamic window sampling approach to get useful velocity commands
     if(! isInitialized()){
@@ -252,11 +252,11 @@ namespace ymglp {
           current_pose_,
           boost::bind(&YmgLP::checkTrajectory, dp_, _1, _2, _3));
     } else {
-      bool isOk = dwaComputeVelocityCommands(current_pose_, cmd_vel);
+      bool isOk = ymglpComputeVelocityCommands(current_pose_, cmd_vel);
       if (isOk) {
         publishGlobalPlan(transformed_plan);
       } else {
-        ROS_WARN_NAMED("dwa_local_planner", "DWA planner failed to produce path.");
+        ROS_WARN_NAMED("ymg_local_planner", "failed to produce path.");
         std::vector<geometry_msgs::PoseStamped> empty_plan;
         publishGlobalPlan(empty_plan);
       }

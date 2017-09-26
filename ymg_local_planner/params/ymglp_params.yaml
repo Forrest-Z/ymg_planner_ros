@@ -25,6 +25,11 @@ YmgLPROS:
   vth_samples: 19
   controller_frequency: 5.0
 
+  use_dwa: false
+
+  path_tolerance: 0.1
+  obstacle_torerance: 64
+
   path_distance_bias: 40.0
   goal_distance_bias: 10.0
   occdist_scale: 0.01

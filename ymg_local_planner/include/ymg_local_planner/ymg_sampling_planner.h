@@ -38,6 +38,12 @@ public:
 	void setParameters(
 		double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period);
 
+	void setTolerance(double path_tolerance, int obstacle_tolerance)
+	{/*{{{*/
+		path_tolerance_ = path_tolerance;
+		obstacle_tolerance_ = obstacle_tolerance;
+	}/*}}}*/
+
   /**
    * Calls generator until generator has no more samples or max_samples is reached.
    * For each generated traj, calls critics in turn. If any critic returns negative
@@ -65,8 +71,9 @@ private:
   base_local_planner::LocalPlannerLimits* limits_;
 	Eigen::Vector3f pos_, vel_, vsamples_;
 	Eigen::Vector3f max_vel_, min_vel_;
-	double pdist_tolerance_;
 
+	double path_tolerance_;
+	int obstacle_tolerance_;
 	base_local_planner::TrajectoryCostFunction* pdist_critic_;
 	base_local_planner::TrajectoryCostFunction* obstacle_critic_;
 

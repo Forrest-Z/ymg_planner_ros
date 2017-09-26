@@ -89,10 +89,11 @@ Below what maximum rotation velocity we consider the robot to be stopped in rota
 
 ~/YmgLPROS/sim_time (double[sec], defalut: 1.7)  
 The amount of time to roll trajectories out for in seconds  
-dwaで経路を算出する際のシミュレート時間．
+経路を算出する際のシミュレート時間．
 
 ~/YmgLPROS/additional_sim_time (double[sec], default: 1.7)  
 The amount of time for calc obstacle costs in seconds  
+障害物のコスト算出の際に，追加で前方を見ることができる．
 
 ~/YmgLPROS/sim_granularity (double[m], default: 0.025)  
 The granularity with which to check for collisions along each trajectory in meters  
@@ -102,6 +103,21 @@ The granularity with which to check for collisions along each trajectory in mete
 The granularity with which to check for collisions for rotations in radians  
 シミュレートの際の角度の間隔．
 
+~/YmgLPROS/use_dwa (bool, default: False)
+Use dynamic window approach to constrain sampling velocities to small window.
+プランニングにdwaを使用するか．
+以下のpath_tolerance, obstacle_toleranceはymglpのパラメータ.
+path_distance_bias, goal_distance_bias, occdist_scaleはdwaのパラメータ．
+
+~/YmgLPROS/path_tolerance (double[m], default: 0.1)
+The tolerance between global path and endpoint of the simulated local path.
+ローカルプランの終端とグローバルパスの距離の許容値．
+距離はグリッドマップ上で計算されるため，距離の精度はローカルコストマップの解像度に依存するため注意．
+（解像度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
+
+~/YmgLPROS/obstacle_tolerance (int, default: 64)
+The maximum cost of the cell which the path can be drawn.
+シミュレートされた経路上にこの値以上のコストがあった場合，その経路は棄却される．
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  

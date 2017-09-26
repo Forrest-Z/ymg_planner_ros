@@ -8,11 +8,8 @@
 
 //for computing path distance
 #include <queue>
-
 #include <angles/angles.h>
-
 #include <ros/ros.h>
-
 #include <pcl_conversions/pcl_conversions.h>
 
 namespace ymglp {
@@ -33,18 +30,25 @@ namespace ymglp {
         config.sim_granularity,
         config.angular_sim_granularity,
         sim_period_);
+		ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
 
     double resolution = planner_util_->getCostmap()->getResolution();
 
     pdist_scale_ = config.path_distance_bias;
-    path_costs_.setScale(resolution * pdist_scale_);
+		if (!use_dwa_)
+			path_costs_.setScale(resolution);
+		else
+			path_costs_.setScale(resolution * pdist_scale_);
     path_costs_.setForwardPointDist(config.forward_point_dist);
 
     gdist_scale_ = config.goal_distance_bias;
     goal_costs_.setScale(resolution * gdist_scale_);
 
     occdist_scale_ = config.occdist_scale;
-    obstacle_costs_.setScale(resolution * occdist_scale_);
+		if (!use_dwa_)
+			obstacle_costs_.setScale(1.0);
+		else
+			obstacle_costs_.setScale(resolution * occdist_scale_);
 		obstacle_costs_.setAdditionalSimTime(config.additional_sim_time);
 		obstacle_costs_.setSimGranularity(config.sim_granularity);
 		obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
@@ -139,6 +143,7 @@ namespace ymglp {
     std::vector<base_local_planner::TrajectorySampleGenerator*> generator_list;
     generator_list.push_back(&generator_);
 
+		use_dwa_ = false;
     scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 		ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &goal_costs_);
 		local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
@@ -283,12 +288,16 @@ namespace ymglp {
 
 		ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
 
-    result_traj_.cost_ = 10;
-    // result_traj_.cost_ = -7;
-    // find best trajectory by sampling and scoring the samples
     std::vector<base_local_planner::Trajectory> all_explored;
-    // scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-    ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+
+		if (!use_dwa_) {
+			result_traj_.cost_ = 10;
+			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
+		else {
+			result_traj_.cost_ = -7;
+			scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
 
     if(publish_traj_pc_)
     {
