@@ -145,7 +145,7 @@ namespace ymglp {
 
 		use_dwa_ = false;
     scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
-		ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &goal_costs_);
+		ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_);
 		local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 
     private_nh.param("cheat_factor", cheat_factor_, 1.0);

@@ -26,7 +26,7 @@ public:
   ~YmgSamplingPlanner() {}
   YmgSamplingPlanner() {}
   YmgSamplingPlanner(
-			base_local_planner::TrajectoryCostFunction* pdist_critic,
+			base_local_planner::TrajectoryCostFunction* path_critic,
 			base_local_planner::TrajectoryCostFunction* obstacle_critic);
 
   void initialize(
@@ -79,7 +79,7 @@ private:
 
 	double path_tolerance_;
 	int obstacle_tolerance_;
-	base_local_planner::TrajectoryCostFunction* pdist_critic_;
+	base_local_planner::TrajectoryCostFunction* path_critic_;
 	base_local_planner::TrajectoryCostFunction* obstacle_critic_;
 
   int max_samples_;

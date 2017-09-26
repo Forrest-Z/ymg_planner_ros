@@ -78,8 +78,6 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
     return -9;
   }
 
-	ROS_INFO("obstacle_cost_function");
-
   for (unsigned int i = 0; i < traj.getPointsSize(); ++i) {
     traj.getPoint(i, px, py, pth);
     double f_cost = footprintCost(px, py, pth,

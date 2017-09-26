@@ -5,11 +5,11 @@
 namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
-		base_local_planner::TrajectoryCostFunction* pdist_critic,
+		base_local_planner::TrajectoryCostFunction* path_critic,
 		base_local_planner::TrajectoryCostFunction* obstacle_critic)
 	: path_tolerance_(0.1), obstacle_tolerance_(10)
 {/*{{{*/
-	pdist_critic_ = pdist_critic;
+	path_critic_ = path_critic;
 	obstacle_critic_ = obstacle_critic;
 }/*}}}*/
 
@@ -46,7 +46,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
-	if (pdist_critic_->prepare() == false) {
+	if (path_critic_->prepare() == false) {
 		ROS_WARN("Pdist scoring function failed to prepare");
 		return false;
 	}
@@ -73,13 +73,14 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
 				continue;
 			}
-			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
+			comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj) * path_critic_->getScale();
 			// ROS_INFO("comt_traj.cost_ = %f", comp_traj.cost_);
 			if (0.0<=comp_traj.cost_
 					&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
 				best_traj = comp_traj;
 			}
 		}
+		if (best_traj.cost_ < 0.0) continue;
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
 		ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
 		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
