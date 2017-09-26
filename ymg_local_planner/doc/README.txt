@@ -115,9 +115,9 @@ The tolerance between global path and endpoint of the simulated local path.
 距離はグリッドマップ上で計算されるため，距離の精度はローカルコストマップの解像度に依存するため注意．
 （解像度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
 
-~/YmgLPROS/obstacle_tolerance (int, default: 64)
+~/YmgLPROS/obstacle_tolerance (int, default: 253)
 The maximum cost of the cell which the path can be drawn.
-シミュレートされた経路上にこの値以上のコストがあった場合，その経路は棄却される．
+シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  

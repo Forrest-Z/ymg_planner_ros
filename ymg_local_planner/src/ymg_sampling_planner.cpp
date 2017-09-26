@@ -80,7 +80,10 @@ bool YmgSamplingPlanner::findBestTrajectory(
 				best_traj = comp_traj;
 			}
 		}
-		if (best_traj.cost_ < 0.0) continue;
+
+		if (best_traj.cost_ < 0.0) {
+			continue;
+		}
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
 		ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
 		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
