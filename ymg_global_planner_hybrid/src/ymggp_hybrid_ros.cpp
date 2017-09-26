@@ -477,7 +477,7 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 				const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
-		ROS_INFO("[YmgGPHybROS] robot status : goal_reached");
+		// ROS_INFO("[YmgGPHybROS] robot status : goal_reached");
 		robot_status_ = goal_reached;
 		return;
 	}
@@ -496,14 +496,14 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 	}
 
 	if (v_is_zero && omega_is_zero) {
-		ROS_INFO("[YmgGPHybROS] robot status : stopped");
+		// ROS_INFO("[YmgGPHybROS] robot status : stopped");
 		if (robot_status_ != stopped) {
 			stop_time_ = ros::Time::now();
 		}
 		robot_status_ = stopped;
 	}
 	else {
-		ROS_INFO("[YmgGPHybROS] robot status : moving");
+		// ROS_INFO("[YmgGPHybROS] robot status : moving");
 		robot_status_ = moving;
 	}
 

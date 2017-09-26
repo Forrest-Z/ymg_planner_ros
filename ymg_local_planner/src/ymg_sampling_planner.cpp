@@ -74,7 +74,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	for (int iv=0; iv<=vsamples_[0]; ++iv) {
 		target_vel[0] = max_vel_[0] - iv * v_step;
 		base_local_planner::Trajectory best_traj;
-		best_traj.cost_ = DBL_MAX;
+		best_traj.cost_ = -1.0;
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
 			base_local_planner::Trajectory comp_traj;
@@ -87,8 +87,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
 		ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
 		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-			if (best_traj.cost_ < path_tolerance_) {
-				ROS_INFO("found velocity v theta : %f %f", target_vel[0], target_vel[2]);
+			if (0.0<=best_traj.cost_ && best_traj.cost_ < path_tolerance_) {
 				traj = best_traj;
 				return true;
 			}
@@ -99,11 +98,12 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	if (0.0<=better_traj.cost_) {
+		ROS_INFO("better path was elected.");
 		traj = better_traj;
 		return true;
 	}
 
-	ROS_INFO("[ymg_sampling_planner] falied to find valid path.");
+	ROS_INFO_NAMED("ymg_sampling_planner", "falied to find valid path.");
 
 	base_local_planner::Trajectory stop_traj;
 	Eigen::Vector3f stop_vel;
