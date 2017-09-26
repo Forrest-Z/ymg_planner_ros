@@ -7,6 +7,7 @@ namespace ymglp {
 YmgSamplingPlanner::YmgSamplingPlanner(
 		base_local_planner::TrajectoryCostFunction* pdist_critic,
 		base_local_planner::TrajectoryCostFunction* obstacle_critic)
+	: path_tolerance_(0.1), obstacle_tolerance_(10)
 {/*{{{*/
 	pdist_critic_ = pdist_critic;
 	obstacle_critic_ = obstacle_critic;
@@ -39,15 +40,6 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
-}/*}}}*/
-
-void YmgSamplingPlanner::setParameters(
-		double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period)
-{/*{{{*/
-	sim_time_ = sim_time;
-	sim_granularity_ = sim_granularity;
-	angular_sim_granularity_ = angular_sim_granularity;
-	sim_period_ = sim_period;
 }/*}}}*/
 
 bool YmgSamplingPlanner::findBestTrajectory(

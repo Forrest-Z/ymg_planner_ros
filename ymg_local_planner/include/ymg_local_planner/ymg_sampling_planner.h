@@ -35,8 +35,13 @@ public:
       const Eigen::Vector3f& vel,
       const Eigen::Vector3f& vsamples);
 
-	void setParameters(
-		double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period);
+	void setParameters(double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period)
+	{/*{{{*/
+		sim_time_ = sim_time;
+		sim_granularity_ = sim_granularity;
+		angular_sim_granularity_ = angular_sim_granularity;
+		sim_period_ = sim_period;
+	}/*}}}*/
 
 	void setTolerance(double path_tolerance, int obstacle_tolerance)
 	{/*{{{*/
