@@ -121,15 +121,20 @@ double ObstacleCostFunctionKai::footprintCost (
   //check if the footprint is legal
   // TODO: Cache inscribed radius
 	
-	// scaling footprint
+	double footprint_cost;
+	
 	if (1.0 < scale) {
-		for (int i=0; i<footprint_spec.size(); ++i) {
-			footprint_spec[i].x *= scale;
-			footprint_spec[i].y *= scale;
+		std::vector<geometry_msgs::Point> scaled_footprint_spec = footprint_spec;
+		for (int i=0; i<scaled_footprint_spec.size(); ++i) {
+			scaled_footprint_spec[i].x *= scale;
+			scaled_footprint_spec[i].y *= scale;
 		}
+		footprint_cost = world_model->footprintCost(x, y, th, scaled_footprint_spec);
+	}
+	else {
+		footprint_cost = world_model->footprintCost(x, y, th, footprint_spec);
 	}
 
-  double footprint_cost = world_model->footprintCost(x, y, th, footprint_spec);
 
   if (footprint_cost < 0) {
     return -6.0;
