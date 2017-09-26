@@ -28,7 +28,7 @@ YmgLPROS:
   use_dwa: false
 
   path_tolerance: 0.1
-  obstacle_torerance: 64
+  obstacle_torerance: 10
 
   path_distance_bias: 40.0
   goal_distance_bias: 10.0
