@@ -80,7 +80,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
 			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
-			if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
+			if (0.0<=comp_traj.cost_ || comp_traj.cost_<best_traj.cost_) {
 				best_traj = comp_traj;
 			}
 		}
