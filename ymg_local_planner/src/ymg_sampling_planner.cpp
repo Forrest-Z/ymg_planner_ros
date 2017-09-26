@@ -79,10 +79,10 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			target_vel[2] = max_vel_[2] - iw * w_step;
 			base_local_planner::Trajectory comp_traj;
 			generateTrajectory(pos_, vel_, target_vel, comp_traj);
-			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj);
+			comp_traj.cost_ = pdist_critic_->scoreTrajectory(comp_traj) * pdist_critic_->getScale();
 			ROS_INFO("comt_traj.cost_ = %f", comp_traj.cost_);
-			comp_traj.cost_ *= pdist_critic_->getScale();
-			if (0.0<=comp_traj.cost_ || comp_traj.cost_<best_traj.cost_) {
+			if (0.0<=comp_traj.cost_
+					&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
 				best_traj = comp_traj;
 			}
 		}
@@ -93,7 +93,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 				traj = best_traj;
 				return true;
 			}
-			else if (better_traj.cost_<0 || best_traj.cost_<better_traj.cost_) {
+			else if (0.0 <= best_traj.cost_
+					&& (better_traj.cost_<0.0 || best_traj.cost_<better_traj.cost_)) {
 				better_traj = best_traj;
 			}
 		}
