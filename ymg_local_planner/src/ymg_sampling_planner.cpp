@@ -71,7 +71,7 @@ namespace ymglp {
 			}
 
 			double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-			ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
+			// ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
 			if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 				if (best_traj.cost_ < path_tolerance_) {
 					traj = best_traj;
