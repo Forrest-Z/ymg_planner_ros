@@ -64,8 +64,13 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 		unsigned int head_cell_x, head_cell_y;
 		double head_grid_dist;
 
-		head_x = foot_x + forward_point_dist_ * cos(foot_th);
-		head_y = foot_y + forward_point_dist_ * sin(foot_th);
+		double look_ahead = forward_point_dist_;
+		if (traj.xv_ < 0.0) {
+			look_ahead *= -1;
+		}
+
+		head_x = foot_x + look_ahead * cos(foot_th);
+		head_y = foot_y + look_ahead * sin(foot_th);
 
 		if ( ! costmap_->worldToMap(head_x, head_y, head_cell_x, head_cell_y)) {
 			ROS_WARN("Off Map (head) %f, %f", head_x, head_y);
