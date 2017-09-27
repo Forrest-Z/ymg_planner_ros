@@ -65,6 +65,9 @@ public:
 
 
 private:
+
+	base_local_planner::Trajectory generateClosestTrajectory(double vel_x);
+
 	bool generateTrajectory(
 			Eigen::Vector3f pos, Eigen::Vector3f vel, Eigen::Vector3f sample_target_vel,
 			base_local_planner::Trajectory& traj);
