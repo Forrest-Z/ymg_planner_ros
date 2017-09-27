@@ -7,7 +7,7 @@ namespace ymglp {
 	YmgSamplingPlanner::YmgSamplingPlanner(
 			base_local_planner::TrajectoryCostFunction* path_critic,
 			base_local_planner::TrajectoryCostFunction* obstacle_critic)
-		: path_tolerance_(0.1), obstacle_tolerance_(10)
+		: reverse_order_(false), path_tolerance_(0.1), obstacle_tolerance_(10)
 	{/*{{{*/
 		path_critic_ = path_critic;
 		obstacle_critic_ = obstacle_critic;
@@ -40,6 +40,10 @@ namespace ymglp {
 		min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 		min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
+		if (fabs(max_vel_x) < fabs(min_vel_x))
+			reverse_order_ = true;
+		else
+			reverse_order_ = false;
 	}/*}}}*/
 
 	bool YmgSamplingPlanner::findBestTrajectory(
@@ -59,10 +63,16 @@ namespace ymglp {
 		base_local_planner::Trajectory better_traj;
 		better_traj.cost_ = -1.0;
 
+		double start_vel_x = max_vel_[0];
+		if (reverse_order_) {
+			start_vel_x = min_vel_[0];
+			v_step *= -1;
+		}
+
 		// trajectory.cost_ is the distance from global path.
 		double target_vel_x;
 		for (int iv=0; iv<=vsamples_[0]; ++iv) {
-			target_vel_x = max_vel_[0] - iv * v_step;
+			target_vel_x = start_vel_x - iv * v_step;
 			base_local_planner::Trajectory best_traj;
 			best_traj = generateClosestTrajectory(target_vel_x);
 
@@ -122,29 +132,15 @@ namespace ymglp {
 			Eigen::Vector3f sample_target_vel,
 			base_local_planner::Trajectory& traj)
 	{/*{{{*/
-		double vmag = hypot(sample_target_vel[0], sample_target_vel[1]);
-		double eps = 1e-4;
-		traj.cost_   = -1.0; // placed here in case we return early
-		//trajectory might be reused so we'll make sure to reset it
-		traj.resetPoints();
-
-		// make sure that the robot would at least be moving with one of
-		// the required minimum velocities for translation and rotation (if set)
-		if ((limits_->min_trans_vel >= 0 && vmag + eps < limits_->min_trans_vel) &&
-				(limits_->min_rot_vel >= 0 && fabs(sample_target_vel[2]) + eps < limits_->min_rot_vel)) {
-			return false;
-		}
-		// make sure we do not exceed max diagonal (x+y) translational velocity (if set)
-		if (limits_->max_trans_vel >=0 && vmag - eps > limits_->max_trans_vel) {
-			return false;
-		}
+		traj.cost_   = -1.0;   // placed here in case we return early
+		traj.resetPoints();   //trajectory might be reused so we'll make sure to reset it
 
 		int num_steps;
 		if (angular_sim_granularity_ < 0.0) {
 			num_steps = ceil(sim_time_ / sim_granularity_);
 		} else {
 			//compute the number of steps we must take along this trajectory to be "safe"
-			double sim_time_distance = vmag * sim_time_; // the distance the robot would travel in sim_time if it did not change velocity
+			double sim_time_distance = sample_target_vel[0] * sim_time_; // the distance the robot would travel in sim_time if it did not change velocity
 			double sim_time_angle = fabs(sample_target_vel[2]) * sim_time_; // the angle the robot would rotate in sim_time
 			num_steps =
 				ceil(std::max(sim_time_distance / sim_granularity_, sim_time_angle / angular_sim_granularity_));

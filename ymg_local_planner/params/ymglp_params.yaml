@@ -2,22 +2,16 @@
 
 YmgLPROS:
   acc_lim_x: 0.6
-  acc_lim_y: 0.0
   acc_lim_th: 0.5
   max_vel_x: 0.6
   min_vel_x: 0.0
-  max_vel_y: 0.0
-  min_vel_y: 0.0
-  max_trans_vel: 0.6
-  min_trans_vel: 0.0
   max_rot_vel: 0.5
   min_rot_vel: 0.0
 
   yaw_goal_tolerance: 0.3
   xy_goal_tolerance: 0.4
 
-  sim_time: 1.7
-  additional_sim_time: 0.0
+  sim_time: 1.5
   sim_granularity: 0.025
   angular_sim_granularity: 0.1
   vx_samples: 4

@@ -75,6 +75,7 @@ private:
 	Eigen::Vector3f computeNewPositions(
 			const Eigen::Vector3f& pos, const Eigen::Vector3f& vel, double dt);
 
+	bool reverse_order_;
   double sim_time_, sim_granularity_, angular_sim_granularity_, sim_period_;
   base_local_planner::LocalPlannerLimits* limits_;
 	Eigen::Vector3f pos_, vel_, vsamples_;
@@ -84,8 +85,6 @@ private:
 	int obstacle_tolerance_;
 	base_local_planner::TrajectoryCostFunction* path_critic_;
 	base_local_planner::TrajectoryCostFunction* obstacle_critic_;
-
-  int max_samples_;
 };
 
 

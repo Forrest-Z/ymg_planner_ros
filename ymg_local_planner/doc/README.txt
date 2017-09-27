@@ -18,29 +18,13 @@ local goalの位置を可視化．デバッグ用．
 (move base param) ~/base_local_planner: "ymglp/YmgLPROS"  
 
 
-~/YmgLPROS/max_trans_vel (double[m/s], default: 0.55)  
-The absolute value of the maximum translational velocity for the robot in m/s  
-ロボットの速度の絶対値の上限．
-
-~/YmgLPROS/min_trans_vel (double[m/s], default: 0.1)  
-The absolute value of the minimum translational velocity for the robot in m/s  
-ロボットの速度の絶対値の上限．
-
 ~/YmgLPROS/max_vel_x (double[m/s], default: 0.55)  
 The maximum x velocity for the robot in m/s  
-ロボットのx方向の速度の絶対値の上限．
+ロボットのx方向の速度の上限．
 
 ~/YmgLPROS/min_vel_x (double[m/s], default: 0.0)  
 The minimum x velocity for the robot in m/s  
-ロボットのx方向の速度の絶対値の下限．
-
-~/YmgLPROS/max_vel_y (double[m/s], default: 0.1)  
-The maximum y velocity for the robot in m/s  
-ロボットのy方向の速度の絶対値の上限．
-
-~/YmgLPROS/min_vel_y (double[m/s], default: -0.1)  
-The minimum y velocity for the robot in m/s  
-ロボットのy方向の速度の絶対値の下限．
+ロボットのx方向の速度の下限．
 
 ~/YmgLPROS/max_rot_vel (double[rad/s], default: 1.0)  
 The absolute value of the maximum rotational velocity for the robot in rad/s  
@@ -54,17 +38,9 @@ The absolute value of the minimum rotational velocity for the robot in rad/s
 The acceleration limit of the robot in the x direction
 ロボットのx方向の加速度の絶対値の上限．
 
-~/YmgLPROS/acc_lim_y (double[m/s^2], default: 2.5)  
-The acceleration limit of the robot in the y direction  
-ロボットのy方向の加速度の絶対値の上限．
-
 ~/YmgLPROS/acc_lim_theta (double[rad/s^2], default: 3.2)  
 The acceleration limit of the robot in the theta direction  
 ロボットの角加速度の絶対値の上限．
-
-~/YmgLPROS/acc_limit_trans (double[m/s^2], default: 0.1)  
-The absolute value of the maximum translational acceleration for the robot in m/s^2  
-ロボットの(x,y方向を合わせた)加速度の絶対値の上限．
 
 
 
@@ -75,6 +51,7 @@ Within what maximum distance we consider the robot to be in goal
 ~/YmgLPROS/yaw_goal_tolerance (double[rad], default: 0.1)  
 Within what maximum angle difference we consider the robot to face goal direction  
 ゴール到達判定時のyaw方向のズレの許容範囲．
+
 
 
 ~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.1)  
