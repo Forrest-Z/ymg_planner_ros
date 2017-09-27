@@ -90,14 +90,6 @@ namespace ymglp {
 
 		ROS_INFO_NAMED("ymg_sampling_planner", "falied to find valid path. [stop]");
 
-		base_local_planner::Trajectory stop_traj;
-		Eigen::Vector3f stop_vel;
-		stop_vel[0] = 0.0;
-		stop_vel[1] = 0.0;
-		stop_vel[2] = 0.0;
-		generateTrajectory(pos_, vel_, stop_vel, stop_traj);
-		traj = stop_traj;
-
 		return false;
 	}/*}}}*/
 

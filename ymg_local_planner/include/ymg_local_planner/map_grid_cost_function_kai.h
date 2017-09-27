@@ -37,8 +37,6 @@ public:
   
   void setForwardPointDist(double forward_point_dist) {forward_point_dist_ = forward_point_dist;}
   
-	void setValidTrajRatio(double valid_traj_ratio) {valid_traj_ratio_ = valid_traj_ratio;}
-
   /** @brief If true, failures along the path cause the entire path to be rejected.
    *
    * Default is true. */
@@ -79,8 +77,6 @@ private:
   // if true, we look for a suitable local goal on path, else we use the full path for costs
   bool is_local_goal_function_;
   bool stop_on_failure_;
-
-	double valid_traj_ratio_;
 };
 
 } /* namespace base_local_planner */

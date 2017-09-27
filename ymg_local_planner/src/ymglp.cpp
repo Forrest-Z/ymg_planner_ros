@@ -49,7 +49,6 @@ namespace ymglp {
 			obstacle_costs_.setScale(1.0);
 		else
 			obstacle_costs_.setScale(resolution * occdist_scale_);
-		obstacle_costs_.setAdditionalSimTime(config.additional_sim_time);
 		obstacle_costs_.setSimGranularity(config.sim_granularity);
 		obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
 
@@ -91,8 +90,7 @@ namespace ymglp {
   YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util)
 /*{{{*/
 		: planner_util_(planner_util),
-		obstacle_costs_(planner_util->getCostmap(), 2.0, 0.025),
-		// obstacle_costs_(planner_util->getCostmap()),
+		obstacle_costs_(planner_util->getCostmap()),
 		path_costs_(planner_util->getCostmap(), false),
 		goal_costs_(planner_util->getCostmap(), true)
 	{
@@ -115,11 +113,6 @@ namespace ymglp {
       }
     }
     ROS_INFO("Sim period is set to %.2f", sim_period_);
-
-    bool sum_scores;
-    private_nh.param("sum_scores", sum_scores, false);
-    obstacle_costs_.setSumScores(sum_scores);
-
 
     private_nh.param("publish_cost_grid_pc", publish_cost_grid_pc_, false);
     map_viz_.initialize(name, planner_util->getGlobalFrame(), boost::bind(&YmgLP::getCellCosts, this, _1, _2, _3, _4, _5, _6));
@@ -290,14 +283,12 @@ namespace ymglp {
 
     std::vector<base_local_planner::Trajectory> all_explored;
 
-		if (!use_dwa_) {
-			result_traj_.cost_ = 10;
+		result_traj_.cost_ = -7;
+
+		if (!use_dwa_)
 			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-		}
-		else {
-			result_traj_.cost_ = -7;
+		else
 			scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-		}
 
     if(publish_traj_pc_)
     {

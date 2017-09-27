@@ -101,7 +101,7 @@ namespace ymglp {
 
       base_local_planner::LocalPlannerUtil planner_util_;
 
-      boost::shared_ptr<YmgLP> dp_; ///< @brief The trajectory controller
+      boost::shared_ptr<YmgLP> ymglp_; ///< @brief The trajectory controller
 
       costmap_2d::Costmap2DROS* costmap_ros_;
 

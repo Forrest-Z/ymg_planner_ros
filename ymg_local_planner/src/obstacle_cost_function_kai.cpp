@@ -5,11 +5,10 @@
 
 namespace base_local_planner {
 
-ObstacleCostFunctionKai::ObstacleCostFunctionKai(costmap_2d::Costmap2D* costmap,
-		double additional_sim_time, double forward_point_dist, double sim_granularity)
+ObstacleCostFunctionKai::ObstacleCostFunctionKai(
+		costmap_2d::Costmap2D* costmap, double forward_point_dist, double sim_granularity)
 	/*{{{*/
-	: costmap_(costmap), sum_scores_(false), additional_sim_time_(additional_sim_time),
-		forward_point_dist_(forward_point_dist), sim_granularity_(sim_granularity)
+	: costmap_(costmap), forward_point_dist_(forward_point_dist), sim_granularity_(sim_granularity)
 	{
   if (costmap != NULL) {
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
@@ -50,23 +49,16 @@ bool ObstacleCostFunctionKai::isZero(double x)
 
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
-	double additional_length = 0.0;
-
-	if (0.0 < additional_sim_time_) {
-		additional_length += traj.xv_ * additional_sim_time_;
-	}
-
 	// XXX added but has not tested yet.
+	// add external scoreing point
 	if (!isZero(traj.xv_)) {
-		additional_length += forward_point_dist_;
-	}
-
-	double ep_x, ep_y, ep_th;
-	traj.getEndpoint(ep_x, ep_y, ep_th);
-	int additional_points = additional_length / sim_granularity_;
-	for (int i=0; i<additional_points; ++i) {
-		double len = (i+1) * sim_granularity_;
-		traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
+		double ep_x, ep_y, ep_th;
+		traj.getEndpoint(ep_x, ep_y, ep_th);
+		int additional_points = forward_point_dist_ / sim_granularity_;
+		for (int i=0; i<additional_points; ++i) {
+			double len = (i+1) * sim_granularity_;
+			traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
+		}
 	}
 
   double cost = 0;
@@ -88,10 +80,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
         return f_cost;
     }
 
-    if(sum_scores_)
-        cost +=  f_cost;
-    else
-        cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
+		cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
   return cost;
 }/*}}}*/

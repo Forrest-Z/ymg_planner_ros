@@ -91,10 +91,6 @@ Below what maximum rotation velocity we consider the robot to be stopped in rota
 The amount of time to roll trajectories out for in seconds  
 経路を算出する際のシミュレート時間．
 
-~/YmgLPROS/additional_sim_time (double[sec], default: 1.7)  
-The amount of time for calc obstacle costs in seconds  
-障害物のコスト算出の際に，追加で前方を見ることができる．
-
 ~/YmgLPROS/sim_granularity (double[m], default: 0.025)  
 The granularity with which to check for collisions along each trajectory in meters  
 シミュレートの際の点の間隔．
@@ -103,37 +99,38 @@ The granularity with which to check for collisions along each trajectory in mete
 The granularity with which to check for collisions for rotations in radians  
 シミュレートの際の角度の間隔．
 
+
 ~/YmgLPROS/use_dwa (bool, default: False)
 Use dynamic window approach to constrain sampling velocities to small window.
 プランニングにdwaを使用するか．
 以下のpath_tolerance, obstacle_toleranceはymglpのパラメータ.
-path_distance_bias, goal_distance_bias, occdist_scaleはdwaのパラメータ．
+path_distance_bias, goal_distance_bias, occdist_scale, local_goal_distanceはdwaのパラメータ．
 
 ~/YmgLPROS/path_tolerance (double[m], default: 0.1)
 The tolerance between global path and endpoint of the simulated local path.
-ローカルプランの終端とグローバルパスの距離の許容値．
+[ymglp]ローカルプランの終端とグローバルパスの距離の許容値．
 距離はグリッドマップ上で計算されるため，距離の精度はローカルコストマップの解像度に依存するため注意．
 （解像度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
 
 ~/YmgLPROS/obstacle_tolerance (int, default: 253)
 The maximum cost of the cell which the path can be drawn.
-シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
+[ymglp]シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  
-dwaでのコスト計算の際のパスとの距離の重み．
+[dwa]コスト計算の際のパスとの距離の重み．
 
 ~/YmgLPROS/goal_distance_bias (double, default: 24.0)  
 The weight for the goal distance part of the cost function  
-dwaでのコスト計算の際のローカルゴールとの距離の重み．
+[dwa]コスト計算の際のローカルゴールとの距離の重み．
 
 ~/YmgLPROS/occdist_scale (double, default: 0.01)  
 The weight for the obstacle distance part of the cost function  
-dwaでのコスト計算の際の障害物を避ける重み．
+[dwa]コスト計算の際の障害物を避ける重み．
 
 ~/YmgLPROS/local_goal_distance (double, default: 2.0)
 The distance to the local goal
-ローカルゴールを現在位置から(グローバルパス上の)どのくらい先に置くか．
+[dwa]ローカルゴールを現在位置から(グローバルパス上の)どのくらい先に置くか．
 
 
 ~/YmgLPROS/forward_point_distance (double[m], default: 0.325)  

@@ -48,7 +48,7 @@ namespace ymglp {
       planner_util_.reconfigureCB(limits, config.restore_defaults);
 
       // update dwa specific configuration
-      dp_->reconfigure(config);
+      ymglp_->reconfigure(config);
   }/*}}}*/
 
   YmgLPROS::YmgLPROS() :
@@ -74,7 +74,7 @@ namespace ymglp {
       planner_util_.initialize(tf, costmap, costmap_ros_->getGlobalFrameID());
 
       // create the actual planner that we'll use.. it'll configure itself from the parameter server
-      dp_ = boost::shared_ptr<YmgLP>(new YmgLP(name, &planner_util_));
+      ymglp_ = boost::shared_ptr<YmgLP>(new YmgLP(name, &planner_util_));
 
       if( private_nh.getParam( "odom_topic", odom_topic_ ))
       {
@@ -102,7 +102,7 @@ namespace ymglp {
     latchedStopRotateController_.resetLatching();
 
     ROS_INFO("Got new plan");
-    return dp_->setPlan(orig_global_plan);
+    return ymglp_->setPlan(orig_global_plan);
   }/*}}}*/
 
   bool YmgLPROS::isGoalReached()
@@ -162,7 +162,7 @@ namespace ymglp {
     drive_cmds.frame_id_ = costmap_ros_->getBaseFrameID();
     
     // call with updated footprint
-    base_local_planner::Trajectory path = dp_->findBestPath(global_pose, robot_vel, drive_cmds, costmap_ros_->getRobotFootprint());
+    base_local_planner::Trajectory path = ymglp_->findBestPath(global_pose, robot_vel, drive_cmds, costmap_ros_->getRobotFootprint());
     //ROS_ERROR("Best: %.2f, %.2f, %.2f, %.2f", path.xv_, path.yv_, path.thetav_, path.cost_);
 
     /* For timing uncomment
@@ -181,14 +181,14 @@ namespace ymglp {
     //if we cannot move... tell someone
     std::vector<geometry_msgs::PoseStamped> local_plan;
     if(path.cost_ < 0) {
-      ROS_DEBUG_NAMED("dwa_local_planner",
+      ROS_DEBUG_NAMED("ymg_local_planner",
           "The dwa local planner failed to find a valid plan, cost functions discarded all candidates. This can mean there is an obstacle too close to the robot.");
       local_plan.clear();
       publishLocalPlan(local_plan);
       return false;
     }
 
-    ROS_DEBUG_NAMED("dwa_local_planner", "A valid velocity command of (%.2f, %.2f, %.2f) was found for this cycle.", 
+    ROS_DEBUG_NAMED("ymg_local_planner", "A valid velocity command of (%.2f, %.2f, %.2f) was found for this cycle.", 
                     cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z);
 
     // Fill out the local plan
@@ -228,13 +228,13 @@ namespace ymglp {
 
     //if the global plan passed in is empty... we won't do anything
     if(transformed_plan.empty()) {
-      ROS_WARN_NAMED("dwa_local_planner", "Received an empty transformed plan.");
+      ROS_WARN_NAMED("ymg_local_planner", "Received an empty transformed plan.");
       return false;
     }
-    ROS_DEBUG_NAMED("dwa_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
+    ROS_DEBUG_NAMED("ymg_local_planner", "Received a transformed plan with %zu points.", transformed_plan.size());
 
     // update plan in dwa_planner even if we just stop and rotate, to allow checkTrajectory
-    dp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
+    ymglp_->updatePlanAndLocalCosts(current_pose_, transformed_plan);
 
     if (latchedStopRotateController_.isPositionReached(&planner_util_, current_pose_)) {
       //publish an empty plan because we've reached our goal position
@@ -246,11 +246,11 @@ namespace ymglp {
       return latchedStopRotateController_.computeVelocityCommandsStopRotate(
           cmd_vel,
           limits.getAccLimits(),
-          dp_->getSimPeriod(),
+          ymglp_->getSimPeriod(),
           &planner_util_,
           odom_helper_,
           current_pose_,
-          boost::bind(&YmgLP::checkTrajectory, dp_, _1, _2, _3));
+          boost::bind(&YmgLP::checkTrajectory, ymglp_, _1, _2, _3));
     } else {
       bool isOk = ymglpComputeVelocityCommands(current_pose_, cmd_vel);
       if (isOk) {
