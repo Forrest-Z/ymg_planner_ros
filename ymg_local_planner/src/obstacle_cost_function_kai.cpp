@@ -50,6 +50,11 @@ bool ObstacleCostFunctionKai::isZero(double x)
 // this function gets maximum cost in the trajectory and returns scaled value.
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
+
+	if (getScale() == 0.0) {
+		return 0.0;
+	}
+	
 	// XXX added but has not tested yet.
 	// add external scoreing point
 	if (!isZero(traj.xv_)) {
@@ -87,7 +92,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 
 		cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
-  return cost;
+  return cost * getScale();
 }/*}}}*/
 
 double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_vel_abs, double max_scaling_factor)
@@ -114,11 +119,6 @@ double ObstacleCostFunctionKai::footprintCost (
 
   //check if the footprint is legal
   // TODO: Cache inscribed radius
-	
-	if (getScale() == 0.0) {
-		return 0.0;
-	}
-	
 	double footprint_cost;
 	
 	if (1.0 < scale) {
@@ -145,7 +145,7 @@ double ObstacleCostFunctionKai::footprintCost (
 
   double occ_cost = std::max(std::max(0.0, footprint_cost), double(costmap->getCost(cell_x, cell_y)));
 
-  return occ_cost * getScale();
+  return occ_cost;
 }/*}}}*/
 
 } /* namespace base_local_planner */
