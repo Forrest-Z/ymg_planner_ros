@@ -19,21 +19,17 @@ namespace ymglp {
 
     boost::mutex::scoped_lock l(configuration_mutex_);
 
-    generator_.setParameters(
-        config.sim_time,
-        config.sim_granularity,
-        config.angular_sim_granularity,
-        sim_period_);
+		use_dwa_ = config.use_dwa;
 
-    ymg_sampling_planner_.setParameters(
-        config.sim_time,
-        config.sim_granularity,
-        config.angular_sim_granularity,
-        sim_period_);
+    generator_.setParameters(
+				config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
+    
+		ymg_sampling_planner_.setParameters(
+				config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
+
 		ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
 
     double resolution = planner_util_->getCostmap()->getResolution();
-
     pdist_scale_ = config.path_distance_bias;
 		if (!use_dwa_)
 			path_costs_.setScale(resolution);
