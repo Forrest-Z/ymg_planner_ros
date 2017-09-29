@@ -93,7 +93,6 @@ void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& flag)
 	use_navfn_ = false;
 }/*}}}*/
 
-// XXX this callback function has not checked yet
 void YmgGPHybROS::useYmggpForceCallback (const std_msgs::Int32& msg)
 {/*{{{*/
 	switch (msg.data) {
@@ -535,7 +534,6 @@ bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start,
 		goal_reached = false;
 	}
 
-	// XXX this function was changed but has not tested yet.
 	// judge stack from robot vel
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);

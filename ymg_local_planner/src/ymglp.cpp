@@ -53,7 +53,8 @@ namespace ymglp {
 		obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
 
     // obstacle costs can vary due to scaling footprint feature
-    obstacle_costs_.setParams(config.max_trans_vel, config.max_scaling_factor, config.scaling_speed);
+		double max_vel_abs = std::max( fabs(config.min_vel_x), fabs(config.max_vel_x) );
+    obstacle_costs_.setParams(max_vel_abs, config.max_scaling_factor, config.scaling_speed);
 
 		local_goal_distance_ = config.local_goal_distance;
 
@@ -273,12 +274,7 @@ namespace ymglp {
     base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
     // prepare cost functions and generators for this run
-    generator_.initialise(pos,
-        vel,
-        goal,
-        &limits,
-        vsamples_);
-
+    generator_.initialise(pos, vel, goal, &limits, vsamples_);
 		ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
 
     std::vector<base_local_planner::Trajectory> all_explored;

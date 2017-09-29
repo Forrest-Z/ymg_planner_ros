@@ -23,13 +23,13 @@ public:
   bool prepare();
   double scoreTrajectory(Trajectory &traj);
 
-  void setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed);
+  void setParams(double max_vel_abs, double max_scaling_factor, double scaling_speed);
   void setFootprint(std::vector<geometry_msgs::Point> footprint_spec);
 	void setSimGranularity (double sim_granularity) { sim_granularity_ = sim_granularity; }
 	void setForwardPointDist (double forward_point_dist) { forward_point_dist_ = forward_point_dist; }
 
   // helper functions, made static for easy unit testing
-  static double getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor);
+  static double getScalingFactor(Trajectory &traj, double scaling_speed, double max_vel_abs, double max_scaling_factor);
   static double footprintCost(
       const double& x,
       const double& y,
@@ -43,7 +43,7 @@ private:
   costmap_2d::Costmap2D* costmap_;
   std::vector<geometry_msgs::Point> footprint_spec_;
   base_local_planner::WorldModel* world_model_;
-  double max_trans_vel_;
+  double max_vel_abs_;
 
   //footprint scaling with velocity;
   double max_scaling_factor_, scaling_speed_;

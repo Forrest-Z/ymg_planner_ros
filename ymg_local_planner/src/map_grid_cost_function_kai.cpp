@@ -36,17 +36,21 @@ double MapGridCostFunctionKai::getCellCosts (unsigned int px, unsigned int py)
   return grid_dist;
 }/*}}}*/
 
+// this function gets the distance from the endpoint of the trajectory to the global path and returns scaled value.
 double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 {/*{{{*/
+	if (getScale() == 0.0) {
+		return 0.0;
+	}
+
+	if (!traj.getPointsSize()) {
+		return -6.0;
+	}
+
   double cost = 0.0;
   double foot_x, foot_y, foot_th;
   unsigned int foot_cell_x, foot_cell_y;
   double foot_grid_dist;
-
-	if (!traj.getPointsSize()) {
-		// ROS_ERROR("trajectory size is zero");
-		return -6.0;
-	}
 
 	traj.getEndpoint(foot_x, foot_y, foot_th);
 
@@ -64,13 +68,11 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 		unsigned int head_cell_x, head_cell_y;
 		double head_grid_dist;
 
-		double look_ahead = forward_point_dist_;
-		if (traj.xv_ < 0.0) {
-			look_ahead *= -1;
-		}
+		int sign = 1;
+		if (traj.xv_<0.0) sign = -1;
 
-		head_x = foot_x + look_ahead * cos(foot_th);
-		head_y = foot_y + look_ahead * sin(foot_th);
+		head_x = foot_x + sign*forward_point_dist_ * cos(foot_th);
+		head_y = foot_y + sign*forward_point_dist_ * sin(foot_th);
 
 		if ( ! costmap_->worldToMap(head_x, head_y, head_cell_x, head_cell_y)) {
 			ROS_WARN("Off Map (head) %f, %f", head_x, head_y);
@@ -93,7 +95,7 @@ double MapGridCostFunctionKai::scoreTrajectory (Trajectory &traj)
 	}
 
 
-  return cost;
+  return cost * getScale();
 }/*}}}*/
 
 } /* namespace base_local_planner */

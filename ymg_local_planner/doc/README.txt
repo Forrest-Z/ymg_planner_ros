@@ -118,7 +118,7 @@ The distance from the center point of the robot to place an additional scoring p
 
 ~/YmgLPROS/scaling_speed (double[m/s], default: 0.25)  
 The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  
-速度の閾値．ロボットの速度がこの値を超えると，footprintがスケーリングされる．
+速度の閾値．ロボットの速度の絶対値がこの値を超えると，footprintがスケーリングされる．
 
 ~/YmgLPROS/max_scaling_factor (double, default: 1.5)  
 The maximum factor to scale the robot's footprint by  

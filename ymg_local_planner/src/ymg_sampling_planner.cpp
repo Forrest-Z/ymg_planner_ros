@@ -106,17 +106,18 @@ namespace ymglp {
 	base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(double vel_x)
 	{/*{{{*/
 		base_local_planner::Trajectory best_traj;
+		best_traj.cost_ = -1.0;
+
 		Eigen::Vector3f target_vel;
 		target_vel[0] = vel_x;
 		target_vel[1] = 0.0;   // velocity_y must be zero
 		double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
 
-		best_traj.cost_ = -1.0;
 		for (int iw=0; iw<=vsamples_[2]; ++iw) {
 			target_vel[2] = max_vel_[2] - iw * w_step;
 			base_local_planner::Trajectory comp_traj;
 			if(generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
-				comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj) * path_critic_->getScale();
+				comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
 				if (0.0<=comp_traj.cost_
 						&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
 					best_traj = comp_traj;

@@ -47,6 +47,9 @@ public:
    */
   bool prepare();
 
+	/**
+	 * return the distance from the endpoint of the trajectory to global path
+	 */
   double scoreTrajectory(Trajectory &traj);
 
   /**

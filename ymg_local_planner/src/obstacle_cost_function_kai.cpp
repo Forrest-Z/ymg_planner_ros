@@ -23,10 +23,10 @@ ObstacleCostFunctionKai::~ObstacleCostFunctionKai()
 }/*}}}*/
 
 
-void ObstacleCostFunctionKai::setParams(double max_trans_vel, double max_scaling_factor, double scaling_speed)
+void ObstacleCostFunctionKai::setParams(double max_vel_abs, double max_scaling_factor, double scaling_speed)
 {/*{{{*/
   // TODO: move this to prepare if possible
-  max_trans_vel_ = max_trans_vel;
+  max_vel_abs_ = max_vel_abs;
   max_scaling_factor_ = max_scaling_factor;
   scaling_speed_ = scaling_speed;
 }/*}}}*/
@@ -47,6 +47,7 @@ bool ObstacleCostFunctionKai::isZero(double x)
 	return (0<=x && x<DBL_MIN*128);
 }/*}}}*/
 
+// this function gets maximum cost in the trajectory and returns scaled value.
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
 	// XXX added but has not tested yet.
@@ -55,14 +56,18 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		double ep_x, ep_y, ep_th;
 		traj.getEndpoint(ep_x, ep_y, ep_th);
 		int additional_points = forward_point_dist_ / sim_granularity_;
-		for (int i=0; i<additional_points; ++i) {
-			double len = (i+1) * sim_granularity_;
+
+		int sign = 1;
+		if (traj.xv_<0.0) sign = -1;
+
+		for (int i=1; i<=additional_points; ++i) {
+			double len = sign * i * sim_granularity_;
 			traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
 		}
 	}
 
   double cost = 0;
-  double scale = getScalingFactor(traj, scaling_speed_, max_trans_vel_, max_scaling_factor_);
+  double scale = getScalingFactor(traj, scaling_speed_, max_vel_abs_, max_scaling_factor_);
   double px, py, pth;
   if (footprint_spec_.size() == 0) {
     // Bug, should never happen
@@ -85,7 +90,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
   return cost;
 }/*}}}*/
 
-double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_trans_vel, double max_scaling_factor)
+double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_vel_abs, double max_scaling_factor)
 {/*{{{*/
   double vmag = hypot(traj.xv_, traj.yv_);
 
@@ -94,7 +99,7 @@ double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scalin
   double scale = 1.0;
   if (vmag > scaling_speed) {
     //scale up to the max scaling factor linearly... this could be changed later
-    double ratio = (vmag - scaling_speed) / (max_trans_vel - scaling_speed);
+    double ratio = (vmag - scaling_speed) / (max_vel_abs - scaling_speed);
     scale = (max_scaling_factor - 1.0) * ratio + 1.0;
   }
   return scale;
@@ -109,6 +114,10 @@ double ObstacleCostFunctionKai::footprintCost (
 
   //check if the footprint is legal
   // TODO: Cache inscribed radius
+	
+	if (getScale() == 0.0) {
+		return 0.0;
+	}
 	
 	double footprint_cost;
 	
@@ -136,7 +145,7 @@ double ObstacleCostFunctionKai::footprintCost (
 
   double occ_cost = std::max(std::max(0.0, footprint_cost), double(costmap->getCost(cell_x, cell_y)));
 
-  return occ_cost;
+  return occ_cost * getScale();
 }/*}}}*/
 
 } /* namespace base_local_planner */

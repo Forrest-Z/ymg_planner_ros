@@ -15,17 +15,11 @@ namespace base_local_planner {
     int gen_id = 0;
     for(std::vector<TrajectoryCostFunction*>::iterator score_function = critics_.begin(); score_function != critics_.end(); ++score_function) {
       TrajectoryCostFunction* score_function_p = *score_function;
-      if (score_function_p->getScale() == 0) {
-        continue;
-      }
       double cost = score_function_p->scoreTrajectory(traj);
       if (cost < 0) {
-        ROS_DEBUG("Velocity %.3lf, %.3lf, %.3lf discarded by cost function  %d with cost: %f", traj.xv_, traj.yv_, traj.thetav_, gen_id, cost);
+        // ROS_DEBUG("Velocity %.3lf, %.3lf, %.3lf discarded by cost function  %d with cost: %f", traj.xv_, traj.yv_, traj.thetav_, gen_id, cost);
         traj_cost = cost;
         break;
-      }
-      if (cost != 0) {
-        cost *= score_function_p->getScale();
       }
       traj_cost += cost;
       if (best_traj_cost > 0) {
