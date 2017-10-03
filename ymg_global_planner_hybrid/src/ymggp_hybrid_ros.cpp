@@ -124,7 +124,7 @@ void YmgGPHybROS::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray:
 			&& status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
 		ymg_global_planner_.clearPlan();
 		use_navfn_ = false;
-		ROS_INFO_NAMED("YmgGPHyb", "Goal reached. Cleared plan.");
+		// ROS_INFO_NAMED("YmgGPHyb", "Goal reached. Cleared plan.");
 	}
 }/*}}}*/
 

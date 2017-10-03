@@ -210,41 +210,49 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 	int closest_index = getClosestIndexOfPath(current_pose, global_plan_);
 	if (closest_index < 0) return;
 
-	// calc local goal and shorten the global plan
-	double now_distance = 0.0;
-	int local_goal_index = -1;
-	for (int i=closest_index+1; i<global_plan_.size(); ++i) {
-		now_distance += calcDist(global_plan_[i-1], global_plan_[i]);
-		if (local_goal_distance_ < now_distance) {
-			local_goal_index = i;
-			break;
-		}
+	if (!use_dwa_) {
+		path_costs_.setTargetPoses(new_plan);
+		goal_costs_.setTargetPoses(new_plan);
 	}
 
-	// resize global_plan
-	std::vector<geometry_msgs::PoseStamped> shortened_plan;
-	if (local_goal_index == -1) {
-		shortened_plan = global_plan_;
-	} else {
-		for (int i=closest_index; i<local_goal_index; ++i) {
-			shortened_plan.push_back(global_plan_[i]);
+	if (use_dwa_) {
+		// calc local goal and shorten the global plan
+		double now_distance = 0.0;
+		int local_goal_index = -1;
+		for (int i=closest_index+1; i<global_plan_.size(); ++i) {
+			now_distance += calcDist(global_plan_[i-1], global_plan_[i]);
+			if (local_goal_distance_ < now_distance) {
+				local_goal_index = i;
+				break;
+			}
 		}
-	}
 
-	geometry_msgs::PointStamped local_goal_msg;
-	local_goal_msg.header = new_plan.front().header;
-	local_goal_msg.point.x = shortened_plan.back().pose.position.x;
-	local_goal_msg.point.y = shortened_plan.back().pose.position.y;
-	local_goal_msg.point.z = 0.0;
-	local_goal_pub_.publish(local_goal_msg);
+		// resize global_plan
+		std::vector<geometry_msgs::PoseStamped> shortened_plan;
+		if (local_goal_index == -1) {
+			shortened_plan = global_plan_;
+		} else {
+			for (int i=closest_index; i<local_goal_index; ++i) {
+				shortened_plan.push_back(global_plan_[i]);
+			}
+		}
+
+		path_costs_.setTargetPoses(shortened_plan);
+		goal_costs_.setTargetPoses(shortened_plan);
+
+		geometry_msgs::PointStamped local_goal_msg;
+		local_goal_msg.header = new_plan.front().header;
+		local_goal_msg.point.x = shortened_plan.back().pose.position.x;
+		local_goal_msg.point.y = shortened_plan.back().pose.position.y;
+		local_goal_msg.point.z = 0.0;
+		local_goal_pub_.publish(local_goal_msg);
+	}
 
 
   // costs for going away from path
-  path_costs_.setTargetPoses(shortened_plan);
   // path_costs_.setTargetPoses(global_plan_);
 
   // costs for not going towards the local goal as much as possible
-  goal_costs_.setTargetPoses(shortened_plan);
   // goal_costs_.setTargetPoses(global_plan_);
 
 }/*}}}*/
