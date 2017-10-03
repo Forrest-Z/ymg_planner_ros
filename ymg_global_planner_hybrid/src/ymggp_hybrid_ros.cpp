@@ -7,27 +7,27 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 // register this planner as a BaseGlobalPlanner plugin
-PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner)
+PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner);
 
 namespace ymggp {
 
 YmgGPHybROS::YmgGPHybROS() 
-/*{{{*/
+	/*{{{*/
 	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {}
 /*}}}*/
 
 YmgGPHybROS::YmgGPHybROS(std::string name, costmap_2d::Costmap2DROS* costmap_ros)
-/*{{{*/
+	/*{{{*/
 	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true)
 {
-		initialize(name, costmap_ros);
+	initialize(name, costmap_ros);
 }/*}}}*/
 
 YmgGPHybROS::YmgGPHybROS(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
-/*{{{*/
+	/*{{{*/
 	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true)
 {
-		initialize(name, costmap, global_frame);
+	initialize(name, costmap, global_frame);
 }/*}}}*/
 
 void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, std::string global_frame)
@@ -62,6 +62,8 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
 		private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
 
+		private_nh.param("clear_plan_when_goal_reached", clear_plan_when_goal_reached_, true);
+
 		//get the tf prefix
 		ros::NodeHandle prefix_nh;
 		tf_prefix_ = tf::getPrefixParam(prefix_nh);
@@ -71,10 +73,12 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		use_navfn_ = false;
 		ymg_global_planner_.initialize(global_frame, path_resolution_);
 		odom_helper_.setOdomTopic("odom");
-		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
-		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPHybROS::useYmggpForceCallback, this);
 		robot_status_ = goal_reached;
 		stop_time_ = ros::Time::now();
+
+		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPHybROS::resetFlagCallback, this);
+		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPHybROS::useYmggpForceCallback, this);
+		movebase_status_sub_ = private_nh.subscribe("/move_base/status", 100, &YmgGPHybROS::movebaseStatusCallback, this);
 
 		initialized_ = true;
 	}
@@ -87,7 +91,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap
 	initialize(name, costmap_ros->getCostmap(), costmap_ros->getGlobalFrameID());
 }/*}}}*/
 
-void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& flag)
+void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	use_navfn_ = false;
@@ -106,6 +110,21 @@ void YmgGPHybROS::useYmggpForceCallback (const std_msgs::Int32& msg)
 			use_ymggp_force_ = true;
 			use_navfn_ = false;
 			break;
+	}
+}/*}}}*/
+		
+void YmgGPHybROS::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg)
+{/*{{{*/
+	if (msg->status_list.empty())
+		return;
+
+	actionlib_msgs::GoalStatus status = msg->status_list[0];
+
+	if (clear_plan_when_goal_reached_
+			&& status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
+		ymg_global_planner_.clearPlan();
+		use_navfn_ = false;
+		ROS_INFO_NAMED("YmgGPHyb", "Goal reached. Cleared plan.");
 	}
 }/*}}}*/
 
@@ -213,7 +232,8 @@ void YmgGPHybROS::mapToWorld(double mx, double my, double& wx, double& wy)
 	wy = costmap_->getOriginY() + my * costmap_->getResolution();
 }/*}}}*/
 
-bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
+bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start,
+		const geometry_msgs::PoseStamped& goal, double tolerance, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	boost::mutex::scoped_lock lock(mutex_);
 
@@ -365,7 +385,8 @@ bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start, const 
 	return !plan.empty();
 }/*}}}*/
 
-bool YmgGPHybROS::makeYmggpPlan (const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
+bool YmgGPHybROS::makeYmggpPlan (const geometry_msgs::PoseStamped& start,
+		const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	plan.clear();
 	ymg_global_planner_.makePlan(start, goal, plan);
@@ -472,8 +493,8 @@ bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& pl
 }/*}}}*/
 
 void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
-				const geometry_msgs::PoseStamped& goal,
-				const std::vector<geometry_msgs::PoseStamped>& plan)
+		const geometry_msgs::PoseStamped& goal,
+		const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
 		// ROS_INFO("[YmgGPHybROS] robot status : goal_reached");

@@ -1,6 +1,7 @@
 #ifndef YMGGP_HYBRID_ROS_H_
 #define YMGGP_HYBRID_ROS_H_
 
+#include <vector>
 #include <ros/ros.h>
 #include <navfn/navfn.h>
 #include <ymg_global_planner/ymggp.h>
@@ -9,7 +10,6 @@
 #include <geometry_msgs/Point.h>
 #include <nav_msgs/Path.h>
 #include <tf/transform_datatypes.h>
-#include <vector>
 #include <nav_core/base_global_planner.h>
 #include <nav_msgs/GetPlan.h>
 #include <navfn/potarr_point.h>
@@ -17,6 +17,7 @@
 #include <base_local_planner/odometry_helper_ros.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Int32.h>
+#include <actionlib_msgs/GoalStatusArray.h>
 
 namespace ymggp {
 
@@ -25,6 +26,7 @@ namespace ymggp {
  * @brief Provides a ROS wrapper for the navfn planner which runs a fast, interpolated navigation function on a costmap.
  */
 class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
+
 	public:
 		/**
 		 * @brief  Default constructor for the NavFnROS object
@@ -150,6 +152,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 		bool makePlanService(nav_msgs::GetPlan::Request& req, nav_msgs::GetPlan::Response& resp);
 
+
 	protected:
 
 		/**
@@ -163,6 +166,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 
 	private:
+
 		void mapToWorld(double mx, double my, double& wx, double& wy);
 		void clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my);
 		double planner_window_x_, planner_window_y_, default_tolerance_;
@@ -173,11 +177,8 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 		YmgGP ymg_global_planner_;
 		base_local_planner::OdometryHelperRos odom_helper_;
-		double path_resolution_;
-		double navfn_goal_dist_;
-		double recovery_dist_;
-		double stuck_timeout_;
-		double stuck_vel_, stuck_rot_vel_, goal_tolerance_;
+		double path_resolution_, navfn_goal_dist_, recovery_dist_;
+		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
 		enum RobotStatus {moving, stopped, goal_reached};
 		RobotStatus robot_status_;
@@ -186,19 +187,21 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 				const geometry_msgs::PoseStamped& goal,
 				const std::vector<geometry_msgs::PoseStamped>& plan);
 
-		bool use_navfn_;
+		bool use_navfn_, use_ymggp_force_, clear_plan_when_goal_reached_;
 		geometry_msgs::PoseStamped navfn_goal_;
 		bool isStuck(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal);
 		bool setNavfnGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool updateNavfnGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index = 0);
 
-		void resetFlagCallback (const std_msgs::Empty& flag);
+		void resetFlagCallback (const std_msgs::Empty& msg);
 		ros::Subscriber reset_flag_sub_;
 
 		void useYmggpForceCallback (const std_msgs::Int32& msg);
 		ros::Subscriber use_ymggp_force_sub_;
-		bool use_ymggp_force_;
+
+		void movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+		ros::Subscriber movebase_status_sub_;
 
 };   // class YmgGPHybROS
 

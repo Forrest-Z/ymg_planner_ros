@@ -1,6 +1,7 @@
 # ########## ymglp params ##########
 
 YmgGPHybROS:
+
   path_resolution: 10.0
 
   stuck_timeout: 7.0
@@ -10,5 +11,7 @@ YmgGPHybROS:
 
   navfn_goal_dist: 5.0
   recovery_dist: 2.0
+
+  clear_plan_when_goal_reached: true
   
 

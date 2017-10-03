@@ -26,26 +26,29 @@ navfnモードの状態で1を受け取るとnavfnのゴールに到達した後
 ### Parameters
 (move base param) ~/base_global_planner: "ymggp/YmgGPHybROS"  
 
-~/YmgGPROS/path_resolution (double[points/m], default: 10.0)
+~/YmgGPHybROS/path_resolution (double[points/m], default: 10.0)
 点の集合で表されるグローバルパスの密度．
 
-~/YmgGPROS/stuck_timeout (double[sec], default: 10.0)
+~/YmgGPHybROS/stuck_timeout (double[sec], default: 10.0)
 When the robot stops while this time, this planner changes algorithm to dijkstra.
 この秒数間ロボットがスタックしたら，グローバルパスの算出アルゴリズムをnavfn(dijkstra法)に切り替える．
 
-~/YmgGPROS/stuck_vel (double[m/s], default: 0.05)
+~/YmgGPHybROS/stuck_vel (double[m/s], default: 0.05)
 ロボットの速度の絶対値がこの速度以下となった場合にロボットがスタックしたとみなす．
 マイナスにセットした場合は，スタック判定を行わない．(navfnに切り替わらない)
 
-~/YmgGPROS/stuck_rot_vel (double[rad/s], default: -1.0)
+~/YmgGPHybROS/stuck_rot_vel (double[rad/s], default: -1.0)
 ロボットの角速度の絶対値がこの速度以下となった場合にロボットがスタックしたとみなす．
 マイナスにセットした場合は角速度はスタック判定に用いられない．
 
-~/YmgGPROS/navfn_goal_dist (double[m], default: 5.0)
+~/YmgGPHybROS/navfn_goal_dist (double[m], default: 5.0)
 navfnにアルゴリズムが切り替わった時，現在地から(ymggpで算出されたパス上の)何メートル先にnavfnのゴールを置くか．
 
-~/YmgGPROS/recovery_dist (double[m], default: 2.0)
+~/YmgGPHybROS/recovery_dist (double[m], default: 2.0)
 navfnモード時にnavfnのゴールとの距離がこの値以下となった時，ymggpモードに切り替わる．
 
-~/YmgGPROS/goal_tolerance (double[m], default: 0.3)
+~/YmgGPHybROS/goal_tolerance (double[m], default: 0.3)
 ロボットとゴールの位置がこの距離以下となって止まっている時，ロボットはスタック判定を行わない．(navfnモードに切り替わらない)
+
+~/YmgGPHybROS/clear_plan_when_goal_reached (bool, default: true)
+ロボットがゴールに到達した時，global_planの配列をclearするかどうか．
