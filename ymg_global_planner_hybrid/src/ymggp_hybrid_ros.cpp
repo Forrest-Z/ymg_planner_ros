@@ -53,7 +53,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		private_nh.param("planner_window_y", planner_window_y_, 0.0);
 		private_nh.param("default_tolerance", default_tolerance_, 0.0);
 
-		private_nh.param("path_granularity", path_granularity_, 10.0);
+		private_nh.param("path_granularity", path_granularity_, 0.05);
 		private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
 		private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
 		private_nh.param("recovery_dist", recovery_dist_, 2.0);

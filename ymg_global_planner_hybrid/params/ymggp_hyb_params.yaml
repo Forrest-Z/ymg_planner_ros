@@ -2,7 +2,7 @@
 
 YmgGPHybROS:
 
-  path_resolution: 10.0
+  path_granularity: 0.05
 
   stuck_timeout: 7.0
   stuck_vel: 0.05
