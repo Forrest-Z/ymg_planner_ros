@@ -177,7 +177,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 
 		YmgGP ymg_global_planner_;
 		base_local_planner::OdometryHelperRos odom_helper_;
-		double path_resolution_, navfn_goal_dist_, recovery_dist_;
+		double path_granularity_, navfn_goal_dist_, recovery_dist_;
 		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
 		enum RobotStatus {moving, stopped, goal_reached};

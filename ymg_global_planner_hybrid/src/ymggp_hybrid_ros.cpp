@@ -53,7 +53,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		private_nh.param("planner_window_y", planner_window_y_, 0.0);
 		private_nh.param("default_tolerance", default_tolerance_, 0.0);
 
-		private_nh.param("path_resolution", path_resolution_, 10.0);
+		private_nh.param("path_granularity", path_granularity_, 10.0);
 		private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
 		private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
 		private_nh.param("recovery_dist", recovery_dist_, 2.0);
@@ -71,7 +71,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		make_plan_srv_ =  private_nh.advertiseService("make_plan", &YmgGPHybROS::makePlanService, this);
 
 		use_navfn_ = false;
-		ymg_global_planner_.initialize(global_frame, path_resolution_);
+		ymg_global_planner_.initialize(global_frame, path_granularity_);
 		odom_helper_.setOdomTopic("odom");
 		robot_status_ = goal_reached;
 		stop_time_ = ros::Time::now();
@@ -445,7 +445,7 @@ bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& p
 	if (plan.empty())
 		return false;
 
-	int forward_index = navfn_goal_dist_ * path_resolution_;
+	int forward_index = navfn_goal_dist_ / path_granularity_;
 	setValidGoal(plan, forward_index);
 
 	return true;

@@ -13,12 +13,12 @@ using namespace ymggp;
 /**
  * @brief  Initialization function for the YmgGP object
  * @param  global_frame The Global frame of this planner
- * @param  path_resolution path resolution
+ * @param  path_granularity path resolution
  */
-void YmgGP::initialize (std::string global_frame, double path_resolution)
+void YmgGP::initialize (std::string global_frame, double path_granularity)
 {/*{{{*/
 	global_frame_ = global_frame;
-	path_resolution_ = path_resolution;
+	path_granularity_ = path_granularity;
 	initialized_ = true;
 }/*}}}*/
 
@@ -84,7 +84,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 
 
 	geometry_msgs::PoseStamped endpoint = plan_.back();
-	int points = ymglp::calcDist(endpoint, goal) * path_resolution_;
+	int points = ceil(ymglp::calcDist(endpoint, goal) / path_granularity_);
 	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
 	if (1 <= points) {
 		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;

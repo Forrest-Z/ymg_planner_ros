@@ -32,11 +32,11 @@ void YmgGPROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ro
 {/*{{{*/
 	if (!initialized_) {
 		ros::NodeHandle private_nh("~/" + name);
-		double path_resolution, max_path_length;
-		private_nh.param("path_resolution", path_resolution, 10.0);
+		double path_granularity, max_path_length;
+		private_nh.param("path_granularity", path_granularity, 10.0);
 		plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
 
-		ymg_global_planner_.initialize(costmap_ros->getGlobalFrameID(), path_resolution);
+		ymg_global_planner_.initialize(costmap_ros->getGlobalFrameID(), path_granularity);
 
 		initialized_ = true;
 	}
