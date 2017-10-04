@@ -24,7 +24,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 		reverse_mode_ = false;
 	}
 	else {
-		config.min_vel_x = -config.max_vel_x;
+		config.min_vel_x = config.max_vel_x;
 		config.max_vel_x = 0.0;
 		reverse_mode_ = true;
 	}
