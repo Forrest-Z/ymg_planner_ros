@@ -41,6 +41,7 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
+	ROS_INFO("sim_period  : %f", sim_period_);
 	ROS_INFO("acc_lim_th  : %f", acc_lim[2]);
 	ROS_INFO("theta range : %f to %f", min_vel_[2], max_vel_[2]);
 
