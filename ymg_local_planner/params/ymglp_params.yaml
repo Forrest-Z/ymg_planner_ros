@@ -23,6 +23,7 @@ YmgLPROS:
 
   path_tolerance: 0.1
   obstacle_tolerance: 253 
+  direction_error: 1.0
 
   path_distance_bias: 40.0
   goal_distance_bias: 10.0

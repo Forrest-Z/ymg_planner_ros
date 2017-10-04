@@ -142,6 +142,7 @@ class YmgLP {
 				bool use_dwa_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 				YmgSamplingPlanner ymg_sampling_planner_;
+				double direction_tolerance_;
 				DirAdjustPlanner direction_adjust_planner_;
 
 				double local_goal_distance_;

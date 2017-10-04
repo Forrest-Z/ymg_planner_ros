@@ -22,13 +22,13 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 
 	generator_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
-
 	ymg_sampling_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 	direction_adjust_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 
 	ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
+	direction_tolerance_ = config.direction_tolerance;
 
 	double resolution = planner_util_->getCostmap()->getResolution();
 	pdist_scale_ = config.path_distance_bias;
@@ -303,12 +303,12 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
 	double direction_error = calcDirectionError(global_pose, global_plan_);
-	ROS_INFO("direction_error: %f", direction_error);
 
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 	if (!use_dwa_) {
-		if (M_PI/2.0 < fabs(direction_error)) {
+		if (direction_tolerance_ < fabs(direction_error)) {
+			ROS_INFO("direction_error: %f", direction_error);
 			direction_adjust_planner_.initialize(&limits, pos, vel, direction_error);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
