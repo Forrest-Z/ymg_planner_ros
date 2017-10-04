@@ -1,8 +1,8 @@
 #include <ymg_global_planner_hybrid/ymggp_hybrid_ros.h>
+#include <ymg_local_planner/util_functions.h>
 #include <pluginlib/class_list_macros.h>
 #include <tf/transform_listener.h>
 #include <costmap_2d/cost_values.h>
-#include <ymg_local_planner/util_function.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 
@@ -330,7 +330,7 @@ bool YmgGPHybROS::makeNavfnPlan (const geometry_msgs::PoseStamped& start,
 		p.pose.position.x = goal.pose.position.x - tolerance;
 		while(p.pose.position.x <= goal.pose.position.x + tolerance){
 			double potential = getPointPotential(p.pose.position);
-			double sdist = ymglp::calcSqDist(p, goal);
+			double sdist = ymglp::utilfcn::calcSqDist(p, goal);
 			if(potential < POT_HIGH && sdist < best_sdist){
 				best_sdist = sdist;
 				best_pose = p;
@@ -414,7 +414,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	updateRobotStatus(start, goal, plan);
 
 	// changes algorithm to navfn
-	if (use_navfn_ && ymglp::calcDist(start, navfn_goal_) < recovery_dist_) {
+	if (use_navfn_ && ymglp::utilfcn::calcDist(start, navfn_goal_) < recovery_dist_) {
 		ROS_INFO("[YmgGPHybROS] Changes planner to ymggp.");
 		use_navfn_ = false;
 	}
@@ -462,7 +462,7 @@ bool YmgGPHybROS::updateNavfnGoal (const geometry_msgs::PoseStamped robot_pos,
 	if (!costmap_->worldToMap(px, py, cell_x, cell_y)
 			&& costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
 	{
-		int goal_closest_index = ymglp::getClosestIndexOfPath(navfn_goal_, plan);
+		int goal_closest_index = ymglp::utilfcn::getClosestIndexOfPath(navfn_goal_, plan);
 		setValidGoal(plan, goal_closest_index);
 		return true;
 	}
@@ -496,7 +496,7 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		const geometry_msgs::PoseStamped& goal,
 		const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
-	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
+	if (ymglp::utilfcn::calcDist(start, goal) < goal_tolerance_) {
 		// ROS_INFO("[YmgGPHybROS] robot status : goal_reached");
 		robot_status_ = goal_reached;
 		return;
@@ -545,7 +545,7 @@ bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start,
 	}
 
 	// if the robot is near the goal, return false
-	if (ymglp::calcDist(start, goal) < goal_tolerance_) {
+	if (ymglp::utilfcn::calcDist(start, goal) < goal_tolerance_) {
 		ROS_INFO("isStack fcn. robot is near the goal.");
 		last_move_time = ros::Time::now();
 		goal_reached = true;

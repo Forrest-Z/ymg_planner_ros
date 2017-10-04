@@ -129,7 +129,7 @@ class YmgLP {
 				void shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan,
 						std::vector<geometry_msgs::PoseStamped>& shortened_plan,
 						int nearest_index, double goal_distance);
-				double calcDirectionError( const tf::Stamped<tf::Pose>& pose,
+				void calcPoseError( const tf::Stamped<tf::Pose>& pose,
 						const std::vector<geometry_msgs::PoseStamped>& path);
 				void publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explored);
 
@@ -139,10 +139,11 @@ class YmgLP {
 				base_local_planner::MapGridCostFunctionKai path_costs_;
 				base_local_planner::MapGridCostFunctionKai goal_costs_;
 
-				bool use_dwa_;
+				bool use_dwa_, reverse_mode_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 				YmgSamplingPlanner ymg_sampling_planner_;
-				double direction_tolerance_;
+				double position_tolerance_, direction_tolerance_;
+				double position_error_, direction_error_;
 				DirAdjustPlanner direction_adjust_planner_;
 
 				double local_goal_distance_;

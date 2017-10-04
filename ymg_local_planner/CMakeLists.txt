@@ -36,6 +36,13 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_library(ymglp_utilfcn
+	src/util_functions.cpp
+	)
+target_link_libraries(ymglp_utilfcn
+	${catkin_LIBRARIES}
+	)
+
 add_library(ymglp
 	src/ymglp.cpp
 	src/ymglp_ros.cpp
@@ -50,6 +57,7 @@ add_dependencies(ymglp
 	ymg_local_planner_gencfg
 	)
 target_link_libraries(ymglp
+	ymglp_utilfcn
 	${catkin_LIBRARIES}
 	)
 

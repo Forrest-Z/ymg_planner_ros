@@ -2,7 +2,7 @@
 
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
-#include <ymg_local_planner/util_function.h>
+#include <ymg_local_planner/util_functions.h>
 #include <cmath>
 
 // for computing path distance
@@ -19,6 +19,15 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	boost::mutex::scoped_lock l(configuration_mutex_);
 
 	use_dwa_ = config.use_dwa;
+	if (0<config.max_vel_x) {
+		config.min_vel_x = 0.0;
+		reverse_mode_ = false;
+	}
+	else {
+		config.min_vel_x = -config.max_vel_x;
+		config.max_vel_x = 0.0;
+		reverse_mode_ = true;
+	}
 
 	generator_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
@@ -28,6 +37,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 
 	ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
+	position_tolerance_ = config.path_tolerance;
 	direction_tolerance_ = config.direction_tolerance;
 
 	double resolution = planner_util_->getCostmap()->getResolution();
@@ -178,7 +188,7 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 		global_plan_[i] = new_plan[i];
 	}
 
-	nearest_index_ = getClosestIndexOfPath(global_pose, global_plan_);
+	nearest_index_ = utilfcn::getClosestIndexOfPath(global_pose, global_plan_);
 	if (nearest_index_ < 0) return;
 
 	if (!use_dwa_) {
@@ -209,7 +219,7 @@ void YmgLP::shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan
 	double now_distance = 0.0;
 	int local_goal_index = -1;
 	for (int i=nearest_index+1; i<orig_plan.size(); ++i) {
-		now_distance += calcDist(orig_plan[i-1], orig_plan[i]);
+		now_distance += utilfcn::calcDist(orig_plan[i-1], orig_plan[i]);
 		if (goal_distance < now_distance) {
 			local_goal_index = i;
 			break;
@@ -256,14 +266,15 @@ void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explo
 	traj_cloud_pub_.publish(*traj_cloud_);
 }/*}}}*/
 
-double YmgLP::calcDirectionError(const tf::Stamped<tf::Pose>& pose,
+void YmgLP::calcPoseError(const tf::Stamped<tf::Pose>& pose,
 		const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
-	int closest_index = getClosestIndexOfPath(pose, path);
-	if (closest_index < 0) return 0.0;
+	int closest_index = utilfcn::getClosestIndexOfPath(pose, path);
+	if (closest_index < 0) return;
 
-	double robot_direction = tf::getYaw(pose.getRotation());
 	double path_direction;
+	double robot_direction = tf::getYaw(pose.getRotation());
+	if (reverse_mode_) robot_direction += M_PI;
 
 	if (closest_index == path.size()-1) {
 		path_direction = tf::getYaw(path.back().pose.orientation);
@@ -274,9 +285,12 @@ double YmgLP::calcDirectionError(const tf::Stamped<tf::Pose>& pose,
 	}
 
 	double error = robot_direction - path_direction;   // -2pi to 2pi
-	error = atan2(sin(error), cos(error));
+	direction_error_ = atan2(sin(error), cos(error));
 
-	return error;
+	geometry_msgs::PoseStamped p;
+	p.pose.position.x = pose.getOrigin().getX();
+	p.pose.position.y = pose.getOrigin().getY();
+	position_error_ = utilfcn::calcDist(path[closest_index], p);
 }/*}}}*/
 
 /*
@@ -302,24 +316,25 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 			tf::getYaw(goal_pose.pose.orientation));
 	base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
-	double direction_error = calcDirectionError(global_pose, global_plan_);
 
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
-	if (!use_dwa_) {
-		if (direction_tolerance_ < fabs(direction_error)) {
-			ROS_INFO("DirAdjustPlanner running. error: %f", direction_error);
-			direction_adjust_planner_.initialize(&limits, pos, vel, direction_error);
-			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
-		}
-		else {
-			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
-			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-		}
+
+	calcPoseError(global_pose, global_plan_);
+	if (direction_tolerance_ < fabs(direction_error_) && position_error_ < position_tolerance_) {
+		ROS_INFO("DirAdjustPlanner running. error: %f", direction_error_);
+		direction_adjust_planner_.initialize(&limits, pos, vel, direction_error_);
+		direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 	}
 	else {
-		generator_.initialise(pos, vel, goal, &limits, vsamples_);
-		scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		if (!use_dwa_) {
+				ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+				ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+			}
+		else {
+			generator_.initialise(pos, vel, goal, &limits, vsamples_);
+			scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
 	}
 
 	if(publish_traj_pc_)

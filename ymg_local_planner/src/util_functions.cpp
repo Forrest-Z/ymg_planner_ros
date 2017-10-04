@@ -1,6 +1,3 @@
-#ifndef UTIL_FUNCTION_H_
-#define UTIL_FUNCTION_H_
-
 #include <ros/ros.h>
 #include <float.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -8,14 +5,16 @@
 
 namespace ymglp {
 
-inline double calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
+namespace utilfcn {
+
+double calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
 {/*{{{*/
 	double dx = p1.pose.position.x - p2.pose.position.x;
 	double dy = p1.pose.position.y - p2.pose.position.y;
 	return dx*dx + dy*dy;
 }/*}}}*/
 
-inline double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
+double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
 {/*{{{*/
 	double dx = p1.pose.position.x - p2.pose.position.x;
 	double dy = p1.pose.position.y - p2.pose.position.y;
@@ -47,12 +46,11 @@ int getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose, const std::vector<g
 	return getClosestIndexOfPath(p, path);
 }/*}}}*/
 
-// XXX new function and has not tested yet.
 bool isZero(double x)
 {/*{{{*/
 	return (0<=x && x<DBL_MIN*100);
 }/*}}}*/
 
-};   // namespace ymglp
+}   // namespace utilfcn
 
-#endif
+}   // namespace ymglp
