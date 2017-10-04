@@ -28,21 +28,27 @@ void YmgLPROS::reconfigureCB(YmgLPConfig &config, uint32_t level)
 
 		// update generic local planner params
 		base_local_planner::LocalPlannerLimits limits;
-		limits.max_trans_vel = config.max_trans_vel;
-		limits.min_trans_vel = config.min_trans_vel;
-		limits.max_vel_x = config.max_vel_x;
-		limits.min_vel_x = config.min_vel_x;
-		limits.max_vel_y = config.max_vel_y;
-		limits.min_vel_y = config.min_vel_y;
+		limits.max_trans_vel = fabs(config.max_vel_x);
+		limits.min_trans_vel = 0.0;
+		if (0.0 < config.max_vel_x) {
+			limits.max_vel_x = config.max_vel_x;
+			limits.min_vel_x = 0.0;
+		}
+		else {
+			limits.max_vel_x = 0.0;
+			limits.min_vel_x = config.max_vel_x;
+		}
+		limits.max_vel_y = 0.0;
+		limits.min_vel_y = 0.0;
 		limits.max_rot_vel = config.max_rot_vel;
 		limits.min_rot_vel = config.min_rot_vel;
 		limits.acc_lim_x = config.acc_lim_x;
-		limits.acc_lim_y = config.acc_lim_y;
+		limits.acc_lim_y = 0.0;
 		limits.acc_lim_theta = config.acc_lim_theta;
-		limits.acc_limit_trans = config.acc_limit_trans;
+		limits.acc_limit_trans = config.acc_lim_x;
 		limits.xy_goal_tolerance = config.xy_goal_tolerance;
 		limits.yaw_goal_tolerance = config.yaw_goal_tolerance;
-		limits.prune_plan = config.prune_plan;
+		limits.prune_plan = false;
 		limits.trans_stopped_vel = config.trans_stopped_vel;
 		limits.rot_stopped_vel = config.rot_stopped_vel;
 		planner_util_.reconfigureCB(limits, config.restore_defaults);

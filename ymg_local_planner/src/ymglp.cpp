@@ -19,15 +19,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	boost::mutex::scoped_lock l(configuration_mutex_);
 
 	use_dwa_ = config.use_dwa;
-	if (0<config.max_vel_x) {
-		config.min_vel_x = 0.0;
-		reverse_mode_ = false;
-	}
-	else {
-		config.min_vel_x = config.max_vel_x;
-		config.max_vel_x = 0.0;
+	if (config.max_vel_x < 0.0)
 		reverse_mode_ = true;
-	}
 
 	generator_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
@@ -60,7 +53,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
 
 	// obstacle costs can vary due to scaling footprint feature
-	double max_vel_abs = std::max( fabs(config.min_vel_x), fabs(config.max_vel_x) );
+	double max_vel_abs = fabs(config.max_vel_x);
 	obstacle_costs_.setParams(max_vel_abs, config.max_scaling_factor, config.scaling_speed);
 
 	local_goal_distance_ = config.local_goal_distance;
