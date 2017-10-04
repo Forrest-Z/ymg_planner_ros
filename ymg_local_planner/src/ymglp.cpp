@@ -25,6 +25,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 
 	ymg_sampling_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
+	direction_adjust_planner_.setParameters(
+			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 
 	ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
 
@@ -132,6 +134,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	use_dwa_ = false;
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 	ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_);
+	direction_adjust_planner_ = DirAdjustPlanner(&obstacle_costs_);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 }/*}}}*/
 
@@ -253,6 +256,29 @@ void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explo
 	traj_cloud_pub_.publish(*traj_cloud_);
 }/*}}}*/
 
+double YmgLP::calcDirectionError(const tf::Stamped<tf::Pose>& pose,
+		const std::vector<geometry_msgs::PoseStamped>& path)
+{/*{{{*/
+	int closest_index = getClosestIndexOfPath(pose, path);
+	if (closest_index < 0) return 0.0;
+
+	double robot_direction = tf::getYaw(pose.getRotation());
+	double path_direction;
+
+	if (closest_index == path.size()-1) {
+		path_direction = tf::getYaw(path.back().pose.orientation);
+	}
+	else {
+		path_direction = atan2(path[closest_index+1].pose.position.y - path[closest_index].pose.position.y,
+				path[closest_index+1].pose.position.x - path[closest_index].pose.position.x);
+	}
+
+	double error = robot_direction - path_direction;   // -2pi to 2pi
+	error = atan2(sin(error), cos(error));
+
+	return error;
+}/*}}}*/
+
 /*
  * given the current state of the robot, find a good trajectory
  */
@@ -276,16 +302,25 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 			tf::getYaw(goal_pose.pose.orientation));
 	base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
-	// prepare cost functions and generators for this run
-	generator_.initialise(pos, vel, goal, &limits, vsamples_);
-	ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_, global_plan_);
+	double direction_error = calcDirectionError(global_pose, global_plan_);
+	ROS_INFO("direction_error: %f", direction_error);
 
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
-	if (!use_dwa_)
-		ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-	else
+	if (!use_dwa_) {
+		if (M_PI/2.0 < fabs(direction_error)) {
+			direction_adjust_planner_.initialize(&limits, pos, vel, direction_error);
+			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
+		else {
+			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
+	}
+	else {
+		generator_.initialise(pos, vel, goal, &limits, vsamples_);
 		scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+	}
 
 	if(publish_traj_pc_)
 		publishTrajPC(all_explored);
@@ -304,4 +339,4 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	return result_traj_;
 }/*}}}*/
 
-};
+}

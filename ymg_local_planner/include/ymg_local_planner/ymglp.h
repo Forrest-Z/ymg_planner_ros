@@ -22,6 +22,7 @@
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
 #include <ymg_local_planner/ymg_sampling_planner.h>
+#include <ymg_local_planner/direction_adjust_planner.h>
 
 #include <nav_msgs/Path.h>
 
@@ -128,6 +129,8 @@ class YmgLP {
 				void shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan,
 						std::vector<geometry_msgs::PoseStamped>& shortened_plan,
 						int nearest_index, double goal_distance);
+				double calcDirectionError( const tf::Stamped<tf::Pose>& pose,
+						const std::vector<geometry_msgs::PoseStamped>& path);
 				void publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explored);
 
 				// see constructor body for explanations
@@ -139,12 +142,13 @@ class YmgLP {
 				bool use_dwa_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 				YmgSamplingPlanner ymg_sampling_planner_;
+				DirAdjustPlanner direction_adjust_planner_;
 
 				double local_goal_distance_;
 				ros::Publisher local_goal_pub_;
 
 };   // class ymglp
 
-};   // namespace ymglp
+}   // namespace ymglp
 
 #endif
