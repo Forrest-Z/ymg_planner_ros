@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <float.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <tf/tf.h>
 
 namespace ymglp {
 
@@ -21,7 +22,6 @@ inline double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs
 	return sqrt(dx*dx + dy*dy);
 }/*}}}*/
 
-// XXX this function was changed but has not tested yet.
 int getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose, const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
 	int closest_index = -1;
@@ -36,6 +36,15 @@ int getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose, const std::vec
 	}
 
 	return closest_index;
+}/*}}}*/
+
+int getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose, const std::vector<geometry_msgs::PoseStamped>& path)
+{/*{{{*/
+	geometry_msgs::PoseStamped p;
+	p.pose.position.x = pose.getOrigin().getX();
+	p.pose.position.y = pose.getOrigin().getY();
+
+	return getClosestIndexOfPath(p, path);
 }/*}}}*/
 
 // XXX new function and has not tested yet.

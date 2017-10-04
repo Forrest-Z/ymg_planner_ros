@@ -84,7 +84,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 
 
 	geometry_msgs::PoseStamped endpoint = plan_.back();
-	int points = ceil(ymglp::calcDist(endpoint, goal) / path_granularity_);
+	int points = ymglp::calcDist(endpoint, goal) / path_granularity_;
 	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
 	if (1 <= points) {
 		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <Eigen/Core>
+#include <geometry_msgs/PoseStamped.h>
 #include <base_local_planner/local_planner_limits.h>
 #include <base_local_planner/trajectory_cost_function.h>
 #include <base_local_planner/trajectory_sample_generator.h>
@@ -33,7 +34,8 @@ public:
       base_local_planner::LocalPlannerLimits* limits,
       const Eigen::Vector3f& pos,
       const Eigen::Vector3f& vel,
-      const Eigen::Vector3f& vsamples);
+      const Eigen::Vector3f& vsamples,
+			const std::vector<geometry_msgs::PoseStamped>& global_plan);
 
 	void setParameters(double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period)
 	{/*{{{*/

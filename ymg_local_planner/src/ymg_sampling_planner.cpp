@@ -17,7 +17,8 @@ void YmgSamplingPlanner::initialize(
 		base_local_planner::LocalPlannerLimits* limits,
 		const Eigen::Vector3f& pos,
 		const Eigen::Vector3f& vel,
-		const Eigen::Vector3f& vsamples)
+		const Eigen::Vector3f& vsamples,
+		const std::vector<geometry_msgs::PoseStamped>& global_plan)
 {/*{{{*/
 	pos_ = pos;
 	vel_ = vel;
@@ -39,6 +40,8 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[0] = std::max(min_vel_x, vel[0] - acc_lim[0] * sim_period_);
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
+
+	ROS_INFO("theta range : %f to %f", min_vel_[2], max_vel_[2]);
 
 	if (fabs(max_vel_x) < fabs(min_vel_x))
 		reverse_order_ = true;

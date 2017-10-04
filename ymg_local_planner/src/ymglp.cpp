@@ -2,11 +2,10 @@
 
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/map_grid_cost_point.h>
-#include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <ymg_local_planner/util_function.h>
 #include <cmath>
 
-//for computing path distance
+// for computing path distance
 #include <queue>
 #include <angles/angles.h>
 #include <ros/ros.h>
@@ -111,9 +110,6 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	}
 	ROS_INFO("Sim period is set to %.2f", sim_period_);
 
-	private_nh.param("publish_cost_grid_pc", publish_cost_grid_pc_, false);
-	map_viz_.initialize(name, planner_util->getGlobalFrame(), boost::bind(&YmgLP::getCellCosts, this, _1, _2, _3, _4, _5, _6));
-
 	std::string frame_id;
 	private_nh.param("global_frame_id", frame_id, std::string("odom"));
 
@@ -137,28 +133,6 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 	ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
-
-	private_nh.param("cheat_factor", cheat_factor_, 1.0);
-}/*}}}*/
-
-// used for visualization only, total_costs are not really total costs
-bool YmgLP::getCellCosts (int cx, int cy, float &path_cost, float &goal_cost, float &occ_cost, float &total_cost)
-{/*{{{*/
-	path_cost = path_costs_.getCellCosts(cx, cy);
-	goal_cost = goal_costs_.getCellCosts(cx, cy);
-	occ_cost = planner_util_->getCostmap()->getCost(cx, cy);
-	if (path_cost == path_costs_.obstacleCosts() ||
-			path_cost == path_costs_.unreachableCellCosts() ||
-			occ_cost >= costmap_2d::INSCRIBED_INFLATED_OBSTACLE) {
-		return false;
-	}
-
-	double resolution = planner_util_->getCostmap()->getResolution();
-	total_cost =
-		pdist_scale_ * resolution * path_cost +
-		gdist_scale_ * resolution * goal_cost +
-		occdist_scale_ * occ_cost;
-	return true;
 }/*}}}*/
 
 bool YmgLP::setPlan (const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
@@ -201,13 +175,16 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 		global_plan_[i] = new_plan[i];
 	}
 
+	nearest_index_ = getClosestIndexOfPath(global_pose, global_plan_);
+	if (nearest_index_ < 0) return;
+
 	if (!use_dwa_) {
-		path_costs_.setTargetPoses(new_plan);
-		goal_costs_.setTargetPoses(new_plan);
+		path_costs_.setTargetPoses(global_plan_);
+		goal_costs_.setTargetPoses(global_plan_);
 	}
 	else {
 		std::vector<geometry_msgs::PoseStamped> shortened_plan;
-		shortenPath(global_pose, new_plan, shortened_plan);
+		shortenPath(global_plan_, shortened_plan, nearest_index_, local_goal_distance_);
 
 		path_costs_.setTargetPoses(shortened_plan);
 		goal_costs_.setTargetPoses(shortened_plan);
@@ -222,23 +199,15 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 
 }/*}}}*/
 
-void YmgLP::shortenPath(const tf::Stamped<tf::Pose>& global_pose,
-		const std::vector<geometry_msgs::PoseStamped>& orig_plan,
-		std::vector<geometry_msgs::PoseStamped>& shortened_plan)
+void YmgLP::shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan,
+		std::vector<geometry_msgs::PoseStamped>& shortened_plan, int nearest_index, double goal_distance)
 {/*{{{*/
-	geometry_msgs::PoseStamped current_pose;
-	current_pose.pose.position.x = global_pose.getOrigin().getX();
-	current_pose.pose.position.y = global_pose.getOrigin().getY();
-
-	int closest_index = getClosestIndexOfPath(current_pose, orig_plan);
-	if (closest_index < 0) return;
-
-	// calc local goal and shorten the global plan
+	// calc local goal index
 	double now_distance = 0.0;
 	int local_goal_index = -1;
-	for (int i=closest_index+1; i<orig_plan.size(); ++i) {
+	for (int i=nearest_index+1; i<orig_plan.size(); ++i) {
 		now_distance += calcDist(orig_plan[i-1], orig_plan[i]);
-		if (local_goal_distance_ < now_distance) {
+		if (goal_distance < now_distance) {
 			local_goal_index = i;
 			break;
 		}
@@ -249,10 +218,39 @@ void YmgLP::shortenPath(const tf::Stamped<tf::Pose>& global_pose,
 	if (local_goal_index == -1) {
 		shortened_plan = orig_plan;
 	} else {
-		for (int i=closest_index; i<local_goal_index; ++i) {
+		for (int i=nearest_index; i<local_goal_index; ++i) {
 			shortened_plan.push_back(orig_plan[i]);
 		}
 	}
+}/*}}}*/
+
+void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explored)
+{/*{{{*/
+	base_local_planner::MapGridCostPoint pt;
+	traj_cloud_->points.clear();
+	traj_cloud_->width = 0;
+	traj_cloud_->height = 0;
+	std_msgs::Header header;
+	pcl_conversions::fromPCL(traj_cloud_->header, header);
+	header.stamp = ros::Time::now();
+	traj_cloud_->header = pcl_conversions::toPCL(header);
+	for(std::vector<base_local_planner::Trajectory>::iterator t=all_explored.begin(); t != all_explored.end(); ++t)
+	{
+		if(t->cost_<0)
+			continue;
+		// Fill out the plan
+		for(unsigned int i = 0; i < t->getPointsSize(); ++i) {
+			double p_x, p_y, p_th;
+			t->getPoint(i, p_x, p_y, p_th);
+			pt.x=p_x;
+			pt.y=p_y;
+			pt.z=0;
+			pt.path_cost=p_th;
+			pt.total_cost=t->cost_;
+			traj_cloud_->push_back(pt);
+		}
+	}
+	traj_cloud_pub_.publish(*traj_cloud_);
 }/*}}}*/
 
 /*
@@ -269,61 +267,28 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	//make sure that our configuration doesn't change mid-run
 	boost::mutex::scoped_lock l(configuration_mutex_);
 
-	Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(), tf::getYaw(global_pose.getRotation()));
-	Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(), tf::getYaw(global_vel.getRotation()));
+	Eigen::Vector3f pos(global_pose.getOrigin().getX(), global_pose.getOrigin().getY(),
+			tf::getYaw(global_pose.getRotation()));
+	Eigen::Vector3f vel(global_vel.getOrigin().getX(), global_vel.getOrigin().getY(),
+			tf::getYaw(global_vel.getRotation()));
 	geometry_msgs::PoseStamped goal_pose = global_plan_.back();
-	Eigen::Vector3f goal(goal_pose.pose.position.x, goal_pose.pose.position.y, tf::getYaw(goal_pose.pose.orientation));
+	Eigen::Vector3f goal(goal_pose.pose.position.x, goal_pose.pose.position.y,
+			tf::getYaw(goal_pose.pose.orientation));
 	base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
 	// prepare cost functions and generators for this run
 	generator_.initialise(pos, vel, goal, &limits, vsamples_);
-	ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+	ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_, global_plan_);
 
 	std::vector<base_local_planner::Trajectory> all_explored;
-
 	result_traj_.cost_ = -7;
-
 	if (!use_dwa_)
 		ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 	else
 		scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 
 	if(publish_traj_pc_)
-	{
-		base_local_planner::MapGridCostPoint pt;
-		traj_cloud_->points.clear();
-		traj_cloud_->width = 0;
-		traj_cloud_->height = 0;
-		std_msgs::Header header;
-		pcl_conversions::fromPCL(traj_cloud_->header, header);
-		header.stamp = ros::Time::now();
-		traj_cloud_->header = pcl_conversions::toPCL(header);
-		for(std::vector<base_local_planner::Trajectory>::iterator t=all_explored.begin(); t != all_explored.end(); ++t)
-		{
-			if(t->cost_<0)
-				continue;
-			// Fill out the plan
-			for(unsigned int i = 0; i < t->getPointsSize(); ++i) {
-				double p_x, p_y, p_th;
-				t->getPoint(i, p_x, p_y, p_th);
-				pt.x=p_x;
-				pt.y=p_y;
-				pt.z=0;
-				pt.path_cost=p_th;
-				pt.total_cost=t->cost_;
-				traj_cloud_->push_back(pt);
-			}
-		}
-		traj_cloud_pub_.publish(*traj_cloud_);
-	}
-
-	// verbose publishing of point clouds
-	if (publish_cost_grid_pc_) {
-		//we'll publish the visualization of the costs to rviz before returning our best trajectory
-		map_viz_.publishCostCloud(planner_util_->getCostmap());
-	}
-
-	// debrief stateful scoring functions
+		publishTrajPC(all_explored);
 
 	//if we don't have a legal trajectory, we'll just command zero
 	if (result_traj_.cost_ < 0) {
