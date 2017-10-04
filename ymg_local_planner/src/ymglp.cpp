@@ -21,9 +21,9 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	use_dwa_ = config.use_dwa;
 
 	if (0.0 < config.max_vel_x)
-		reverse_mode_ = true;
-	else
 		reverse_mode_ = false;
+	else
+		reverse_mode_ = true;
 
 	generator_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);

@@ -16,7 +16,6 @@
 #include <costmap_2d/costmap_2d_ros.h>
 #include <nav_core/base_local_planner.h>
 #include <base_local_planner/latched_stop_rotate_controller.h>
-#include <base_local_planner/local_planner_limits.h>
 
 #include <base_local_planner/odometry_helper_ros.h>
 
