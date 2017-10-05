@@ -70,8 +70,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 
 	// trajectory.cost_ is the distance from global path.
 	double target_vel_x;
-	for (int iv=0; iv<=vsamples_[0]; ++iv) {
-		target_vel_x = start_vel_x - iv * v_step;
+	for (int i=0; i<=vsamples_[0]; ++i) {
+		target_vel_x = start_vel_x - i * v_step;
 		base_local_planner::Trajectory best_traj;
 		best_traj = generateClosestTrajectory(target_vel_x);
 

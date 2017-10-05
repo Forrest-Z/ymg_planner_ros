@@ -2,37 +2,40 @@
 
 YmgLPROS:
 
+  # robot velocity params
   max_vel_x: 0.6
   max_rot_vel: 1.6
   acc_lim_x: 1.2
   acc_lim_theta: 3.2
 
-  yaw_goal_tolerance: 0.3
+  # scaling robot's footprint
+  scaling_speed: 0.3
+  max_scaling_factor: 2.5
+
+  # goal tolerance param
+  yaw_goal_tolerance: 0.2
   xy_goal_tolerance: 0.4
 
+  # simulation params
+  controller_frequency: 5.0
   sim_time: 1.5
   sim_granularity: 0.025
   angular_sim_granularity: 0.04
   vx_samples: 4
-  vy_samples: 1
   vth_samples: 19
-  controller_frequency: 5.0
+  forward_point_dist: 0.3
+  forward_point_dist_obstacle: 0.3
 
   use_dwa: false
 
+  # ymg sampling planner params (valid if use_dwa set false)
   path_tolerance: 0.1
   obstacle_tolerance: 253 
-  direction_error: 1.0
+  direction_tolerance: 1.0
 
+  # dwa planner params (valid if use_dwa set true)
   path_distance_bias: 40.0
   goal_distance_bias: 10.0
   occdist_scale: 0.01
   local_goal_distance: 2.0
-
-  forward_point_dist: 0.3
-  forward_point_dist_obstacle: 0.3
-
-  scaling_speed: 0.3
-  max_scaling_factor: 2.5
-
 

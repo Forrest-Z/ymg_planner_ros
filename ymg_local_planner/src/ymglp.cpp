@@ -33,6 +33,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 
 	ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
+	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
+			config.yaw_goal_tolerance, config.obstacle_tolerance);
 	position_tolerance_ = config.path_tolerance;
 	direction_tolerance_ = config.direction_tolerance;
 
@@ -61,21 +63,14 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 
 	local_goal_distance_ = config.local_goal_distance;
 
-	int vx_samp, vy_samp, vth_samp;
+	int vx_samp, vth_samp;
 	vx_samp = config.vx_samples;
-	vy_samp = config.vy_samples;
 	vth_samp = config.vth_samples;
 
 	if (vx_samp <= 0) {
 		ROS_WARN("You've specified that you don't want any samples in the x dimension. We'll at least assume that you want to sample one value... so we're going to set vx_samples to 1 instead");
 		vx_samp = 1;
 		config.vx_samples = vx_samp;
-	}
-
-	if (vy_samp <= 0) {
-		ROS_WARN("You've specified that you don't want any samples in the y dimension. We'll at least assume that you want to sample one value... so we're going to set vy_samples to 1 instead");
-		vy_samp = 1;
-		config.vy_samples = vy_samp;
 	}
 
 	if (vth_samp <= 0) {
@@ -85,7 +80,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	}
 
 	vsamples_[0] = vx_samp;
-	vsamples_[1] = vy_samp;
+	vsamples_[1] = 1;
 	vsamples_[2] = vth_samp;
 
 
@@ -316,21 +311,20 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 
-	calcPoseError(global_pose, global_plan_);
-	if (direction_tolerance_ < fabs(direction_error_) && position_error_ < position_tolerance_) {
-		ROS_INFO("DirAdjustPlanner running. error: %f", direction_error_);
-		direction_adjust_planner_.initialize(&limits, pos, vel, direction_error_);
-		direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
+	if (!use_dwa_) {
+		calcPoseError(global_pose, global_plan_);
+		if (direction_adjust_planner_.haveToHandle(position_error_, direction_error_)) {
+			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_, direction_error_);
+			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
+		else {
+			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+		}
 	}
 	else {
-		if (!use_dwa_) {
-				ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
-				ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-			}
-		else {
-			generator_.initialise(pos, vel, goal, &limits, vsamples_);
-			scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-		}
+		generator_.initialise(pos, vel, goal, &limits, vsamples_);
+		scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 	}
 
 	if(publish_traj_pc_)

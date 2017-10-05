@@ -20,19 +20,13 @@ local goalの位置を可視化．デバッグ用．
 
 ~/YmgLPROS/max_vel_x (double[m/s], default: 0.55)  
 The maximum x velocity for the robot in m/s  
-ロボットのx方向の速度の上限．
-
-~/YmgLPROS/min_vel_x (double[m/s], default: 0.0)  
-The minimum x velocity for the robot in m/s  
-ロボットのx方向の速度の下限．
+ロボットのx方向の速度の上限．マイナスにセットすると，バックすることができる．
+min_vel_xは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)
 
 ~/YmgLPROS/max_rot_vel (double[rad/s], default: 1.0)  
 The absolute value of the maximum rotational velocity for the robot in rad/s  
 ロボットの角速度の絶対値の上限.
-
-~/YmgLPROS/min_rot_vel (double[rad/s], default: 0.4)  
-The absolute value of the minimum rotational velocity for the robot in rad/s  
-ロボットの角速度の絶対値の下限．
+min_rot_velは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)
 
 ~/YmgLPROS/acc_lim_x (double[m/s^2], default: 2.5)  
 The acceleration limit of the robot in the x direction
@@ -77,21 +71,29 @@ The granularity with which to check for collisions for rotations in radians
 シミュレートの際の角度の間隔．
 
 
+
 ~/YmgLPROS/use_dwa (bool, default: False)
 Use dynamic window approach to constrain sampling velocities to small window.
 プランニングにdwaを使用するか．
-以下のpath_tolerance, obstacle_toleranceはymglpのパラメータ.
+以下のpath_tolerance, obstacle_toleranceはymg_sampling_plannerのパラメータ.
 path_distance_bias, goal_distance_bias, occdist_scale, local_goal_distanceはdwaのパラメータ．
 
 ~/YmgLPROS/path_tolerance (double[m], default: 0.1)
 The tolerance between global path and endpoint of the simulated local path.
-[ymglp]ローカルプランの終端とグローバルパスの距離の許容値．
+[ymg_sampling_planner]ローカルプランの終端とグローバルパスの距離の許容値．
 距離はグリッドマップ上で計算されるため，距離の精度はローカルコストマップの解像度に依存するため注意．
 （解像度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
 
 ~/YmgLPROS/obstacle_tolerance (int, default: 253)
 The maximum cost of the cell which the path can be drawn.
-[ymglp]シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
+[ymg_sampling_planner]シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
+
+~/YmgLPROS/direction_tolerance (double[rad], default: 1.57(M_PI/2))
+The tolerance of the direction error between global path and robot.
+[ymg_sampling_planner]グローバルパスとロボットの向きのズレの許容値．
+ロボットがグローバルパス上にいる(グローバルパスとの距離がpath_tolerance以下)かつ
+向きのズレがこの値以上あるとき，専用のdirection_adjust_plannerで向きを調整する．
+direction_adjust_plannerはグローバルパスとロボットの向きのズレがyaw_goal_tolerance以下になるまで回転を行う．
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  
