@@ -535,6 +535,8 @@ bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start,
 	static bool goal_reached = true;
 	static ros::Time last_move_time = ros::Time::now();
 
+	ROS_INFO("stuck_vel rot : %f : %f", stuck_vel_, stuck_rot_vel_);
+
 	if (stuck_vel_ < 0.0) {
 		return false;
 	}
