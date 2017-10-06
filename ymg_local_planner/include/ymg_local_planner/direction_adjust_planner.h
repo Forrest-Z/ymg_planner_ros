@@ -37,9 +37,6 @@ class DirAdjustPlanner {
 			sim_period_ = sim_period;
 		}/*}}}*/
 
-		bool haveToHandle(const tf::Stamped<tf::Pose>& robot_pose,
-				const std::vector<geometry_msgs::PoseStamped>& global_plan);
-
 		bool haveToHandle(double position_error, double direction_error);
 
 		void initialize(

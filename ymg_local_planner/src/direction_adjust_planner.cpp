@@ -46,23 +46,17 @@ void DirAdjustPlanner::initialize(
 	}
 }/*}}}*/
 
-// XXX has not implemented yet
-bool DirAdjustPlanner::haveToHandle(const tf::Stamped<tf::Pose>& robot_pose,
-		const std::vector<geometry_msgs::PoseStamped>& global_plan)
-{/*{{{*/
-	return false;
-}/*}}}*/
-
 bool DirAdjustPlanner::haveToHandle(double position_error, double direction_error)
 {/*{{{*/
 	if (position_tolerance_ < fabs(position_error)) {
 		handle_latch_ = false;
 	}
 	else{
-		if (direction_tolerance_ < fabs(direction_error))
+		if (direction_tolerance_ < fabs(direction_error)) {
 			if (handle_latch_ == false)
 				ROS_INFO_NAMED("DirAdjustPlanner", "Adjusting direction.");
-		handle_latch_ = true;
+			handle_latch_ = true;
+		}
 		if (fabs(direction_error) < yaw_goal_tolerance_) 
 			handle_latch_ = false;
 	}
