@@ -40,10 +40,9 @@ void DirAdjustPlanner::initialize(
 
 	if (rotate_direction_ == UNDEFINED) {
 		if (0.0 < direction_error)
-			rotate_direction_ == CW;
+			rotate_direction_ = CW;
 		else
-			rotate_direction_ == CCW;
-		ROS_INFO("error : direction = %f : %d", direction_error, rotate_direction_);
+			rotate_direction_ = CCW;
 	}
 }/*}}}*/
 
