@@ -101,7 +101,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		target_vel_[2] = start_vel_theta - i * theta_step;
 		if (generateTrajectory(pos_, vel_, target_vel_, traj)) {
 			traj.cost_ = obstacle_critic_->scoreTrajectory(traj);
-			if (0.0 < traj.cost_ && traj.cost_ < obstacle_tolerance_) {
+			if (0.0 <= traj.cost_ && traj.cost_ <= obstacle_tolerance_) {
 				if (0.0 < target_vel_[2]) {
 					rotate_direction_ = CCW;
 				}

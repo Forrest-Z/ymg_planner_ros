@@ -316,6 +316,7 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 		calcPoseError(global_pose, global_plan_);
 		if (direction_adjust_planner_.haveToHandle(position_error_, direction_error_)) {
 		// if (0) {
+			ROS_INFO("direction_adjust_planner running.");
 			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_, direction_error_);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
