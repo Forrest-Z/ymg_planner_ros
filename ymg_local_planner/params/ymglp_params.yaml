@@ -14,7 +14,7 @@ YmgLPROS:
 
   # goal tolerance param
   yaw_goal_tolerance: 0.3
-  xy_goal_tolerance: 0.3
+  xy_goal_tolerance: 0.35
 
   # simulation params
   controller_frequency: 5.0
