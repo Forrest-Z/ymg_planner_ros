@@ -67,7 +67,7 @@ bool DirAdjustPlanner::haveToHandle(double position_error, double direction_erro
 			handle_latch_ = false;
 	}
 
-	if (handle_latch_)
+	if (!handle_latch_)
 		rotate_direction_ = UNDEFINED;
 
 	return handle_latch_;
