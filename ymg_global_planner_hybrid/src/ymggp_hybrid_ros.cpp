@@ -515,8 +515,8 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		omega_is_zero = true;
 	}
 
-	ROS_INFO("stack_rot_vel - robot_w = %f - %f", stuck_rot_vel_, fabs(robot_w));
-	ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
+	// ROS_INFO("stack_rot_vel - robot_w = %f - %f", stuck_rot_vel_, fabs(robot_w));
+	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
 
 	if (v_is_zero && omega_is_zero) {
 		// ROS_INFO("[YmgGPHybROS] robot status : stopped");
