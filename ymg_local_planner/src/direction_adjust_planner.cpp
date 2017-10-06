@@ -43,6 +43,7 @@ void DirAdjustPlanner::initialize(
 			rotate_direction_ == CW;
 		else
 			rotate_direction_ == CCW;
+		ROS_INFO("error : direction = %f : %d", direction_error, rotate_direction_);
 	}
 }/*}}}*/
 
