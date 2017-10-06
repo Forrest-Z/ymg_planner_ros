@@ -90,7 +90,6 @@ bool DirAdjustPlanner::findBestTrajectory(
 	// y velocity must be zero
 	target_vel[1] = 0.0;
 
-
 	double theta_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
 	double start_vel_theta = max_vel_[2];
 	if (rotate_direction_ == CW) {
@@ -103,14 +102,11 @@ bool DirAdjustPlanner::findBestTrajectory(
 		if (generateTrajectory(pos_, vel_, target_vel_, traj)) {
 			traj.cost_ = obstacle_critic_->scoreTrajectory(traj);
 			if (0.0 < traj.cost_ && traj.cost_ < obstacle_tolerance_) {
-				ROS_INFO("target_vel_[2] = %f", target_vel_[2]);
 				if (0.0 < target_vel_[2]) {
 					rotate_direction_ = CCW;
-					ROS_INFO("direction : CCW");
 				}
 				else {
 					rotate_direction_ = CW;
-					ROS_INFO("direction : CW");
 				}
 				return true;
 			}
