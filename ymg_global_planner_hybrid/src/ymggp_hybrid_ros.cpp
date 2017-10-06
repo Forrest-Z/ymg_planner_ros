@@ -532,52 +532,6 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 
 }/*}}}*/
 
-bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start, 
-		const geometry_msgs::PoseStamped& goal)
-{/*{{{*/
-	static bool goal_reached = true;
-	static ros::Time last_move_time = ros::Time::now();
-
-	ROS_INFO("stuck_vel rot : %f : %f", stuck_vel_, stuck_rot_vel_);
-
-	if (stuck_vel_ < 0.0) {
-		return false;
-	}
-
-	// if the robot reached goal past roop, reset last move time.
-	if (goal_reached) {
-		last_move_time = ros::Time::now();
-	}
-
-	// if the robot is near the goal, return false
-	if (ymglp::UtilFcn::calcDist(start, goal) < goal_tolerance_) {
-		ROS_INFO("isStack fcn. robot is near the goal.");
-		last_move_time = ros::Time::now();
-		goal_reached = true;
-		return false;
-	}
-	else {
-		goal_reached = false;
-	}
-
-	// judge stack from robot vel
-	tf::Stamped<tf::Pose> robot_vel;
-	odom_helper_.getRobotVel(robot_vel);
-	double robot_v = robot_vel.getOrigin().getX();
-	double robot_w = tf::getYaw(robot_vel.getRotation());
-	ROS_INFO("stuck_rot_vel : rot_vel = %f : %f", stuck_rot_vel_, fabs(robot_w));
-	if (stuck_vel_ < fabs(robot_v) || (0.0 < stuck_rot_vel_ && stuck_rot_vel_ < fabs(robot_w))) {
-		// ROS_INFO("robot moving. now vel = %f", fabs(robot_v));
-		last_move_time = ros::Time::now();
-		return false;
-	}
-	else if (ros::Duration(stuck_timeout_) < ros::Time::now() - last_move_time) {
-		return true;
-	}
-
-	return false;
-}/*}}}*/
-
 void YmgGPHybROS::publishNavfnPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
 	if(!initialized_){
