@@ -23,6 +23,7 @@ public:
   bool prepare();
   double scoreTrajectory(Trajectory &traj);
 
+	void setScalingFlag(bool scaling_flag) { scaling_flag_ = scaling_flag; }
   void setParams(double max_vel_abs, double max_scaling_factor, double scaling_speed);
   void setFootprint(std::vector<geometry_msgs::Point> footprint_spec);
 	void setSimGranularity (double sim_granularity) { sim_granularity_ = sim_granularity; }
@@ -46,6 +47,7 @@ private:
   double max_vel_abs_;
 
   //footprint scaling with velocity;
+	bool scaling_flag_;
   double max_scaling_factor_, scaling_speed_;
 	double sim_granularity_, forward_point_dist_;
 	bool isZero(double x);

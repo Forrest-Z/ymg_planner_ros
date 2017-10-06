@@ -4,8 +4,8 @@
 namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
-		base_local_planner::TrajectoryCostFunction* path_critic,
-		base_local_planner::TrajectoryCostFunction* obstacle_critic)
+		base_local_planner::MapGridCostFunctionKai* path_critic,
+		base_local_planner::ObstacleCostFunctionKai* obstacle_critic)
 	: reverse_order_(false), path_tolerance_(0.1), obstacle_tolerance_(10)
 {/*{{{*/
 	path_critic_ = path_critic;
@@ -39,7 +39,7 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
-	ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
+	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
 
 	if (fabs(max_vel_x) < fabs(min_vel_x))
 		reverse_order_ = true;
@@ -82,6 +82,12 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
+		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
+			obstacle_critic_->setScalingFlag(false);
+			obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
+			obstacle_critic_->setScalingFlag(true);
+		}
+
 		// ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
 		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 			if (best_traj.cost_ < path_tolerance_) {
