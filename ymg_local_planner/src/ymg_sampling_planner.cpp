@@ -82,14 +82,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
-			obstacle_critic_->setScalingFlag(false);
-			obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-			obstacle_critic_->setScalingFlag(true);
-		}
-
 		// ROS_INFO("[ysp] dist obstacle = %f %f", best_traj.cost_, obstacle_cost);
-		if (0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
+		if (0.0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 			if (best_traj.cost_ < path_tolerance_) {
 				traj = best_traj;
 				return true;
@@ -100,12 +94,24 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 	}
 
+	// if this planner find better path (closest to the global plan)
 	if (0.0<=better_traj.cost_) {
 		traj = better_traj;
 		return true;
 	}
 
-	ROS_INFO_NAMED("ymg_sampling_planner", "falied to find valid path. [stop]");
+	// if connot find valid path, try to find path with no scaling
+	base_local_planner::Trajectory no_scaling_traj;
+	no_scaling_traj = generateClosestTrajectory(target_vel_x);
+	double obstacle_cost = obstacle_critic_->scoreTrajectory(no_scaling_traj);
+	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
+		ROS_INFO_NAMED("ymg_sampling_planner", "no scaling path found.");
+		traj = no_scaling_traj;
+		return true;
+	}
+
+
+	ROS_INFO_NAMED("ymg_sampling_planner", "failed to find valid path. (send zero velocity)");
 
 	return false;
 }/*}}}*/

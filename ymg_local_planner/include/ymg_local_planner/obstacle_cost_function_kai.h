@@ -22,8 +22,8 @@ public:
 
   bool prepare();
   double scoreTrajectory(Trajectory &traj);
+  double scoreTrajectory(Trajectory &traj, bool scaling_flag);
 
-	void setScalingFlag(bool scaling_flag) { scaling_flag_ = scaling_flag; }
   void setParams(double max_vel_abs, double max_scaling_factor, double scaling_speed);
   void setFootprint(std::vector<geometry_msgs::Point> footprint_spec);
 	void setSimGranularity (double sim_granularity) { sim_granularity_ = sim_granularity; }

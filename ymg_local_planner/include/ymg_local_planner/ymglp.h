@@ -23,6 +23,7 @@
 #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
 #include <ymg_local_planner/ymg_sampling_planner.h>
 #include <ymg_local_planner/direction_adjust_planner.h>
+#include <ymg_local_planner/util_functions.h>
 
 #include <nav_msgs/Path.h>
 
@@ -110,6 +111,7 @@ class YmgLP {
 		private:
 
 				base_local_planner::LocalPlannerUtil *planner_util_;
+				UtilFcn utilfcn_;
 
 				double pdist_scale_, gdist_scale_, occdist_scale_;
 				Eigen::Vector3f vsamples_;

@@ -8,19 +8,37 @@
 
 namespace ymglp {
 
-namespace utilfcn {
+class UtilFcn {
 
-double calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
+	public:
 
-double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
+		static double calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
+		static double calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2);
+		static int getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose,
+				const std::vector<geometry_msgs::PoseStamped>& path);
+		static int getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose,
+				const std::vector<geometry_msgs::PoseStamped>& path);
+		
+		UtilFcn();
+		void setInfo(const geometry_msgs::PoseStamped& pose,
+				const std::vector<geometry_msgs::PoseStamped>& plan);
+		void setInfo(const tf::Stamped<tf::Pose>& pose,
+				const std::vector<geometry_msgs::PoseStamped>& plan);
+		int getNearestIndex();
+		void getShortenedPlan(double distance, std::vector<geometry_msgs::PoseStamped>& shortened_plan);
+		double getRobotDirection();
+		double getNearestDirection();
 
-int getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose, const std::vector<geometry_msgs::PoseStamped>& path);
+	private:
+		void resetFlag();
+		geometry_msgs::PoseStamped pose_;
+		std::vector<geometry_msgs::PoseStamped> plan_;
 
-int getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose, const std::vector<geometry_msgs::PoseStamped>& path);
+		bool has_nearest_index_, has_nearest_direction_;
+		int nearest_index_;
+		double nearest_direction_;
 
-bool isZero(double x);
-
-}   // namespace utilfcn
+};   // class utilfcn
 
 }   // namespace ymglp
 

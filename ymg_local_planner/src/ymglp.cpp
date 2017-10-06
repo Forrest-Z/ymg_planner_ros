@@ -179,8 +179,7 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 		global_plan_[i] = new_plan[i];
 	}
 
-	nearest_index_ = utilfcn::getClosestIndexOfPath(global_pose, global_plan_);
-	if (nearest_index_ < 0) return;
+	utilfcn_.setInfo(global_pose, global_plan_);
 
 	if (!use_dwa_) {
 		path_costs_.setTargetPoses(global_plan_);
@@ -188,7 +187,8 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 	}
 	else {
 		std::vector<geometry_msgs::PoseStamped> shortened_plan;
-		shortenPath(global_plan_, shortened_plan, nearest_index_, local_goal_distance_);
+		utilfcn_.getShortenedPlan(local_goal_distance_, shortened_plan);
+		// shortenPath(global_plan_, shortened_plan, nearest_index_, local_goal_distance_);
 
 		path_costs_.setTargetPoses(shortened_plan);
 		goal_costs_.setTargetPoses(shortened_plan);
@@ -210,7 +210,7 @@ void YmgLP::shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan
 	double now_distance = 0.0;
 	int local_goal_index = -1;
 	for (int i=nearest_index+1; i<orig_plan.size(); ++i) {
-		now_distance += utilfcn::calcDist(orig_plan[i-1], orig_plan[i]);
+		now_distance += UtilFcn::calcDist(orig_plan[i-1], orig_plan[i]);
 		if (goal_distance < now_distance) {
 			local_goal_index = i;
 			break;
@@ -260,20 +260,21 @@ void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explo
 void YmgLP::calcPoseError(const tf::Stamped<tf::Pose>& pose,
 		const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
-	int closest_index = utilfcn::getClosestIndexOfPath(pose, path);
+	int closest_index = UtilFcn::getClosestIndexOfPath(pose, path);
 	if (closest_index < 0) return;
 
-	double path_direction;
-	double robot_direction = tf::getYaw(pose.getRotation());
+	// double robot_direction = tf::getYaw(pose.getRotation());
+	double robot_direction = utilfcn_.getRobotDirection();
 	if (reverse_mode_) robot_direction += M_PI;
 
-	if (closest_index == path.size()-1) {
-		path_direction = tf::getYaw(path.back().pose.orientation);
-	}
-	else {
-		path_direction = atan2(path[closest_index+1].pose.position.y - path[closest_index].pose.position.y,
-				path[closest_index+1].pose.position.x - path[closest_index].pose.position.x);
-	}
+	double path_direction = utilfcn_.getNearestDirection();
+	// if (closest_index == path.size()-1) {
+	// 	path_direction = tf::getYaw(path.back().pose.orientation);
+	// }
+	// else {
+	// 	path_direction = atan2(path[closest_index+1].pose.position.y - path[closest_index].pose.position.y,
+	// 			path[closest_index+1].pose.position.x - path[closest_index].pose.position.x);
+	// }
 
 	double error = robot_direction - path_direction;   // -2pi to 2pi
 	direction_error_ = atan2(sin(error), cos(error));
@@ -281,7 +282,7 @@ void YmgLP::calcPoseError(const tf::Stamped<tf::Pose>& pose,
 	geometry_msgs::PoseStamped p;
 	p.pose.position.x = pose.getOrigin().getX();
 	p.pose.position.y = pose.getOrigin().getY();
-	position_error_ = utilfcn::calcDist(path[closest_index], p);
+	position_error_ = UtilFcn::calcDist(path[closest_index], p);
 }/*}}}*/
 
 /*

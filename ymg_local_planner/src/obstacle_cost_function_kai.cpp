@@ -98,6 +98,19 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
   return cost * getScale();
 }/*}}}*/
 
+double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj, bool scaling_flag)
+{/*{{{*/
+	bool default_scaling_flag = scaling_flag_;
+	if (scaling_flag) scaling_flag_ = true;
+	else              scaling_flag_ = false;
+
+	double score = scoreTrajectory(traj);
+
+	scaling_flag_ = default_scaling_flag;
+
+	return score;
+}/*}}}*/
+
 double ObstacleCostFunctionKai::getScalingFactor(Trajectory &traj, double scaling_speed, double max_vel_abs, double max_scaling_factor)
 {/*{{{*/
   double vmag = hypot(traj.xv_, traj.yv_);

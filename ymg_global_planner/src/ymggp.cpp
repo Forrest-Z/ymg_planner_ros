@@ -74,7 +74,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 	
 	// get nearest plan index and shorten trajectory
 	double min_dist = DBL_MAX;
-	int closest_index = ymglp::utilfcn::getClosestIndexOfPath(start, plan_);
+	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(start, plan_);
 	if (closest_index < 0) closest_index = 0;
 
 	std::vector<geometry_msgs::PoseStamped> new_plan;
@@ -84,7 +84,7 @@ bool YmgGP::makePlan(const geometry_msgs::PoseStamped& start,
 
 
 	geometry_msgs::PoseStamped endpoint = plan_.back();
-	int points = ymglp::utilfcn::calcDist(endpoint, goal) / path_granularity_;
+	int points = ymglp::UtilFcn::calcDist(endpoint, goal) / path_granularity_;
 	// ROS_INFO("global planner makePlan() function called and add %d points trajectory", points);
 	if (1 <= points) {
 		double step_x = (goal.pose.position.x - endpoint.pose.position.x) / points;
