@@ -103,10 +103,14 @@ bool DirAdjustPlanner::findBestTrajectory(
 		if (generateTrajectory(pos_, vel_, target_vel_, traj)) {
 			traj.cost_ = obstacle_critic_->scoreTrajectory(traj);
 			if (0.0 < traj.cost_ && traj.cost_ < obstacle_tolerance_) {
-				if (0.0 < target_vel_[2])
+				if (0.0 < target_vel_[2]) {
 					rotate_direction_ = CCW;
-				else
+					ROS_INFO("direction : CCW");
+				}
+				else {
 					rotate_direction_ = CW;
+					ROS_INFO("direction : CW");
+				}
 				return true;
 			}
 		}
