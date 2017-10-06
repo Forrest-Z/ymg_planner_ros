@@ -39,6 +39,8 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
+	ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
+
 	if (fabs(max_vel_x) < fabs(min_vel_x))
 		reverse_order_ = true;
 	else
