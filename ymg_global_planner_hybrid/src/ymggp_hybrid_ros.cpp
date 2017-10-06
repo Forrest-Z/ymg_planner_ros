@@ -562,6 +562,7 @@ bool YmgGPHybROS::isStuck(const geometry_msgs::PoseStamped& start,
 	double robot_w = tf::getYaw(robot_vel.getRotation());
 	if (stuck_vel_ < fabs(robot_v) || (0.0 < stuck_rot_vel_ && stuck_rot_vel_ < fabs(robot_w))) {
 		// ROS_INFO("robot moving. now vel = %f", fabs(robot_v));
+		ROS_INFO("robot moving. now rot_vel = %f", fabs(robot_w));
 		last_move_time = ros::Time::now();
 		return false;
 	}
