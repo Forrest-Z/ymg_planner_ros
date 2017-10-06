@@ -4,13 +4,13 @@ YmgLPROS:
 
   # robot velocity params
   max_vel_x: 0.6
-  acc_lim_x: 1.2
-  max_rot_vel: 1.2
-  acc_lim_theta: 2.4
+  acc_lim_x: 0.6
+  max_rot_vel: 1.5
+  acc_lim_theta: 1.5
 
   # scaling robot's footprint
   scaling_speed: 0.3
-  max_scaling_factor: 2.5
+  max_scaling_factor: 2.0
 
   # goal tolerance param
   yaw_goal_tolerance: 0.2
@@ -31,7 +31,7 @@ YmgLPROS:
   # ymg sampling planner params (valid if use_dwa set false)
   path_tolerance: 0.1
   obstacle_tolerance: 253 
-  direction_tolerance: 1.0
+  direction_tolerance: 1.57
 
   # dwa planner params (valid if use_dwa set true)
   path_distance_bias: 40.0
