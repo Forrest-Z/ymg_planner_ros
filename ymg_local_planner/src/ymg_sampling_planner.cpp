@@ -45,6 +45,8 @@ void YmgSamplingPlanner::initialize(
 		reverse_order_ = true;
 	else
 		reverse_order_ = false;
+
+	ROS_INFO("max - min : %f - %f", max_vel_x, min_vel_x);
 }/*}}}*/
 
 bool YmgSamplingPlanner::findBestTrajectory(
