@@ -3,13 +3,13 @@
 YmgLPROS:
 
   # robot velocity params
-  max_vel_x: 0.6
-  acc_lim_x: 0.6
+  max_vel_x: 0.8
+  acc_lim_x: 0.8
   max_rot_vel: 0.8
   acc_lim_theta: 0.8
 
   # scaling robot's footprint
-  scaling_speed: 0.3
+  scaling_speed: 0.4
   max_scaling_factor: 2.0
 
   # goal tolerance param

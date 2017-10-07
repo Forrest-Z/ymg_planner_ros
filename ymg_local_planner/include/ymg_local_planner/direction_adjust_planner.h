@@ -9,6 +9,8 @@
 #include <base_local_planner/trajectory_cost_function.h>
 #include <base_local_planner/trajectory_sample_generator.h>
 #include <base_local_planner/trajectory_search.h>
+#include <ymg_local_planner/obstacle_cost_function_kai.h>
+#include <ymg_local_planner/util_functions.h>
 
 namespace ymglp {
 
@@ -18,7 +20,7 @@ class DirAdjustPlanner {
 
 		~DirAdjustPlanner() {}
 		DirAdjustPlanner() {}
-		DirAdjustPlanner(base_local_planner::TrajectoryCostFunction* obstacle_critic);
+		DirAdjustPlanner(base_local_planner::ObstacleCostFunctionKai* obstacle_critic);
 
 		void setTolerance(double distance_tolerance, double direction_tolerance,
 				double yaw_goal_tolerance, int obstacle_tolerance)
@@ -44,7 +46,7 @@ class DirAdjustPlanner {
 				const Eigen::Vector3f& pos,
 				const Eigen::Vector3f& vel,
 				const Eigen::Vector3f& vsamples,
-				double direction_error);
+				double target_direction);
 
 		bool findBestTrajectory(
 				base_local_planner::Trajectory& traj, std::vector<base_local_planner::Trajectory>* all_explored = 0);
@@ -62,6 +64,7 @@ class DirAdjustPlanner {
 
 		enum Direction {CCW=1, UNDEFINED=0, CW=-1};
 		Direction rotate_direction_;
+		double target_direction_;
 		bool handle_latch_;
 		double distance_tolerance_, direction_tolerance_, yaw_goal_tolerance_, obstacle_tolerance_;
 		double sim_time_, sim_granularity_, angular_sim_granularity_, sim_period_;
@@ -69,7 +72,7 @@ class DirAdjustPlanner {
 		Eigen::Vector3f pos_, vel_, target_vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
 
-		base_local_planner::TrajectoryCostFunction* obstacle_critic_;
+		base_local_planner::ObstacleCostFunctionKai* obstacle_critic_;
 };  // class DirAdjustPlanner
 
 } // namespace

@@ -3,7 +3,8 @@
 
 namespace ymglp {
 
-DirAdjustPlanner::DirAdjustPlanner(base_local_planner::TrajectoryCostFunction* obstacle_critic)
+DirAdjustPlanner::DirAdjustPlanner(
+		base_local_planner::ObstacleCostFunctionKai* obstacle_critic)
 	: handle_latch_(false) 
 {/*{{{*/
 	rotate_direction_ = UNDEFINED;
@@ -15,12 +16,13 @@ void DirAdjustPlanner::initialize(
 		const Eigen::Vector3f& pos,
 		const Eigen::Vector3f& vel,
 		const Eigen::Vector3f& vsamples,
-		double direction_error)
+		double target_direction)
 {/*{{{*/
 	pos_ = pos;
 	vel_ = vel;
 	limits_ = limits;
 	vsamples_ = vsamples;
+	target_direction_ = target_direction;
 
 	double max_vel_th = limits->max_rot_vel;
 	double min_vel_th = -1.0 * max_vel_th;
@@ -39,10 +41,12 @@ void DirAdjustPlanner::initialize(
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	if (rotate_direction_ == UNDEFINED) {
-		if (0.0 < direction_error)
+		if (0.0 < UtilFcn::getDirectionError(target_direction_, pos_[2])) {
 			rotate_direction_ = CW;
-		else
+		}
+		else {
 			rotate_direction_ = CCW;
+		}
 	}
 }/*}}}*/
 
@@ -94,24 +98,57 @@ bool DirAdjustPlanner::findBestTrajectory(
 		start_vel_theta = min_vel_[2];
 	}
 
+	base_local_planner::Trajectory best_traj, rotate_traj, comp_traj;
+	best_traj.cost_ = -1.0;
+	rotate_traj.cost_ = -1.0;
+
+	double path_cost, obstacle_cost;
+
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel_[2] = start_vel_theta - i * theta_step;
-		if (generateTrajectory(pos_, vel_, target_vel_, traj)) {
-			traj.cost_ = obstacle_critic_->scoreTrajectory(traj);
-			if (0.0 <= traj.cost_ && traj.cost_ <= obstacle_tolerance_) {
-				if (0.0 < target_vel_[2]) {
-					rotate_direction_ = CCW;
-				}
-				else {
-					rotate_direction_ = CW;
-				}
-				return true;
-			}
+
+		if (generateTrajectory(pos_, vel_, target_vel_, comp_traj)) {
+			continue;
+		}
+
+		obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
+		if (obstacle_cost < 0.0 || obstacle_tolerance_+0.5 < obstacle_cost) {
+			continue;
+		}
+
+		if (rotate_traj.cost_ < 0.0) {
+			rotate_traj = comp_traj;
+			rotate_traj.cost_ = obstacle_cost;
+		}
+
+		double x, y, th;
+		traj.getEndpoint(x, y, th);
+		double direction_error = UtilFcn::getDirectionError(target_direction_, th);
+		if (best_traj.cost_ < 0.0 || fabs(direction_error) < best_traj.cost_) {
+			best_traj = comp_traj;
+			best_traj.cost_ = fabs(direction_error);
 		}
 	}
 
-	traj.cost_ = -1;
-	return false;
+	if (0.0 <= best_traj.cost_ && best_traj.cost_ < yaw_goal_tolerance_) {
+		traj = best_traj;
+	}
+	else if (0.0 <= rotate_traj.cost_) {
+		traj = rotate_traj;
+	}
+	else {
+		traj.cost_ = -1;
+		return false;
+	}
+
+	if (0.0 < traj.thetav_) {
+		rotate_direction_ = CCW;
+	}
+	else {
+		rotate_direction_ = CW;
+	}
+
+	return true;
 }/*}}}*/
 
 bool DirAdjustPlanner::generateTrajectory(

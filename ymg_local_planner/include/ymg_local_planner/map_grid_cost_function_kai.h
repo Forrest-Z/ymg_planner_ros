@@ -70,6 +70,9 @@ public:
   // used for easier debugging
   double getCellCosts(unsigned int cx, unsigned int cy);
 
+	bool getCost(Trajectory& traj, double& cost);
+	bool getForwardCost(Trajectory& traj, double& cost);
+
 private:
   std::vector<geometry_msgs::PoseStamped> target_poses_;
   costmap_2d::Costmap2D* costmap_;

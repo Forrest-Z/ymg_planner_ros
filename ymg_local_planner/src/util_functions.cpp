@@ -142,6 +142,12 @@ double UtilFcn::getDirectionError()
 	return atan2(sin(error), cos(error));
 }/*}}}*/
 
+double UtilFcn::getDirectionError(double base, double comp)
+{/*{{{*/
+	double error = comp - base;
+	return atan2(sin(error), cos(error));
+}/*}}}*/
+
 void UtilFcn::resetFlag()
 {/*{{{*/
 	has_nearest_index_ = false;

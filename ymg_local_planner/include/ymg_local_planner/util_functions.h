@@ -18,6 +18,7 @@ class UtilFcn {
 				const std::vector<geometry_msgs::PoseStamped>& path);
 		static int getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose,
 				const std::vector<geometry_msgs::PoseStamped>& path);
+		static double getDirectionError(double base, double comp);
 		
 		UtilFcn();
 		void setInfo(const geometry_msgs::PoseStamped& pose,
