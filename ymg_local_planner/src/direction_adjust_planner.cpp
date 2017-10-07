@@ -4,7 +4,7 @@
 namespace ymglp {
 
 DirAdjustPlanner::DirAdjustPlanner(base_local_planner::TrajectoryCostFunction* obstacle_critic)
-	: handle_latch_(false), distance_tolerance_(-1.0), direction_tolerance_(-1.0) 
+	: handle_latch_(false) 
 {/*{{{*/
 	rotate_direction_ = UNDEFINED;
 	obstacle_critic_ = obstacle_critic;
@@ -48,7 +48,8 @@ void DirAdjustPlanner::initialize(
 
 bool DirAdjustPlanner::haveToHandle(double distance, double direction_error)
 {/*{{{*/
-	ROS_INFO("[DirAdjPlanner] dist - dir_error = %f - %f", distance, direction_error);
+	ROS_INFO("[DirAdjPlanner] dir_error = %f", direction_error);
+	ROS_INFO("[DirAdjPlanner] yaw_goal_tolerance = %f", yaw_goal_tolerance_);
 	if (distance_tolerance_ < distance) {
 		handle_latch_ = false;
 	}
@@ -58,7 +59,7 @@ bool DirAdjustPlanner::haveToHandle(double distance, double direction_error)
 				ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
 			handle_latch_ = true;
 		}
-		else {
+		else if (fabs(direction_error) < yaw_goal_tolerance_) {
 			handle_latch_ = false;
 		}
 	}
