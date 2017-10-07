@@ -57,8 +57,9 @@ bool DirAdjustPlanner::haveToHandle(double position_error, double direction_erro
 				ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
 			handle_latch_ = true;
 		}
-		if (fabs(direction_error) < yaw_goal_tolerance_) 
+		else {
 			handle_latch_ = false;
+		}
 	}
 
 	if (!handle_latch_)
