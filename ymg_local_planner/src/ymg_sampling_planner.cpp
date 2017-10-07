@@ -84,10 +84,10 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
-		ROS_INFO("[YmgSampnligPl] obstacle_cost : %f", obstacle_cost);
 		if (0.0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 			if (best_traj.cost_ < path_tolerance_) {
 				traj = best_traj;
+				ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
 				return true;
 			}
 			else if (better_traj.cost_<0.0 || best_traj.cost_<better_traj.cost_) {
@@ -116,6 +116,31 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	ROS_INFO_NAMED("ymg_sampling_planner", "failed to find valid path. (send zero velocity)");
 
 	return false;
+}/*}}}*/
+
+base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(double vel_x)
+{/*{{{*/
+	base_local_planner::Trajectory best_traj;
+	best_traj.cost_ = -1.0;
+
+	Eigen::Vector3f target_vel;
+	target_vel[0] = vel_x;
+	target_vel[1] = 0.0;   // velocity_y must be zero
+	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
+
+	for (int iw=0; iw<=vsamples_[2]; ++iw) {
+		target_vel[2] = max_vel_[2] - iw * w_step;
+		base_local_planner::Trajectory comp_traj;
+		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
+			continue;
+		}
+		comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
+		if (0.0<=comp_traj.cost_
+				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
+			best_traj = comp_traj;
+		}
+	}
+	return best_traj;
 }/*}}}*/
 
 bool YmgSamplingPlanner::generateTrajectory(
@@ -160,31 +185,6 @@ bool YmgSamplingPlanner::generateTrajectory(
 	} // end for simulation steps
 
 	return num_steps > 0; // true if trajectory has at least one point
-}/*}}}*/
-
-base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(double vel_x)
-{/*{{{*/
-	base_local_planner::Trajectory best_traj;
-	best_traj.cost_ = -1.0;
-
-	Eigen::Vector3f target_vel;
-	target_vel[0] = vel_x;
-	target_vel[1] = 0.0;   // velocity_y must be zero
-	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
-
-	for (int iw=0; iw<=vsamples_[2]; ++iw) {
-		target_vel[2] = max_vel_[2] - iw * w_step;
-		base_local_planner::Trajectory comp_traj;
-		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
-			continue;
-		}
-		comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
-		if (0.0<=comp_traj.cost_
-				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
-			best_traj = comp_traj;
-		}
-	}
-	return best_traj;
 }/*}}}*/
 
 Eigen::Vector3f YmgSamplingPlanner::computeNewPositions(
