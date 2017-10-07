@@ -48,6 +48,7 @@ void DirAdjustPlanner::initialize(
 
 bool DirAdjustPlanner::haveToHandle(double distance, double direction_error)
 {/*{{{*/
+	ROS_INFO("[DirAdjPlanner] dist - dir_error = %f - %f", distance, direction_error);
 	if (distance_tolerance_ < distance) {
 		handle_latch_ = false;
 	}
