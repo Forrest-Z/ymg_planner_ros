@@ -52,8 +52,8 @@ void DirAdjustPlanner::initialize(
 
 bool DirAdjustPlanner::haveToHandle(double distance, double direction_error)
 {/*{{{*/
-	ROS_INFO("[DirAdjPlanner] dir_error = %f", direction_error);
-	ROS_INFO("[DirAdjPlanner] yaw_goal_tolerance = %f", yaw_goal_tolerance_);
+	// ROS_INFO("[DirAdjPlanner] dir_error = %f", direction_error);
+	// ROS_INFO("[DirAdjPlanner] yaw_goal_tolerance = %f", yaw_goal_tolerance_);
 	if (distance_tolerance_ < distance) {
 		handle_latch_ = false;
 	}
@@ -123,7 +123,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		}
 
 		double x, y, th;
-		traj.getEndpoint(x, y, th);
+		comp_traj.getEndpoint(x, y, th);
 		double direction_error = UtilFcn::getDirectionError(target_direction_, th);
 		ROS_INFO("direction_error : %f", direction_error);
 		if (best_traj.cost_ < 0.0 || fabs(direction_error) < best_traj.cost_) {
