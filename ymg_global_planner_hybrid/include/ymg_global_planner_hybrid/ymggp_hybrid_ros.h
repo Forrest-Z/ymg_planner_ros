@@ -192,6 +192,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 		bool setNavfnGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool updateNavfnGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index = 0);
+		bool setNavfnFlag(bool flag);
 
 		void resetFlagCallback (const std_msgs::Empty& msg);
 		ros::Subscriber reset_flag_sub_;

@@ -70,7 +70,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 
 		make_plan_srv_ =  private_nh.advertiseService("make_plan", &YmgGPHybROS::makePlanService, this);
 
-		use_navfn_ = false;
+		setNavfnFlag(false);
 		ymg_global_planner_.initialize(global_frame, path_granularity_);
 		odom_helper_.setOdomTopic("odom");
 		robot_status_ = goal_reached;
@@ -94,7 +94,8 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2DROS* costmap
 void YmgGPHybROS::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
-	use_navfn_ = false;
+	setNavfnFlag(false);
+	robot_status_ = stopped;
 }/*}}}*/
 
 void YmgGPHybROS::useYmggpForceCallback (const std_msgs::Int32& msg)
@@ -111,6 +112,7 @@ void YmgGPHybROS::useYmggpForceCallback (const std_msgs::Int32& msg)
 			use_navfn_ = false;
 			break;
 	}
+	ROS_INFO("[YmgGPHybROS] subscribed /use_ymggp_force (data : %d)", msg.data);
 }/*}}}*/
 		
 void YmgGPHybROS::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg)
@@ -413,10 +415,10 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 
 	updateRobotStatus(start, goal, plan);
 
-	// changes algorithm to navfn
+	// if the robot is near the navfn goal. changes algorithm to navfn.
 	if (use_navfn_ && ymglp::UtilFcn::calcDist(start, navfn_goal_) < recovery_dist_) {
 		ROS_INFO("[YmgGPHybROS] Changes planner to ymggp.");
-		use_navfn_ = false;
+		setNavfnFlag(false);
 	}
 
 	if (use_navfn_) {
@@ -424,10 +426,10 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		publishNavfnPlan(plan);
 	}
-	else if (!use_ymggp_force_ && robot_status_ == stopped
-			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_) {
-		ROS_INFO("[YmgGPHybROS] Changes planner to navfn.");
-		use_navfn_ = true;
+	else if (robot_status_ == stopped
+			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
+			&& setNavfnFlag(true)) {
+		ROS_INFO("[YmgGPHybROS] Changes planner to navfn."); setNavfnFlag(true);
 		setNavfnGoal(plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		publishNavfnPlan(plan);
@@ -438,6 +440,17 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 
 	return !plan.empty();
+}/*}}}*/
+
+bool YmgGPHybROS::setNavfnFlag(bool flag)
+{/*{{{*/
+	use_navfn_ = flag;
+
+	if (use_ymggp_force_) {
+		use_navfn_ = false;
+	}
+
+	return use_navfn_;
 }/*}}}*/
 
 bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& plan)
