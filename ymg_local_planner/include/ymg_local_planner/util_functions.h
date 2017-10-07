@@ -28,6 +28,8 @@ class UtilFcn {
 		void getShortenedPlan(double distance, std::vector<geometry_msgs::PoseStamped>& shortened_plan);
 		double getRobotDirection();
 		double getNearestDirection();
+		double getDistance();
+		double getDirectionError();
 
 	private:
 		void resetFlag();

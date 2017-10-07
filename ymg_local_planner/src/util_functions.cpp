@@ -130,6 +130,18 @@ double UtilFcn::getNearestDirection()
 	return nearest_direction_;
 }/*}}}*/
 
+double UtilFcn::getDistance()
+{/*{{{*/
+	return calcDist(pose_, plan_[getNearestIndex()]);
+}/*}}}*/
+
+double UtilFcn::getDirectionError()
+{/*{{{*/
+	// pi to -pi minus pi to -pi  ===>  2*pi to -2*pi
+	double error = getRobotDirection() - getNearestDirection();
+	return atan2(sin(error), cos(error));
+}/*}}}*/
+
 void UtilFcn::resetFlag()
 {/*{{{*/
 	has_nearest_index_ = false;
