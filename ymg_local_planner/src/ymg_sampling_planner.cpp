@@ -141,6 +141,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			best_traj = comp_traj;
 		}
 	}
+	ROS_INFO("roop end");
 	return best_traj;
 }/*}}}*/
 
