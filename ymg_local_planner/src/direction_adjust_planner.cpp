@@ -112,6 +112,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		}
 
 		obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
+		ROS_INFO("obstacle_cost : %f", obstacle_cost);
 		if (obstacle_cost < 0.0 || obstacle_tolerance_+0.5 < obstacle_cost) {
 			continue;
 		}
@@ -124,6 +125,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		double x, y, th;
 		traj.getEndpoint(x, y, th);
 		double direction_error = UtilFcn::getDirectionError(target_direction_, th);
+		ROS_INFO("direction_error : %f", direction_error);
 		if (best_traj.cost_ < 0.0 || fabs(direction_error) < best_traj.cost_) {
 			best_traj = comp_traj;
 			best_traj.cost_ = fabs(direction_error);
