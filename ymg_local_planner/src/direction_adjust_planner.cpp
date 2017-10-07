@@ -54,7 +54,7 @@ bool DirAdjustPlanner::haveToHandle(double distance, double direction_error)
 		handle_latch_ = false;
 	}
 	else{
-		if (distance_tolerance_ < fabs(direction_error)) {
+		if (direction_tolerance_ < fabs(direction_error)) {
 			if (handle_latch_ == false)
 				ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
 			handle_latch_ = true;
