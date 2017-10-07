@@ -135,6 +135,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			continue;
 		}
 		comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
+		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 		if (0.0<=comp_traj.cost_
 				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
 			best_traj = comp_traj;
