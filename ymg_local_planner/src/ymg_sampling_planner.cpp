@@ -87,7 +87,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		if (0.0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 			if (best_traj.cost_ < path_tolerance_) {
 				traj = best_traj;
-				ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
+				// ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
 				return true;
 			}
 			else if (better_traj.cost_<0.0 || best_traj.cost_<better_traj.cost_) {
@@ -107,7 +107,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	no_scaling_traj = generateClosestTrajectory(target_vel_x);
 	double obstacle_cost = obstacle_critic_->scoreTrajectory(no_scaling_traj);
 	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-		ROS_INFO_NAMED("ymg_sampling_planner", "no scaling path found.");
+		ROS_INFO("[YmgSP] no scaling path found.");
 		traj = no_scaling_traj;
 		return true;
 	}
@@ -135,13 +135,13 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			continue;
 		}
 		comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
-		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
+		// ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 		if (0.0<=comp_traj.cost_
 				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
 			best_traj = comp_traj;
 		}
 	}
-	ROS_INFO("roop end");
+	// ROS_INFO("roop end");
 	return best_traj;
 }/*}}}*/
 

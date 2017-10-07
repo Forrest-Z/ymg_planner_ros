@@ -41,7 +41,9 @@ void DirAdjustPlanner::initialize(
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	if (rotate_direction_ == UNDEFINED) {
-		if (0.0 < UtilFcn::getDirectionError(target_direction_, pos_[2])) {
+		double direction_error = UtilFcn::getDirectionError(target_direction_, pos_[2]);
+		ROS_INFO("dire_error : %f", direction_error);
+		if (0.0 < direction_error) {
 			rotate_direction_ = CW;
 		}
 		else {
