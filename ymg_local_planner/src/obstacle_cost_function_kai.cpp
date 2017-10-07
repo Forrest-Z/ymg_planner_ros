@@ -70,6 +70,9 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 			traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
 		}
 	}
+	else {
+		ROS_INFO("[obstacle_cost_function] vel is zero.");
+	}
 
 	double scale = 1.0;
 	if (scaling_flag_)

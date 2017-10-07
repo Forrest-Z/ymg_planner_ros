@@ -20,10 +20,10 @@ class DirAdjustPlanner {
 		DirAdjustPlanner() {}
 		DirAdjustPlanner(base_local_planner::TrajectoryCostFunction* obstacle_critic);
 
-		void setTolerance(double position_tolerance, double direction_tolerance,
+		void setTolerance(double distance_tolerance, double direction_tolerance,
 				double yaw_goal_tolerance, int obstacle_tolerance)
 		{/*{{{*/
-			position_tolerance_ = position_tolerance;
+			distance_tolerance_ = distance_tolerance;
 			direction_tolerance_ = direction_tolerance;
 			yaw_goal_tolerance_ = yaw_goal_tolerance;
 			obstacle_tolerance_ = obstacle_tolerance;
@@ -37,7 +37,7 @@ class DirAdjustPlanner {
 			sim_period_ = sim_period;
 		}/*}}}*/
 
-		bool haveToHandle(double position_error, double direction_error);
+		bool haveToHandle(double distance, double direction_error);
 
 		void initialize(
 				base_local_planner::LocalPlannerLimits* limits,
@@ -63,7 +63,7 @@ class DirAdjustPlanner {
 		enum Direction {CCW=1, UNDEFINED=0, CW=-1};
 		Direction rotate_direction_;
 		bool handle_latch_;
-		double position_tolerance_, direction_tolerance_, yaw_goal_tolerance_, obstacle_tolerance_;
+		double distance_tolerance_, direction_tolerance_, yaw_goal_tolerance_, obstacle_tolerance_;
 		double sim_time_, sim_granularity_, angular_sim_granularity_, sim_period_;
 		base_local_planner::LocalPlannerLimits* limits_;
 		Eigen::Vector3f pos_, vel_, target_vel_, vsamples_;
