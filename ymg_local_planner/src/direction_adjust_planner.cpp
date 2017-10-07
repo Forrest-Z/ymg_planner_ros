@@ -107,7 +107,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel_[2] = start_vel_theta - i * theta_step;
 
-		if (generateTrajectory(pos_, vel_, target_vel_, comp_traj)) {
+		if (!generateTrajectory(pos_, vel_, target_vel_, comp_traj)) {
 			continue;
 		}
 
