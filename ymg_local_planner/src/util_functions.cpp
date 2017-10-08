@@ -44,6 +44,9 @@ int UtilFcn::getNearestIndex()
 		}
 	}
 
+	// set next point to search forward
+	if (nearest_index_+1 != plan_.size()) ++nearest_index_;
+
 	has_nearest_index_ = true;
 	return nearest_index_;
 }/*}}}*/
