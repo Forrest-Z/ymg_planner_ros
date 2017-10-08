@@ -6,6 +6,8 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 
+#define STR(var) #var
+
 // register this planner as a BaseGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner);
 
@@ -542,6 +544,8 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		// ROS_INFO("[YmgGPHybROS] robot status : moving");
 		robot_status_ = moving;
 	}
+
+	ROS_INFO("[YmgGPHybROS] robot status : %s", STR(robot_status_));
 
 }/*}}}*/
 
