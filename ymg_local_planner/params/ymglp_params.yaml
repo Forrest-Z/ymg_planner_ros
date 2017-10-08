@@ -3,10 +3,10 @@
 YmgLPROS:
 
   # robot velocity params
-  max_vel_x: 0.6
-  acc_lim_x: 0.6
-  max_rot_vel: 0.4
-  acc_lim_theta: 0.4
+  max_vel_x: 1.0
+  acc_lim_x: 1.0
+  max_rot_vel: 0.5
+  acc_lim_theta: 0.5
 
   # scaling robot's footprint
   scaling_speed: 0.3
