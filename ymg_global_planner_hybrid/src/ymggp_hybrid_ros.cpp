@@ -43,7 +43,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 
 		navfn_plan_pub_ = private_nh.advertise<nav_msgs::Path>("navfn_plan", 1);
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
-		ymggp_plan_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("navfn_goal", 1);
+		navfn_goal_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("navfn_goal", 1);
 
 		private_nh.param("visualize_potential", visualize_potential_, false);
 
