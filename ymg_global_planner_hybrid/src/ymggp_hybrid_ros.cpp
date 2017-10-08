@@ -476,7 +476,7 @@ bool YmgGPHybROS::updateNavfnGoal (const geometry_msgs::PoseStamped robot_pos,
 	double py = navfn_goal_.pose.position.y;
 
 	// in the costmap and not free space
-	if (!costmap_->worldToMap(px, py, cell_x, cell_y)
+	if (costmap_->worldToMap(px, py, cell_x, cell_y)
 			&& costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
 	{
 		int goal_closest_index = ymglp::UtilFcn::getClosestIndexOfPath(navfn_goal_, plan);
