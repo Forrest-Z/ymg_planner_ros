@@ -424,6 +424,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 
 	if (use_navfn_) {
+		ROS_INFO("path size: %d", (int)plan.size());
 		updateNavfnGoal(start, plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		publishNavfnPlan(plan);
@@ -431,7 +432,8 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	else if (robot_status_ == stopped
 			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
 			&& setNavfnFlag(true)) {
-		ROS_INFO("[YmgGPHybROS] Changes planner to navfn."); setNavfnFlag(true);
+		ROS_INFO("[YmgGPHybROS] Changes planner to navfn.");
+		ROS_INFO("path size: %d", (int)plan.size());
 		setNavfnGoal(plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		publishNavfnPlan(plan);
@@ -545,7 +547,10 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		robot_status_ = moving;
 	}
 
-	ROS_INFO("[YmgGPHybROS] robot status : %d", robot_status_);
+	// ROS_INFO("[YmgGPHybROS] robot status : %d", robot_status_);
+	if (robot_status_ == stopped) {
+		ROS_INFO("[YmgGPHybROS] robot stopped.");
+	}
 
 }/*}}}*/
 
