@@ -111,7 +111,6 @@ class YmgLP {
 		private:
 
 				base_local_planner::LocalPlannerUtil *planner_util_;
-				UtilFcn utilfcn_;
 
 				double pdist_scale_, gdist_scale_, occdist_scale_;
 				Eigen::Vector3f vsamples_;
@@ -140,6 +139,7 @@ class YmgLP {
 				base_local_planner::ObstacleCostFunctionKai obstacle_costs_;
 				base_local_planner::MapGridCostFunctionKai path_costs_;
 				base_local_planner::MapGridCostFunctionKai goal_costs_;
+				UtilFcn utilfcn_;
 
 				bool use_dwa_, reverse_mode_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;

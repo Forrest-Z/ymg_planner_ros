@@ -5,10 +5,12 @@ namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
 		base_local_planner::MapGridCostFunctionKai* path_critic,
-		base_local_planner::ObstacleCostFunctionKai* obstacle_critic)
+		base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
+		UtilFcn* utilfcn)
 	: reverse_order_(false), path_tolerance_(0.1), obstacle_tolerance_(10)
 {/*{{{*/
 	path_critic_ = path_critic;
+	utilfcn_ = utilfcn;
 	obstacle_critic_ = obstacle_critic;
 }/*}}}*/
 
@@ -40,6 +42,9 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
+	
+	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
+	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
 
 	if (fabs(max_vel_x) < fabs(min_vel_x))
 		reverse_order_ = true;
@@ -107,13 +112,13 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	no_scaling_traj = generateClosestTrajectory(target_vel_x);
 	double obstacle_cost = obstacle_critic_->scoreTrajectory(no_scaling_traj);
 	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-		ROS_INFO("[YmgSP] no scaling path found.");
+		ROS_INFO("[YSP] no scaling path found.");
 		traj = no_scaling_traj;
 		return true;
 	}
 
 
-	ROS_INFO_NAMED("ymg_sampling_planner", "failed to find valid path. (send zero velocity)");
+	ROS_INFO("[YSP] failed to find valid path. (send zero velocity)");
 
 	return false;
 }/*}}}*/
@@ -134,7 +139,9 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
 			continue;
 		}
-		comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
+
+		// comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
+		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
 		// ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 		if (0.0<=comp_traj.cost_
 				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {

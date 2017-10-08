@@ -11,46 +11,6 @@ UtilFcn::UtilFcn()
 	resetFlag();
 }/*}}}*/
 
-double UtilFcn::calcSqDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
-{/*{{{*/
-	double dx = p1.pose.position.x - p2.pose.position.x;
-	double dy = p1.pose.position.y - p2.pose.position.y;
-	return dx*dx + dy*dy;
-}/*}}}*/
-
-double UtilFcn::calcDist(const geometry_msgs::PoseStamped& p1, const geometry_msgs::PoseStamped& p2)
-{/*{{{*/
-	double dx = p1.pose.position.x - p2.pose.position.x;
-	double dy = p1.pose.position.y - p2.pose.position.y;
-	return sqrt(dx*dx + dy*dy);
-}/*}}}*/
-
-int UtilFcn::getClosestIndexOfPath(const geometry_msgs::PoseStamped& pose, const std::vector<geometry_msgs::PoseStamped>& path)
-{/*{{{*/
-	int closest_index = -1;
-	double sq_dist, min_sq_dist = DBL_MAX;
-
-	for (int i=0; i<path.size(); ++i) {
-		sq_dist = calcSqDist(pose, path[i]);
-		if (sq_dist < min_sq_dist) {
-			min_sq_dist = sq_dist;
-			closest_index = i;
-		}
-	}
-
-	return closest_index;
-}/*}}}*/
-
-int UtilFcn::getClosestIndexOfPath(const tf::Stamped<tf::Pose>& pose, const std::vector<geometry_msgs::PoseStamped>& path)
-{/*{{{*/
-	geometry_msgs::PoseStamped p;
-	tf::poseStampedTFToMsg(pose, p);
-	// p.pose.position.x = pose.getOrigin().getX();
-	// p.pose.position.y = pose.getOrigin().getY();
-
-	return getClosestIndexOfPath(p, path);
-}/*}}}*/
-
 void UtilFcn::setInfo(const geometry_msgs::PoseStamped& pose,
 		const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
@@ -135,6 +95,50 @@ double UtilFcn::getDistance()
 	return calcDist(pose_, plan_[getNearestIndex()]);
 }/*}}}*/
 
+void UtilFcn::setSearchDist(double max_dist)
+{/*{{{*/
+	double max_sq_dist;
+	if (0.0 < forward_point_dist_) {
+		max_sq_dist = (max_dist+forward_point_dist_) * (max_dist+forward_point_dist_);
+	}
+	else {
+		max_sq_dist = max_dist * max_dist;
+	}
+
+	for (int i=getNearestIndex(); i<plan_.size(); ++i) {
+		if (max_sq_dist < calcSqDist(pose_, plan_[i])) {
+			max_search_size_ = i;
+			break;
+		}
+	}
+}/*}}}*/
+
+double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool reverse_order)
+{/*{{{*/
+	double x, y, th;
+	traj.getEndpoint(x, y, th);
+
+	if (0.0 < forward_point_dist_) {
+		int sign = 1;
+		if (reverse_order) sign = -1;
+		x = x + sign*forward_point_dist_ * cos(th);
+		y = y + sign*forward_point_dist_ * sin(th);
+	}
+
+	double sq_dist, min_sq_dist = DBL_MAX;
+	double xx, yy;
+	for (int i=getNearestIndex(); i<max_search_size_; ++i) {
+		xx = plan_[i].pose.position.x - x;
+		yy = plan_[i].pose.position.y - y;
+		sq_dist = xx*xx + yy*yy;
+		if (sq_dist < min_sq_dist) {
+			min_sq_dist = sq_dist; 
+		}
+	}
+
+	return sqrt(min_sq_dist);
+}/*}}}*/
+
 double UtilFcn::getDirectionError()
 {/*{{{*/
 	// pi to -pi minus pi to -pi  ===>  2*pi to -2*pi
@@ -142,16 +146,11 @@ double UtilFcn::getDirectionError()
 	return atan2(sin(error), cos(error));
 }/*}}}*/
 
-double UtilFcn::getDirectionError(double base, double comp)
-{/*{{{*/
-	double error = comp - base;
-	return atan2(sin(error), cos(error));
-}/*}}}*/
-
 void UtilFcn::resetFlag()
 {/*{{{*/
 	has_nearest_index_ = false;
 	has_nearest_direction_ = false;
+	max_search_size_ = plan_.size();
 }/*}}}*/
 
 }   // namespace ymglp

@@ -37,6 +37,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 			config.yaw_goal_tolerance, config.obstacle_tolerance);
 	position_tolerance_ = config.path_tolerance;
 	direction_tolerance_ = config.direction_tolerance;
+	
+	utilfcn_.setForwardPointDist(config.forward_point_dist);
 
 	double resolution = planner_util_->getCostmap()->getResolution();
 	pdist_scale_ = config.path_distance_bias;
@@ -134,7 +136,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 
 	use_dwa_ = false;
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
-	ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_);
+	ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_, &utilfcn_);
 	direction_adjust_planner_ = DirAdjustPlanner(&obstacle_costs_);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 }/*}}}*/
@@ -314,8 +316,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 
 	if (!use_dwa_) {
 		// calcPoseError(global_pose, global_plan_);
-		// if (direction_adjust_planner_.haveToHandle(position_error_, direction_error_)) {
-		if (direction_adjust_planner_.haveToHandle(utilfcn_.getDistance(), utilfcn_.getDirectionError())) {
+		// if (direction_adjust_planner_.haveToHandle(utilfcn_.getDistance(), utilfcn_.getDirectionError())) {
+		if (0) {
 			// ROS_INFO("direction_adjust_planner running.");
 			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_, utilfcn_.getNearestDirection());
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);

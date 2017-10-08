@@ -9,6 +9,7 @@
 #include <base_local_planner/trajectory_sample_generator.h>
 #include <base_local_planner/trajectory_search.h>
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
+#include <ymg_local_planner/util_functions.h>
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 
 namespace ymglp {
@@ -21,7 +22,8 @@ class YmgSamplingPlanner {
 		YmgSamplingPlanner() {}
 		YmgSamplingPlanner(
 				base_local_planner::MapGridCostFunctionKai* path_critic,
-				base_local_planner::ObstacleCostFunctionKai* obstacle_critic);
+				base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
+				UtilFcn* utilfcn);
 
 		void initialize(
 				base_local_planner::LocalPlannerLimits* limits,
@@ -67,6 +69,7 @@ class YmgSamplingPlanner {
 		double path_tolerance_;
 		int obstacle_tolerance_;
 		base_local_planner::MapGridCostFunctionKai* path_critic_;
+		UtilFcn* utilfcn_;
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic_;
 
 };   // class YmgSamplingPlanner
