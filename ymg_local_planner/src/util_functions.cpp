@@ -44,11 +44,6 @@ int UtilFcn::getNearestIndex()
 		}
 	}
 
-	// set next point to search forward
-	if (nearest_index_+1 != plan_.size()) {
-		++nearest_index_;
-	}
-
 	has_nearest_index_ = true;
 	return nearest_index_;
 }/*}}}*/
@@ -132,7 +127,7 @@ double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool reverse
 
 	double sq_dist, min_sq_dist = DBL_MAX;
 	double xx, yy;
-	for (int i=getNearestIndex(); i<max_search_size_; ++i) {
+	for (int i=getNearestIndex()+1; i<max_search_size_; ++i) {
 		xx = plan_[i].pose.position.x - x;
 		yy = plan_[i].pose.position.y - y;
 		sq_dist = xx*xx + yy*yy;

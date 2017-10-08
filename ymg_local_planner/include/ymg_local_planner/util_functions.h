@@ -46,10 +46,6 @@ class UtilFcn {
 				}
 			}
 
-			if (closest_index+1 != path.size()) {
-				++closest_index;
-			}
-
 			return closest_index;
 		}/*}}}*/
 

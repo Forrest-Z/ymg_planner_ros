@@ -43,7 +43,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 
 		navfn_plan_pub_ = private_nh.advertise<nav_msgs::Path>("navfn_plan", 1);
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
-		navfn_goal_pub_ = private_nh.advertise<geometry_msgs::PoseStamped>("navfn_goal", 1);
+		navfn_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("navfn_goal", 1);
 
 		private_nh.param("visualize_potential", visualize_potential_, false);
 
@@ -446,7 +446,10 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 
 	if (use_navfn_) {
-		navfn_goal_pub_.publish(navfn_goal_);
+		geometry_msgs::PointStamped msg;
+		msg.header = navfn_goal_.header;
+		msg.point = navfn_goal_.pose.position;
+		navfn_goal_pub_.publish(msg);
 	}
 
 	return !plan.empty();
@@ -470,6 +473,7 @@ bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& p
 
 	int forward_index = navfn_goal_dist_ / path_granularity_;
 	setValidGoal(plan, forward_index);
+	ROS_INFO("start_index = %d", forward_index);
 
 	return true;
 }/*}}}*/
