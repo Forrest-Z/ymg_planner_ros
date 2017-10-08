@@ -545,7 +545,7 @@ void YmgGPHybROS::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		robot_status_ = moving;
 	}
 
-	ROS_INFO("[YmgGPHybROS] robot status : %s", STR(robot_status_));
+	ROS_INFO("[YmgGPHybROS] robot status : %d", robot_status_);
 
 }/*}}}*/
 
