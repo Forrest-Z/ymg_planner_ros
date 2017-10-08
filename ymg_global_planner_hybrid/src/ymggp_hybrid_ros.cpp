@@ -427,6 +427,7 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		ROS_INFO("path size: %d", (int)plan.size());
 		updateNavfnGoal(start, plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
+		ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishNavfnPlan(plan);
 	}
 	else if (robot_status_ == stopped
