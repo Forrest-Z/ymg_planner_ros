@@ -20,7 +20,9 @@ class DirAdjustPlanner {
 
 		~DirAdjustPlanner() {}
 		DirAdjustPlanner() {}
-		DirAdjustPlanner(base_local_planner::ObstacleCostFunctionKai* obstacle_critic);
+		DirAdjustPlanner(
+				base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
+				UtilFcn* utilfcn);
 
 		void setTolerance(double distance_tolerance, double direction_tolerance,
 				double yaw_goal_tolerance, int obstacle_tolerance)
@@ -39,14 +41,13 @@ class DirAdjustPlanner {
 			sim_period_ = sim_period;
 		}/*}}}*/
 
-		bool haveToHandle(double distance, double direction_error);
+		bool haveToHandle();
 
 		void initialize(
 				base_local_planner::LocalPlannerLimits* limits,
 				const Eigen::Vector3f& pos,
 				const Eigen::Vector3f& vel,
-				const Eigen::Vector3f& vsamples,
-				double target_direction);
+				const Eigen::Vector3f& vsamples);
 
 		bool findBestTrajectory(
 				base_local_planner::Trajectory& traj, std::vector<base_local_planner::Trajectory>* all_explored = 0);
@@ -73,6 +74,7 @@ class DirAdjustPlanner {
 		Eigen::Vector3f max_vel_, min_vel_;
 
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic_;
+		UtilFcn* utilfcn_;
 };  // class DirAdjustPlanner
 
 } // namespace

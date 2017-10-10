@@ -11,20 +11,23 @@ UtilFcn::UtilFcn()
 	resetFlag();
 }/*}}}*/
 
-void UtilFcn::setInfo(const geometry_msgs::PoseStamped& pose,
-		const std::vector<geometry_msgs::PoseStamped>& plan)
+void UtilFcn::setPlan(const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
-	pose_ = pose;
 	plan_ = plan;
 	resetFlag();
 }/*}}}*/
 
-void UtilFcn::setInfo(const tf::Stamped<tf::Pose>& pose,
-		const std::vector<geometry_msgs::PoseStamped>& plan)
+void UtilFcn::setPose(const geometry_msgs::PoseStamped& pose)
+{/*{{{*/
+	pose_ = pose;
+	resetFlag();
+}/*}}}*/
+
+void UtilFcn::setPose(const tf::Stamped<tf::Pose>& pose)
 {/*{{{*/
 	geometry_msgs::PoseStamped p;
 	tf::poseStampedTFToMsg(pose, p);
-	setInfo(p, plan);
+	setPose(p);
 }/*}}}*/
 
 int UtilFcn::getNearestIndex()

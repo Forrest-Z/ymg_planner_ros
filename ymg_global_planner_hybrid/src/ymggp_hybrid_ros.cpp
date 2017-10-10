@@ -14,7 +14,7 @@ PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner);
 namespace ymggp {
 
 YmgGPHybROS::YmgGPHybROS() 
-	/*{{{*/
+/*{{{*/
 	: costmap_(NULL),  planner_(), initialized_(false), allow_unknown_(true) {}
 /*}}}*/
 

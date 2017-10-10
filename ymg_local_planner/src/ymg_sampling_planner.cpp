@@ -7,11 +7,25 @@ YmgSamplingPlanner::YmgSamplingPlanner(
 		base_local_planner::MapGridCostFunctionKai* path_critic,
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
 		UtilFcn* utilfcn)
-	: reverse_order_(false), path_tolerance_(0.1), obstacle_tolerance_(10)
+	: is_param_set_(false), reverse_order_(false)
 {/*{{{*/
 	path_critic_ = path_critic;
 	utilfcn_ = utilfcn;
 	obstacle_critic_ = obstacle_critic;
+}/*}}}*/
+
+void YmgSamplingPlanner::setParameters(
+		double sim_time, double sim_granularity, double angular_sim_granularity, double sim_period,
+		double path_tolerance, int obstacle_tolerance)
+{/*{{{*/
+	is_param_set_ = true;
+
+	sim_time_ = sim_time;
+	sim_granularity_ = sim_granularity;
+	angular_sim_granularity_ = angular_sim_granularity;
+	sim_period_ = sim_period;
+	path_tolerance_ = path_tolerance;
+	obstacle_tolerance_ = obstacle_tolerance;
 }/*}}}*/
 
 void YmgSamplingPlanner::initialize(
@@ -42,7 +56,7 @@ void YmgSamplingPlanner::initialize(
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
-	
+
 	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
 	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
 
@@ -58,6 +72,11 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
+	if (!is_param_set_) {
+		ROS_WARN("[YSP] Has not set parameters. Please call setParameters() fcn.");
+		return false;
+	}
+
 	if (path_critic_->prepare() == false) {
 		ROS_WARN("Pdist scoring function failed to prepare");
 		return false;

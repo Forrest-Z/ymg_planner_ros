@@ -28,15 +28,13 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	generator_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 	ymg_sampling_planner_.setParameters(
-			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
+			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
+			config.path_tolerance, config.obstacle_tolerance);
 	direction_adjust_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
 
-	ymg_sampling_planner_.setTolerance(config.path_tolerance, config.obstacle_tolerance);
 	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
 			config.yaw_goal_tolerance, config.obstacle_tolerance);
-	position_tolerance_ = config.path_tolerance;
-	direction_tolerance_ = config.direction_tolerance;
 	
 	utilfcn_.setForwardPointDist(config.forward_point_dist);
 
@@ -65,9 +63,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 
 	local_goal_distance_ = config.local_goal_distance;
 
-	int vx_samp, vth_samp;
-	vx_samp = config.vx_samples;
-	vth_samp = config.vth_samples;
+	int vx_samp = config.vx_samples;
+	int vth_samp = config.vth_samples;
 
 	if (vx_samp <= 0) {
 		ROS_WARN("You've specified that you don't want any samples in the x dimension. We'll at least assume that you want to sample one value... so we're going to set vx_samples to 1 instead");
@@ -85,7 +82,6 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	vsamples_[1] = 1;
 	vsamples_[2] = vth_samp;
 
-
 }/*}}}*/
 
 YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_util)
@@ -93,7 +89,9 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	: planner_util_(planner_util),
 	obstacle_costs_(planner_util->getCostmap()),
 	path_costs_(planner_util->getCostmap(), false),
-	goal_costs_(planner_util->getCostmap(), true)
+	goal_costs_(planner_util->getCostmap(), true),
+	ymg_sampling_planner_(&path_costs_, &obstacle_costs_, &utilfcn_),
+	direction_adjust_planner_(&obstacle_costs_, &utilfcn_)
 {
 	ros::NodeHandle private_nh("~/" + name);
 
@@ -136,8 +134,6 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 
 	use_dwa_ = false;
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
-	ymg_sampling_planner_ = YmgSamplingPlanner(&path_costs_, &obstacle_costs_, &utilfcn_);
-	direction_adjust_planner_ = DirAdjustPlanner(&obstacle_costs_);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 }/*}}}*/
 
@@ -181,7 +177,8 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 		global_plan_[i] = new_plan[i];
 	}
 
-	utilfcn_.setInfo(global_pose, global_plan_);
+	utilfcn_.setPose(global_pose);
+	utilfcn_.setPlan(global_plan_);
 
 	if (!use_dwa_) {
 		path_costs_.setTargetPoses(global_plan_);
@@ -259,34 +256,6 @@ void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explo
 	traj_cloud_pub_.publish(*traj_cloud_);
 }/*}}}*/
 
-void YmgLP::calcPoseError(const tf::Stamped<tf::Pose>& pose,
-		const std::vector<geometry_msgs::PoseStamped>& path)
-{/*{{{*/
-	int closest_index = UtilFcn::getClosestIndexOfPath(pose, path);
-	if (closest_index < 0) return;
-
-	// double robot_direction = tf::getYaw(pose.getRotation());
-	double robot_direction = utilfcn_.getRobotDirection();
-	if (reverse_mode_) robot_direction += M_PI;
-
-	double path_direction = utilfcn_.getNearestDirection();
-	// if (closest_index == path.size()-1) {
-	// 	path_direction = tf::getYaw(path.back().pose.orientation);
-	// }
-	// else {
-	// 	path_direction = atan2(path[closest_index+1].pose.position.y - path[closest_index].pose.position.y,
-	// 			path[closest_index+1].pose.position.x - path[closest_index].pose.position.x);
-	// }
-
-	double error = robot_direction - path_direction;   // -2pi to 2pi
-	direction_error_ = atan2(sin(error), cos(error));
-
-	geometry_msgs::PoseStamped p;
-	p.pose.position.x = pose.getOrigin().getX();
-	p.pose.position.y = pose.getOrigin().getY();
-	position_error_ = UtilFcn::calcDist(path[closest_index], p);
-}/*}}}*/
-
 /*
  * given the current state of the robot, find a good trajectory
  */
@@ -310,16 +279,16 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 			tf::getYaw(goal_pose.pose.orientation));
 	base_local_planner::LocalPlannerLimits limits = planner_util_->getCurrentLimits();
 
+	utilfcn_.setPose(global_pose);
 
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 
 	if (!use_dwa_) {
-		// calcPoseError(global_pose, global_plan_);
-		// if (direction_adjust_planner_.haveToHandle(utilfcn_.getDistance(), utilfcn_.getDirectionError())) {
-		if (0) {
+		// if (0) {
+		if (direction_adjust_planner_.haveToHandle()) {
 			// ROS_INFO("direction_adjust_planner running.");
-			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_, utilfcn_.getNearestDirection());
+			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 		else {
@@ -332,13 +301,15 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 		scored_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 	}
 
-	if(publish_traj_pc_)
+	if(publish_traj_pc_) {
 		publishTrajPC(all_explored);
+	}
 
 	//if we don't have a legal trajectory, we'll just command zero
 	if (result_traj_.cost_ < 0) {
 		drive_velocities.setIdentity();
-	} else {
+	}
+	else {
 		tf::Vector3 start(result_traj_.xv_, result_traj_.yv_, 0);
 		drive_velocities.setOrigin(start);
 		tf::Matrix3x3 matrix;

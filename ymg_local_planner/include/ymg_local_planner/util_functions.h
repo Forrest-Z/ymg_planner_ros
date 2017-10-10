@@ -66,12 +66,31 @@ class UtilFcn {
 			return atan2(sin(error), cos(error));
 		}/*}}}*/
 
+		static inline double getDirectionErrorCCW(double base, double comp)
+		{/*{{{*/
+			double error = comp - base;
+			if (error < 0.0) {
+				error += 2*M_PI;
+			}
+
+			return error;
+		}/*}}}*/
+
+		static inline double getDirectionErrorCW(double base, double comp)
+		{/*{{{*/
+			double error = comp - base;
+			if (0,0 < error) {
+				error -= 2*M_PI;
+			}
+			return fabs(error);
+		}/*}}}*/
+
 
 		UtilFcn();
-		void setInfo(const geometry_msgs::PoseStamped& pose,
-				const std::vector<geometry_msgs::PoseStamped>& plan);
-		void setInfo(const tf::Stamped<tf::Pose>& pose,
-				const std::vector<geometry_msgs::PoseStamped>& plan);
+		void setPlan(const std::vector<geometry_msgs::PoseStamped>& plan);
+		void setPose(const geometry_msgs::PoseStamped& pose);
+		void setPose(const tf::Stamped<tf::Pose>& pose);
+
 		void setForwardPointDist(double forward_point_dist)
 		{/*{{{*/
 			forward_point_dist_ = forward_point_dist;
