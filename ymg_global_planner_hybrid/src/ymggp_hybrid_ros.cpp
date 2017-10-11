@@ -450,6 +450,9 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		msg.header = navfn_goal_.header;
 		msg.point = navfn_goal_.pose.position;
 		navfn_goal_pub_.publish(msg);
+		if (plan.empty()) {
+			ROS_INFO("[YmgGPHybROS] Navfn faild to produce path.");
+		}
 	}
 
 	return !plan.empty();
