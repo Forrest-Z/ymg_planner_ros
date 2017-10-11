@@ -425,17 +425,17 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 	}
 
 	if (use_navfn_) {
-		ROS_INFO("path size: %d", (int)plan.size());
+		// ROS_INFO("path size: %d", (int)plan.size());
 		updateNavfnGoal(start, plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
-		ROS_INFO("dijkstra path size: %d", (int)plan.size());
+		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishNavfnPlan(plan);
 	}
 	else if (robot_status_ == stopped
 			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
 			&& setNavfnFlag(true)) {
 		ROS_INFO("[YmgGPHybROS] Changes planner to navfn.");
-		ROS_INFO("path size: %d", (int)plan.size());
+		// ROS_INFO("path size: %d", (int)plan.size());
 		setNavfnGoal(plan);
 		makeNavfnPlan(start, navfn_goal_, tolerance, plan);
 		publishNavfnPlan(plan);
@@ -473,7 +473,7 @@ bool YmgGPHybROS::setNavfnGoal (const std::vector<geometry_msgs::PoseStamped>& p
 
 	int forward_index = navfn_goal_dist_ / path_granularity_;
 	setValidGoal(plan, forward_index);
-	ROS_INFO("start_index = %d", forward_index);
+	// ROS_INFO("start_index = %d", forward_index);
 
 	return true;
 }/*}}}*/
