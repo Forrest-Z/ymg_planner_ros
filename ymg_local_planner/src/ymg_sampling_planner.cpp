@@ -87,7 +87,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
-	base_local_planner::Trajectory better_traj;
+	base_local_planner::Trajectory comp_traj, better_traj;
 	better_traj.cost_ = -1.0;
 
 	double start_vel_x = max_vel_[0];
@@ -97,25 +97,25 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	// trajectory.cost_ is the distance from global path.
-	double target_vel_x;
+	double target_vel_x, now_dist = utilfcn_->getDistance();
 	for (int i=0; i<=vsamples_[0]; ++i) {
 		target_vel_x = start_vel_x - i * v_step;
-		base_local_planner::Trajectory best_traj;
-		best_traj = generateClosestTrajectory(target_vel_x);
+		comp_traj = generateClosestTrajectory(target_vel_x);
 
-		if (best_traj.cost_ < 0.0) {
+		if (comp_traj.cost_ < 0.0) {
 			continue;
 		}
 
-		double obstacle_cost = obstacle_critic_->scoreTrajectory(best_traj);
+
+		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
 		if (0.0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-			if (best_traj.cost_ < path_tolerance_) {
-				traj = best_traj;
+			if (comp_traj.cost_ < path_tolerance_) {
+				traj = comp_traj;
 				// ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
 				return true;
 			}
-			else if (better_traj.cost_<0.0 || best_traj.cost_<better_traj.cost_) {
-				better_traj = best_traj;
+			else if (comp_traj.cost_ < now_dist && (better_traj.cost_<0.0 || comp_traj.cost_<better_traj.cost_)) {
+				better_traj = comp_traj;
 			}
 		}
 	}
