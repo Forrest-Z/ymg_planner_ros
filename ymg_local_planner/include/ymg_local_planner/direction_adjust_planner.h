@@ -70,7 +70,7 @@ class DirAdjustPlanner {
 		double distance_tolerance_, direction_tolerance_, yaw_goal_tolerance_, obstacle_tolerance_;
 		double sim_time_, sim_granularity_, angular_sim_granularity_, sim_period_;
 		base_local_planner::LocalPlannerLimits* limits_;
-		Eigen::Vector3f pos_, vel_, target_vel_, vsamples_;
+		Eigen::Vector3f pos_, vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
 
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic_;

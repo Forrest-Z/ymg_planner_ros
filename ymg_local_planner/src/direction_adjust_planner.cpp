@@ -110,9 +110,9 @@ bool DirAdjustPlanner::findBestTrajectory(
 	traj.cost_ = -1;
 
 	for (int i=0; i<=vsamples_[2]; ++i) {
-		target_vel_[2] = max_vel_[2] - i * theta_step;
+		target_vel[2] = max_vel_[2] - i * theta_step;
 
-		if (!generateTrajectory(pos_, vel_, target_vel_, comp_traj)) {
+		if (!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
 			ROS_INFO("[DirAdjPlanner] Faild to generate Trajectory.");
 			continue;
 		}
