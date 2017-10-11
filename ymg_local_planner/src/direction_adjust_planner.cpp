@@ -120,7 +120,6 @@ bool DirAdjustPlanner::findBestTrajectory(
 		obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
 		// ROS_INFO("obstacle_cost : %f", obstacle_cost);
 		if (obstacle_cost < 0.0 || obstacle_tolerance_+0.5 < obstacle_cost) {
-			ROS_INFO("[DirAdjPlanner] This traj will hit obstacle. Rejected");
 			continue;
 		}
 
@@ -132,7 +131,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		if (rotate_direction_ == CW) {
 			direction_error = UtilFcn::getDirectionErrorCW(th, utilfcn_->getNearestDirection());
 		}
-		ROS_INFO("direction error : %f", direction_error);
+		// ROS_INFO("direction error : %f", direction_error);
 
 		if (traj.cost_ < 0.0 || fabs(direction_error) < traj.cost_) {
 			traj = comp_traj;
