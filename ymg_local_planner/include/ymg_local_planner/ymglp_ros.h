@@ -10,16 +10,13 @@
 #include <ymg_local_planner/YmgLPConfig.h>
 
 #include <angles/angles.h>
-
 #include <nav_msgs/Odometry.h>
-
 #include <costmap_2d/costmap_2d_ros.h>
 #include <nav_core/base_local_planner.h>
 #include <base_local_planner/latched_stop_rotate_controller.h>
-
 #include <base_local_planner/odometry_helper_ros.h>
-
 #include <ymg_local_planner/ymglp.h>
+#include <geometry_msgs/PoseArray.h>
 
 namespace ymglp {
   /**
@@ -91,6 +88,7 @@ namespace ymglp {
       void reconfigureCB(YmgLPConfig &config, uint32_t level);
 
       void publishLocalPlan(std::vector<geometry_msgs::PoseStamped>& path);
+      void publishLocalPlanArray(geometry_msgs::PoseArray& path);
 
       void publishGlobalPlan(std::vector<geometry_msgs::PoseStamped>& path);
 
@@ -98,6 +96,7 @@ namespace ymglp {
 
       // for visualisation, publishers of global and local plan
       ros::Publisher g_plan_pub_, l_plan_pub_;
+      ros::Publisher l_plan_array_pub_;
 
       base_local_planner::LocalPlannerUtil planner_util_;
 

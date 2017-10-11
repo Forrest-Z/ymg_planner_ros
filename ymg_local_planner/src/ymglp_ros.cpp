@@ -74,6 +74,7 @@ void YmgLPROS::initialize(std::string name, tf::TransformListener* tf, costmap_2
 		ros::NodeHandle private_nh("~/" + name);
 		g_plan_pub_ = private_nh.advertise<nav_msgs::Path>("global_plan", 1);
 		l_plan_pub_ = private_nh.advertise<nav_msgs::Path>("local_plan", 1);
+		l_plan_array_pub_ = private_nh.advertise<geometry_msgs::PoseArray>("local_plan_array", 1);
 		tf_ = tf;
 		costmap_ros_ = costmap_ros;
 		costmap_ros_->getRobotPose(current_pose_);
@@ -139,6 +140,11 @@ void YmgLPROS::publishLocalPlan(std::vector<geometry_msgs::PoseStamped>& path)
 	base_local_planner::publishPlan(path, l_plan_pub_);
 }/*}}}*/
 
+void YmgLPROS::publishLocalPlanArray(geometry_msgs::PoseArray& path)
+{/*{{{*/
+	l_plan_array_pub_.publish(path);
+}/*}}}*/
+
 void YmgLPROS::publishGlobalPlan(std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
 	base_local_planner::publishPlan(path, g_plan_pub_);
@@ -185,11 +191,13 @@ bool YmgLPROS::ymglpComputeVelocityCommands(tf::Stamped<tf::Pose> &global_pose, 
 
 	//if we cannot move... tell someone
 	std::vector<geometry_msgs::PoseStamped> local_plan;
+	geometry_msgs::PoseArray local_plan_array;
 	if(path.cost_ < 0) {
 		ROS_DEBUG_NAMED("ymg_local_planner",
 				"The dwa local planner failed to find a valid plan, cost functions discarded all candidates. This can mean there is an obstacle too close to the robot.");
 		local_plan.clear();
 		publishLocalPlan(local_plan);
+		publishLocalPlanArray(local_plan_array);
 		return false;
 	}
 
@@ -197,6 +205,7 @@ bool YmgLPROS::ymglpComputeVelocityCommands(tf::Stamped<tf::Pose> &global_pose, 
 			cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.angular.z);
 
 	// Fill out the local plan
+	geometry_msgs::PoseStamped pose;
 	for(unsigned int i = 0; i < path.getPointsSize(); ++i) {
 		double p_x, p_y, p_th;
 		path.getPoint(i, p_x, p_y, p_th);
@@ -207,14 +216,16 @@ bool YmgLPROS::ymglpComputeVelocityCommands(tf::Stamped<tf::Pose> &global_pose, 
 						tf::Point(p_x, p_y, 0.0)),
 					ros::Time::now(),
 					costmap_ros_->getGlobalFrameID());
-		geometry_msgs::PoseStamped pose;
 		tf::poseStampedTFToMsg(p, pose);
 		local_plan.push_back(pose);
+		local_plan_array.poses.push_back(pose.pose);
 	}
 
 	//publish information to the visualizer
 
 	publishLocalPlan(local_plan);
+	local_plan_array.header = pose.header;
+	publishLocalPlanArray(local_plan_array);
 	return true;
 }/*}}}*/
 
