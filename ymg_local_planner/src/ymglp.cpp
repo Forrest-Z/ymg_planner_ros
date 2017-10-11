@@ -286,8 +286,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	result_traj_.cost_ = -7;
 
 	if (!use_dwa_) {
-		// if (0) {
-		if (direction_adjust_planner_.haveToHandle()) {
+		if (0) {
+		// if (direction_adjust_planner_.haveToHandle()) {
 			// ROS_INFO("direction_adjust_planner running.");
 			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
