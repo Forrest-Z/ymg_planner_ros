@@ -650,7 +650,8 @@ bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, s
 
 	planner_->setStart(map_goal);
 
-	planner_->calcPath(costmap_->getSizeInCellsX() * 4);
+	// XXX changed 4 -> 1
+	planner_->calcPath(costmap_->getSizeInCellsX() * 1);
 
 	//extract the plan
 	float *x = planner_->getPathX();
