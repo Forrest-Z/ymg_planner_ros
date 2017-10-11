@@ -18,7 +18,7 @@ YmgLPROS:
 
   # simulation params
   controller_frequency: 5.0
-  sim_time: 1.5
+  sim_time: 1.0
   sim_granularity: 0.05
   angular_sim_granularity: 0.04
   vx_samples: 4
