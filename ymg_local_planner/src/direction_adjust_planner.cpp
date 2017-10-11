@@ -42,11 +42,12 @@ void DirAdjustPlanner::initialize(
 
 	if (rotate_direction_ == UNDEFINED) {
 		double direction_error = utilfcn_->getDirectionError();
-		ROS_INFO("dire_error : %f", direction_error);
 		if (0.0 < direction_error) {
+			ROS_INFO("[DirAdjPlanner] direction:CW (error : %f)", direction_error);
 			rotate_direction_ = CW;
 		}
 		else {
+			ROS_INFO("[DirAdjPlanner] direction:CCW (error : %f)", direction_error);
 			rotate_direction_ = CCW;
 		}
 	}
@@ -129,14 +130,15 @@ bool DirAdjustPlanner::findBestTrajectory(
 		if (rotate_direction_ == CW) {
 			direction_error = UtilFcn::getDirectionErrorCW(th, utilfcn_->getNearestDirection());
 		}
+		ROS_INFO("direction error : %f", direction_error);
 
 		if (traj.cost_ < 0.0 || fabs(direction_error) < traj.cost_) {
 			traj = comp_traj;
 			traj.cost_ = fabs(direction_error);
 		}
 	}
-		
-	// ROS_INFO("best_direction_error : %f", traj.cost_);
+
+	ROS_INFO("best_direction_error : %f", traj.cost_);
 
 	if (rotate_direction_ == CCW && traj.thetav_ < 0.0) {
 		rotate_direction_ = CW;
