@@ -55,33 +55,16 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		return 0.0;
 	}
 	
-	// XXX added but has not tested yet.
-	// add external scoreing point
-	if (!isZero(traj.xv_)) {
-		double ep_x, ep_y, ep_th;
-		traj.getEndpoint(ep_x, ep_y, ep_th);
-		int additional_points = forward_point_dist_ / sim_granularity_;
-
-		int sign = 1;
-		if (traj.xv_<0.0) sign = -1;
-
-		for (int i=1; i<=additional_points; ++i) {
-			double len = sign * i * sim_granularity_;
-			traj.addPoint(ep_x+len*cos(ep_th), ep_y+len*sin(ep_th), ep_th);
-		}
-	}
-
 	double scale = 1.0;
 	if (scaling_flag_)
 		scale = getScalingFactor(traj, scaling_speed_, max_vel_abs_, max_scaling_factor_);
 
-  double px, py, pth;
   if (footprint_spec_.size() == 0) {
-    // Bug, should never happen
     ROS_ERROR("Footprint spec is empty, maybe missing call to setFootprint?");
     return -9;
   }
 
+  double px, py, pth;
   double cost = 0.0;
   for (unsigned int i = 0; i < traj.getPointsSize(); ++i) {
     traj.getPoint(i, px, py, pth);
@@ -95,6 +78,31 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 
 		cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
+
+	// external score
+	if (!isZero(traj.xv_)) {
+		traj.getEndpoint(px, py, pth);
+		int additional_points = forward_point_dist_ / sim_granularity_;
+
+		int sign = 1;
+		if (traj.xv_<0.0) sign = -1;
+
+		double len;
+		for (int i=1; i<=additional_points; ++i) {
+			len = sign * i * sim_granularity_;
+			traj.addPoint(px+len*cos(pth), py+len*sin(pth), pth);
+			double f_cost = footprintCost(px, py, pth,
+					scale, footprint_spec_,
+					costmap_, world_model_);
+
+			if(f_cost < 0){
+					return f_cost;
+			}
+
+			cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
+		}
+	}
+
   return cost * getScale();
 }/*}}}*/
 
