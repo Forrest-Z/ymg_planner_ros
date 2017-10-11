@@ -9,7 +9,7 @@ YmgLPROS:
   acc_lim_theta: 0.5
 
   # scaling robot's footprint
-  scaling_speed: 0.3
+  scaling_speed: 0.4
   max_scaling_factor: 2.0
 
   # goal tolerance param
@@ -18,7 +18,7 @@ YmgLPROS:
 
   # simulation params
   controller_frequency: 5.0
-  sim_time: 1.0
+  sim_time: 1.5
   sim_granularity: 0.05
   angular_sim_granularity: 0.04
   vx_samples: 4
