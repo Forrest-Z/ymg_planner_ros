@@ -116,18 +116,8 @@ void UtilFcn::setSearchDist(double max_dist)
 	}
 }/*}}}*/
 
-double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool reverse_order)
+double UtilFcn::getPathDist(double x, double y)
 {/*{{{*/
-	double x, y, th;
-	traj.getEndpoint(x, y, th);
-
-	if (0.0 < forward_point_dist_) {
-		int sign = 1;
-		if (reverse_order) sign = -1;
-		x = x + sign*forward_point_dist_ * cos(th);
-		y = y + sign*forward_point_dist_ * sin(th);
-	}
-
 	double sq_dist, min_sq_dist = DBL_MAX;
 	double xx, yy;
 	for (int i=getNearestIndex()+1; i<max_search_size_; ++i) {
@@ -140,6 +130,29 @@ double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool reverse
 	}
 
 	return sqrt(min_sq_dist);
+}/*}}}*/
+
+double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj)
+{/*{{{*/
+	double x, y, th;
+	traj.getEndpoint(x, y, th);
+
+	return getPathDist(x, y);
+}/*}}}*/
+
+double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool reverse_order)
+{/*{{{*/
+	double x, y, th;
+	traj.getEndpoint(x, y, th);
+
+	if (0.0 < forward_point_dist_) {
+		int sign = 1;
+		if (reverse_order) sign = -1;
+		x = x + sign*forward_point_dist_ * cos(th);
+		y = y + sign*forward_point_dist_ * sin(th);
+	}
+
+	return getPathDist(x, y);
 }/*}}}*/
 
 double UtilFcn::getDirectionError()

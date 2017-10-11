@@ -102,7 +102,9 @@ class UtilFcn {
 		double getDistance();
 		double getDirectionError();
 		void setSearchDist(double max_dist);
-		double scoreTrajDist(base_local_planner::Trajectory& traj, bool reverse_order = false);
+		double getPathDist(double x, double y);
+		double scoreTrajDist(base_local_planner::Trajectory& traj);
+		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool reverse_order = false);
 
 	private:
 		void resetFlag();
