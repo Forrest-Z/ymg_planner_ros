@@ -6,8 +6,6 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 
-#define STR(var) #var
-
 // register this planner as a BaseGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(ymggp::YmgGPHybROS, nav_core::BaseGlobalPlanner);
 
@@ -650,8 +648,7 @@ bool YmgGPHybROS::getPlanFromPotential(const geometry_msgs::PoseStamped& goal, s
 
 	planner_->setStart(map_goal);
 
-	// XXX changed 4 -> 1
-	planner_->calcPath(costmap_->getSizeInCellsX() * 1);
+	planner_->calcPath(costmap_->getSizeInCellsX() * 4);
 
 	//extract the plan
 	float *x = planner_->getPathX();

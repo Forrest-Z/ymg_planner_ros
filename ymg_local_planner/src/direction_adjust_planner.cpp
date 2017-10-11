@@ -44,7 +44,7 @@ void DirAdjustPlanner::initialize(
 
 bool DirAdjustPlanner::haveToHandle()
 {/*{{{*/
-	double distance = utilfcn_->getDistance();
+	double distance = utilfcn_->getPathDist();
 	double direction_error = utilfcn_->getDirectionError();
 	// ROS_INFO("[DirAdjPlanner] dir_error = %f", direction_error);
 	// ROS_INFO("[DirAdjPlanner] yaw_goal_tolerance = %f", yaw_goal_tolerance_);

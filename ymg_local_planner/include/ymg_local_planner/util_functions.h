@@ -99,12 +99,13 @@ class UtilFcn {
 		void getShortenedPlan(double distance, std::vector<geometry_msgs::PoseStamped>& shortened_plan);
 		double getRobotDirection();
 		double getNearestDirection();
-		double getDistance();
 		double getDirectionError();
 		void setSearchDist(double max_dist);
+		double getPathDist();
+		double getForwardPointPathDist(bool back_mode = false);
 		double getPathDist(double x, double y);
 		double scoreTrajDist(base_local_planner::Trajectory& traj);
-		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool reverse_order = false);
+		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode = false);
 
 	private:
 		void resetFlag();

@@ -93,11 +93,6 @@ double UtilFcn::getNearestDirection()
 	return nearest_direction_;
 }/*}}}*/
 
-double UtilFcn::getDistance()
-{/*{{{*/
-	return calcDist(pose_, plan_[getNearestIndex()]);
-}/*}}}*/
-
 void UtilFcn::setSearchDist(double max_dist)
 {/*{{{*/
 	double max_sq_dist;
@@ -114,6 +109,26 @@ void UtilFcn::setSearchDist(double max_dist)
 			break;
 		}
 	}
+}/*}}}*/
+
+double UtilFcn::getPathDist()
+{/*{{{*/
+	return calcDist(pose_, plan_[getNearestIndex()]);
+}/*}}}*/
+
+double UtilFcn::getForwardPointPathDist(bool back_mode)
+{/*{{{*/
+	if (forward_point_dist_ < 0.0) {
+		return getPathDist();
+	}
+
+	double robot_th = getRobotDirection();
+	int sign = 1;
+	if (back_mode) sign = -1;
+	double forward_x = pose_.pose.position.x + sign*forward_point_dist_ * cos(robot_th);
+	double forward_y = pose_.pose.position.y + sign*forward_point_dist_ * sin(robot_th);
+
+	return getPathDist(forward_x, forward_y);
 }/*}}}*/
 
 double UtilFcn::getPathDist(double x, double y)
@@ -140,14 +155,14 @@ double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj)
 	return getPathDist(x, y);
 }/*}}}*/
 
-double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool reverse_order)
+double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode)
 {/*{{{*/
 	double x, y, th;
 	traj.getEndpoint(x, y, th);
 
 	if (0.0 < forward_point_dist_) {
 		int sign = 1;
-		if (reverse_order) sign = -1;
+		if (back_mode) sign = -1;
 		x = x + sign*forward_point_dist_ * cos(th);
 		y = y + sign*forward_point_dist_ * sin(th);
 	}

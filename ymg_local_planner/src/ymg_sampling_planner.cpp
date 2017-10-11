@@ -96,27 +96,34 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		v_step *= -1;
 	}
 
+	double now_dist = utilfcn_->getForwardPointPathDist();
+
 	// trajectory.cost_ is the distance from global path.
-	double target_vel_x, now_dist = utilfcn_->getDistance();
+	double target_vel_x;
 	for (int i=0; i<=vsamples_[0]; ++i) {
 		target_vel_x = start_vel_x - i * v_step;
 		comp_traj = generateClosestTrajectory(target_vel_x);
 
+		// if failed to generate trajectory
 		if (comp_traj.cost_ < 0.0) {
 			continue;
 		}
 
-
+		// if the trajectory hit obstacles
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
-		if (0.0<=obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-			if (comp_traj.cost_ < path_tolerance_) {
-				traj = comp_traj;
-				// ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
-				return true;
-			}
-			else if (comp_traj.cost_ < now_dist && (better_traj.cost_<0.0 || comp_traj.cost_<better_traj.cost_)) {
-				better_traj = comp_traj;
-			}
+		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
+			continue;
+		}
+
+		if (comp_traj.cost_ < path_tolerance_) {
+			traj = comp_traj;
+			// ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
+			return true;
+		}
+		// if far from global path and can approach global path
+		else if (comp_traj.cost_ < now_dist
+				&& (better_traj.cost_<0.0 || comp_traj.cost_<better_traj.cost_)) {
+			better_traj = comp_traj;
 		}
 	}
 
@@ -160,7 +167,8 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		}
 
 		// comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
-		if (UtilFcn::isZero(comp_traj.xv_)) {
+		if (0) {
+		// if (UtilFcn::isZero(comp_traj.xv_)) {
 			comp_traj.cost_ = utilfcn_->scoreTrajForwardDist(comp_traj, reverse_order_);
 		}
 		else {
