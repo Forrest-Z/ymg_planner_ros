@@ -114,7 +114,7 @@ class UtilFcn {
 		double forward_point_dist_;
 
 		bool has_nearest_index_, has_nearest_direction_;
-		int nearest_index_, max_search_size_;
+		int nearest_index_, max_search_index_;
 		double nearest_direction_;
 
 };   // class utilfcn

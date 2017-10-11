@@ -105,7 +105,7 @@ void UtilFcn::setSearchDist(double max_dist)
 
 	for (int i=getNearestIndex(); i<plan_.size(); ++i) {
 		if (max_sq_dist < calcSqDist(pose_, plan_[i])) {
-			max_search_size_ = i;
+			max_search_index_ = i;
 			break;
 		}
 	}
@@ -114,6 +114,28 @@ void UtilFcn::setSearchDist(double max_dist)
 double UtilFcn::getPathDist()
 {/*{{{*/
 	return calcDist(pose_, plan_[getNearestIndex()]);
+}/*}}}*/
+
+double UtilFcn::getPathDist(double x, double y)
+{/*{{{*/
+	double sq_dist, min_sq_dist = DBL_MAX;
+	double dx, dy;
+
+	int start_index = getNearestIndex();
+	if (start_index+1 <= max_search_index_) {
+		++start_index;
+	}
+
+	for (int i=start_index; i<=max_search_index_; ++i) {
+		dx = plan_[i].pose.position.x - x;
+		dy = plan_[i].pose.position.y - y;
+		sq_dist = dx*dx + dy*dy;
+		if (sq_dist < min_sq_dist) {
+			min_sq_dist = sq_dist; 
+		}
+	}
+
+	return sqrt(min_sq_dist);
 }/*}}}*/
 
 double UtilFcn::getForwardPointPathDist(bool back_mode)
@@ -129,22 +151,6 @@ double UtilFcn::getForwardPointPathDist(bool back_mode)
 	double forward_y = pose_.pose.position.y + sign*forward_point_dist_ * sin(robot_th);
 
 	return getPathDist(forward_x, forward_y);
-}/*}}}*/
-
-double UtilFcn::getPathDist(double x, double y)
-{/*{{{*/
-	double sq_dist, min_sq_dist = DBL_MAX;
-	double xx, yy;
-	for (int i=getNearestIndex()+1; i<max_search_size_; ++i) {
-		xx = plan_[i].pose.position.x - x;
-		yy = plan_[i].pose.position.y - y;
-		sq_dist = xx*xx + yy*yy;
-		if (sq_dist < min_sq_dist) {
-			min_sq_dist = sq_dist; 
-		}
-	}
-
-	return sqrt(min_sq_dist);
 }/*}}}*/
 
 double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj)
@@ -181,7 +187,7 @@ void UtilFcn::resetFlag()
 {/*{{{*/
 	has_nearest_index_ = false;
 	has_nearest_direction_ = false;
-	max_search_size_ = plan_.size();
+	max_search_index_ = plan_.size()-1;
 }/*}}}*/
 
 }   // namespace ymglp
