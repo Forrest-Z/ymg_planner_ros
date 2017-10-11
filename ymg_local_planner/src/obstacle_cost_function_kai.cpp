@@ -78,8 +78,9 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
   }
 
-	// external score
-	if (!isZero(traj.xv_)) {
+	// calc forward point score
+	if (0) {
+	// if (!isZero(traj.xv_)) {
 		traj.getEndpoint(px, py, pth);
 		int additional_points = forward_point_dist_ / sim_granularity_;
 
