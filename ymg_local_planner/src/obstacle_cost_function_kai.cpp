@@ -69,8 +69,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
   for (unsigned int i = 0; i < traj.getPointsSize(); ++i) {
     traj.getPoint(i, px, py, pth);
     double f_cost = footprintCost(px, py, pth,
-        scale, footprint_spec_,
-        costmap_, world_model_);
+				scale, footprint_spec_, costmap_, world_model_);
 
     if(f_cost < 0){
         return f_cost;
@@ -90,10 +89,8 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 		double len;
 		for (int i=1; i<=additional_points; ++i) {
 			len = sign * i * sim_granularity_;
-			traj.addPoint(px+len*cos(pth), py+len*sin(pth), pth);
-			double f_cost = footprintCost(px, py, pth,
-					scale, footprint_spec_,
-					costmap_, world_model_);
+			double f_cost = footprintCost(px+len*cos(pth), py+len*sin(pth), pth,
+					scale, footprint_spec_, costmap_, world_model_);
 
 			if(f_cost < 0){
 					return f_cost;
