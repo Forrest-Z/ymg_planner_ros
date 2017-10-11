@@ -79,8 +79,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
   }
 
 	// calc forward point score
-	if (0) {
-	// if (!isZero(traj.xv_)) {
+	if (!isZero(traj.xv_)) {
 		traj.getEndpoint(px, py, pth);
 		int additional_points = forward_point_dist_ / sim_granularity_;
 
