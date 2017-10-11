@@ -139,6 +139,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 
 bool YmgLP::setPlan (const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
 {/*{{{*/
+	direction_adjust_planner_.resetRotateDirection();
 	return planner_util_->setPlan(orig_global_plan);
 }/*}}}*/
 

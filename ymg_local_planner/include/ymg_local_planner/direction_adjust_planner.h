@@ -52,6 +52,8 @@ class DirAdjustPlanner {
 		bool findBestTrajectory(
 				base_local_planner::Trajectory& traj, std::vector<base_local_planner::Trajectory>* all_explored = 0);
 
+		void resetRotateDirection();
+
 
 	private:
 

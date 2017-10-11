@@ -40,17 +40,6 @@ void DirAdjustPlanner::initialize(
 	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
-	if (rotate_direction_ == UNDEFINED) {
-		double direction_error = utilfcn_->getDirectionError();
-		if (0.0 < direction_error) {
-			ROS_INFO("[DirAdjPlanner] direction:CW (error : %f)", direction_error);
-			rotate_direction_ = CW;
-		}
-		else {
-			ROS_INFO("[DirAdjPlanner] direction:CCW (error : %f)", direction_error);
-			rotate_direction_ = CCW;
-		}
-	}
 }/*}}}*/
 
 bool DirAdjustPlanner::haveToHandle()
@@ -79,13 +68,26 @@ bool DirAdjustPlanner::haveToHandle()
 	return handle_latch_;
 }/*}}}*/
 
+void DirAdjustPlanner::resetRotateDirection()
+{/*{{{*/
+	rotate_direction_ = UNDEFINED;
+}/*}}}*/
+
 bool DirAdjustPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
+
 	if (rotate_direction_ == UNDEFINED) {
-		ROS_WARN("[DirAdjPlanner] Has not defined rotate direction.");
-		return false;
+		double direction_error = utilfcn_->getDirectionError();
+		if (0.0 < direction_error) {
+			ROS_INFO("[DirAdjPlanner] direction:CW (error : %f)", direction_error);
+			rotate_direction_ = CW;
+		}
+		else {
+			ROS_INFO("[DirAdjPlanner] direction:CCW (error : %f)", direction_error);
+			rotate_direction_ = CCW;
+		}
 	}
 
 	if (obstacle_critic_->prepare() == false) {
@@ -139,7 +141,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 		}
 	}
 
-	ROS_INFO("best_direction_error : %f", traj.cost_);
+	// ROS_INFO("best_direction_error : %f", traj.cost_);
 
 	if (rotate_direction_ == CCW && traj.thetav_ < 0.0) {
 		rotate_direction_ = CW;
