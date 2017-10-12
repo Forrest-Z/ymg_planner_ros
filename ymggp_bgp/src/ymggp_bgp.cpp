@@ -387,6 +387,15 @@ bool YmgGPBGP::makeBGPPlan(const geometry_msgs::PoseStamped& start, const geomet
 	return !plan.empty();
 }/*}}}*/
 
+bool YmgGPBGP::makeYmggpPlan (const geometry_msgs::PoseStamped& start,
+		const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
+{/*{{{*/
+	plan.clear();
+	ymg_global_planner_.makePlan(start, goal, plan);
+
+	return !plan.empty();
+}/*}}}*/
+
 void YmgGPBGP::publishPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/
 	if (!initialized_) {
