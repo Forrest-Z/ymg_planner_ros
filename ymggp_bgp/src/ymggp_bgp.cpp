@@ -130,6 +130,7 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 		initialized_ = true;
 
 
+		ymg_global_planner_.initialize(frame_id, path_granularity_);
 		bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("bgp_plan", 1);
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
 		bgp_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("bgp_goal", 1);
@@ -152,6 +153,7 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	orientation_filter_->setMode(config.orientation_mode);
 
 	path_granularity_ = config.path_granularity;
+	ymg_global_planner_.setPathGranularity(path_granularity_);
 	stuck_timeout_ = config.stuck_timeout;
 	stuck_vel_ = config.stuck_vel;
 	stuck_rot_vel_ = config.stuck_rot_vel;
