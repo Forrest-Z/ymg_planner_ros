@@ -66,6 +66,7 @@ bool DirAdjustPlanner::haveToHandle()
 void DirAdjustPlanner::resetRotateDirection()
 {/*{{{*/
 	rotate_direction_ = UNDEFINED;
+	ROS_INFO("{dirAdjPlanner] direction resetted");
 }/*}}}*/
 
 void DirAdjustPlanner::defineDirection()
