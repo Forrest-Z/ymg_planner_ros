@@ -138,7 +138,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 
 	// find better path (closest to the global plan)
 	ROS_INFO("cost better : %f", better_traj.cost_);
-	if (!better_traj.cost_ == DBL_MAX) {
+	if (better_traj.cost_ != DBL_MAX) {
 		traj = better_traj;
 		return true;
 	}
