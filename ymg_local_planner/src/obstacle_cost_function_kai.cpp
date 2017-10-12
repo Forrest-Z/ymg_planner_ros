@@ -93,9 +93,6 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 			cost = std::max(cost, f_cost);   // changed   cost = f_cost ->
 		}
 	}
-	else {
-		ROS_INFO("velocity is zero");
-	}
 
   return cost * getScale();
 }/*}}}*/

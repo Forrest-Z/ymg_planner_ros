@@ -114,7 +114,9 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		// ROS_INFO("obs cost : %f", obstacle_cost);
 		// if the trajectory hit obstacles
 		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
+#ifdef DEBUG
 			ROS_INFO("vel: %f will hit the obstacle", target_vel_x);
+#endif
 			continue;
 		}
 
@@ -141,12 +143,12 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	// connot find valid path, try to calc slowest velocity with no scaling
-	// double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, false);
-	// if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-	// 	ROS_INFO("[YSP] no scaling path found.");
-	// 	traj = comp_traj;
-	// 	return true;
-	// }
+	double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, false);
+	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
+		ROS_INFO("[YSP] no scaling path found.");
+		traj = comp_traj;
+		return true;
+	}
 
 	traj.resetPoints();
 	traj.xv_ = 0.0;
@@ -185,12 +187,16 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		else {
 			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj);
 		}
+#ifdef DEBUG
 		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
+#endif
 		if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
 			best_traj = comp_traj;
 		}
 	}
+#ifdef DEBUG
 	ROS_INFO("roop end");
+#endif
 
 	// cannot find closest path
 	if (best_traj.cost_ == DBL_MAX) {
