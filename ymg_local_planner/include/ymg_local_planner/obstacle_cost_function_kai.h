@@ -5,6 +5,7 @@
 
 #include <base_local_planner/costmap_model.h>
 #include <costmap_2d/costmap_2d.h>
+#include <ymg_local_planner/util_functions.h>
 
 namespace base_local_planner {
 

@@ -41,12 +41,6 @@ bool ObstacleCostFunctionKai::prepare()
   return true;
 }/*}}}*/
 
-// XXX new function and has not tested yet.
-bool ObstacleCostFunctionKai::isZero(double x)
-{/*{{{*/
-	return (0<=x && x<DBL_MIN*128);
-}/*}}}*/
-
 // this function gets maximum cost in the trajectory and returns scaled value.
 double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
 {/*{{{*/
@@ -79,7 +73,7 @@ double ObstacleCostFunctionKai::scoreTrajectory(Trajectory &traj)
   }
 
 	// calc forward point score
-	if (!isZero(traj.xv_)) {
+	if (!ymglp::UtilFcn::isZero(traj.xv_)) {
 		traj.getEndpoint(px, py, pth);
 		int additional_points = forward_point_dist_ / sim_granularity_;
 
