@@ -44,11 +44,11 @@ void DirAdjustPlanner::initialize(
 
 bool DirAdjustPlanner::haveToHandle()
 {/*{{{*/
-	double distance = utilfcn_->getPathDist();
+	double dist = utilfcn_->getPathDist();
 	double direction_error = utilfcn_->getDirectionError();
 	// ROS_INFO("[DirAdjPlanner] dir_error = %f", direction_error);
 	// ROS_INFO("[DirAdjPlanner] yaw_goal_tolerance = %f", yaw_goal_tolerance_);
-	if (distance_tolerance_ < distance) {
+	if (distance_tolerance_ < dist) {
 		handle_latch_ = false;
 	}
 	else{
@@ -56,13 +56,9 @@ bool DirAdjustPlanner::haveToHandle()
 			if (handle_latch_ == false) ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
 			handle_latch_ = true;
 		}
-		else if (fabs(direction_error) < yaw_goal_tolerance_) {
-			handle_latch_ = false;
-		}
 	}
 
-	if (!handle_latch_)
-		rotate_direction_ = UNDEFINED;
+	if (!handle_latch_) rotate_direction_ = UNDEFINED;
 
 	return handle_latch_;
 }/*}}}*/
