@@ -111,6 +111,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 
 		// if velocity is zero, do not calc forward point obstacle score
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
+		ROS_INFO("obs cost : %f", obstacle_cost);
 		// if the trajectory hit obstacles
 		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
 			ROS_INFO("vel: %f will hit the obstacle", target_vel_x);
@@ -132,7 +133,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	// find better path (closest to the global plan)
-	if (!better_traj.cost_==DBL_MAX) {
+	if (!better_traj.cost_ == DBL_MAX) {
 		traj = better_traj;
 		return true;
 	}
