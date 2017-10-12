@@ -146,6 +146,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	traj.xv_ = 0.0;
 	traj.yv_ = 0.0;
 	traj.thetav_ = 0.0;
+	traj.cost_ = 77.7;
 	traj.addPoint(pos_[0], pos_[1], pos_[2]);
 	ROS_INFO("[YSP] failed to find valid path. (send zero velocity)");
 
