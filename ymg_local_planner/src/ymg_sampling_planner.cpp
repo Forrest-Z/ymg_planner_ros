@@ -1,6 +1,8 @@
 #include <ymg_local_planner/ymg_sampling_planner.h>
 #include <ros/console.h>
 
+#define DEBUG
+
 namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
