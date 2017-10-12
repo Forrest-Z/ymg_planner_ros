@@ -129,8 +129,12 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 
 		initialized_ = true;
 
-
+		setBGPFlag(false);
 		ymg_global_planner_.initialize(frame_id, path_granularity_);
+		odom_helper_.setOdomTopic("odom");
+		robot_status_ = goal_reached;
+		stop_time_ = ros::Time::now();
+
 		bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("bgp_plan", 1);
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
 		bgp_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("bgp_goal", 1);
