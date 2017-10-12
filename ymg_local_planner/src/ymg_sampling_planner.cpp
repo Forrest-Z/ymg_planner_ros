@@ -171,7 +171,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		}
 
 		// comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
-		if (0) {
+		if (1) {
 		// if (UtilFcn::isZero(comp_traj.xv_)) {
 			comp_traj.cost_ = utilfcn_->scoreTrajForwardDist(comp_traj, reverse_order_);
 		}

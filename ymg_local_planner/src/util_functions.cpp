@@ -219,8 +219,8 @@ double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool 
 		y += sign*forward_point_dist_ * sin(th);
 	}
 
-	// return getPathDist(x, y);
-	return getPathDistHQ(x, y);
+	return getPathDist(x, y);
+	// return getPathDistHQ(x, y);
 }/*}}}*/
 
 double UtilFcn::getDirectionError()
