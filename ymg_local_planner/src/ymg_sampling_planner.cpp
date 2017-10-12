@@ -197,7 +197,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		}
 	}
 #ifdef DEBUG
-	ROS_INFO("roop end");
+	ROS_INFO("roop end.");
 #endif
 
 	// cannot find closest path
