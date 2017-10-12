@@ -110,9 +110,10 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 
 		// if velocity is zero, do not calc forward point obstacle score
-		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, !UtilFcn::isZero(traj.xv_));
+		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
 		// if the trajectory hit obstacles
 		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
+			ROS_INFO("vel: %f will hit the obstacle", target_vel_x);
 			continue;
 		}
 
