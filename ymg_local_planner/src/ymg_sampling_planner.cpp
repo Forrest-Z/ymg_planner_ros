@@ -135,12 +135,12 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 	// connot find valid path, try to calc slowest velocity with no scaling
-	double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, false);
-	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
-		ROS_INFO("[YSP] no scaling path found.");
-		traj = comp_traj;
-		return true;
-	}
+	// double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, false);
+	// if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
+	// 	ROS_INFO("[YSP] no scaling path found.");
+	// 	traj = comp_traj;
+	// 	return true;
+	// }
 
 	traj.resetPoints();
 	traj.xv_ = 0.0;
