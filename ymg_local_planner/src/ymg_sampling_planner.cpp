@@ -88,7 +88,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 
 	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
 	base_local_planner::Trajectory comp_traj, better_traj;
-	better_traj.cost_ = -1.0;
+	better_traj.cost_ = DBL_MAX;
 
 	double start_vel_x = max_vel_[0];
 	if (reverse_order_) {
@@ -102,44 +102,43 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	double target_vel_x;
 	for (int i=0; i<=vsamples_[0]; ++i) {
 		target_vel_x = start_vel_x - i * v_step;
-		comp_traj = generateClosestTrajectory(target_vel_x);
 
-		// if failed to generate trajectory
+		comp_traj = generateClosestTrajectory(target_vel_x);
+		// cannot generate trajectory
 		if (comp_traj.cost_ < 0.0) {
 			continue;
 		}
 
-		// if the trajectory hit obstacles
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
+		// if the trajectory hit obstacles
 		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
 			continue;
 		}
 
+		// find closest path
 		if (comp_traj.cost_ < path_tolerance_) {
 			traj = comp_traj;
 			// ROS_INFO("[YggSampPl] cost_p : %f", traj.cost_);
 			return true;
 		}
-		// if far from global path and can approach global path
-		else if (comp_traj.cost_ < now_dist
-				&& (better_traj.cost_<0.0 || comp_traj.cost_<better_traj.cost_)) {
+
+		// far from global path and can approach global path
+		else if (comp_traj.cost_ < now_dist && comp_traj.cost_<better_traj.cost_) {
 			better_traj = comp_traj;
 		}
 	}
 
-	// if this planner find better path (closest to the global plan)
-	if (0.0<=better_traj.cost_) {
+	// find better path (closest to the global plan)
+	if (!better_traj.cost_==DBL_MAX) {
 		traj = better_traj;
 		return true;
 	}
 
-	// if connot find valid path, try to find path with no scaling
-	base_local_planner::Trajectory no_scaling_traj;
-	no_scaling_traj = generateClosestTrajectory(target_vel_x);
-	double obstacle_cost = obstacle_critic_->scoreTrajectory(no_scaling_traj);
+	// connot find valid path, try to calc slowest velocity with no scaling
+	double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, false);
 	if (0.0 <= obstacle_cost && obstacle_cost<=obstacle_tolerance_) {
 		ROS_INFO("[YSP] no scaling path found.");
-		traj = no_scaling_traj;
+		traj = comp_traj;
 		return true;
 	}
 
@@ -152,15 +151,15 @@ bool YmgSamplingPlanner::findBestTrajectory(
 base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(double vel_x)
 {/*{{{*/
 	base_local_planner::Trajectory best_traj;
-	best_traj.cost_ = -1.0;
+	best_traj.cost_ = DBL_MAX;
 
 	Eigen::Vector3f target_vel;
 	target_vel[0] = vel_x;
 	target_vel[1] = 0.0;   // velocity_y must be zero
 	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
 
-	for (int iw=0; iw<=vsamples_[2]; ++iw) {
-		target_vel[2] = max_vel_[2] - iw * w_step;
+	for (int i=0; i<=vsamples_[2]; ++i) {
+		target_vel[2] = max_vel_[2] - i * w_step;
 		base_local_planner::Trajectory comp_traj;
 		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
 			continue;
@@ -175,12 +174,17 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj);
 		}
 		// ROS_INFO("[closest] cost : %f", comp_traj.cost_);
-		if (0.0<=comp_traj.cost_
-				&& (best_traj.cost_<0.0 || comp_traj.cost_<best_traj.cost_)) {
+		if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
 			best_traj = comp_traj;
 		}
 	}
 	// ROS_INFO("roop end");
+
+	// cannot find closest path
+	if (best_traj.cost_ == DBL_MAX) {
+		best_traj.cost_ = -1.0;
+	}
+
 	return best_traj;
 }/*}}}*/
 
@@ -208,8 +212,6 @@ bool YmgSamplingPlanner::generateTrajectory(
 	double dt = sim_time_ / num_steps;
 	traj.time_delta_ = dt;
 
-	Eigen::Vector3f loop_vel;
-	loop_vel = sample_target_vel;
 	traj.xv_     = sample_target_vel[0];
 	traj.yv_     = sample_target_vel[1];
 	traj.thetav_ = sample_target_vel[2];
@@ -221,7 +223,7 @@ bool YmgSamplingPlanner::generateTrajectory(
 		traj.addPoint(pos[0], pos[1], pos[2]);
 
 		//update the position of the robot using the velocities passed in
-		pos = computeNewPositions(pos, loop_vel, dt);
+		pos = computeNewPositions(pos, sample_target_vel, dt);
 
 	} // end for simulation steps
 

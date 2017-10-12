@@ -203,31 +203,6 @@ void YmgLP::updatePlanAndLocalCosts (tf::Stamped<tf::Pose> global_pose,
 
 }/*}}}*/
 
-void YmgLP::shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan,
-		std::vector<geometry_msgs::PoseStamped>& shortened_plan, int nearest_index, double goal_distance)
-{/*{{{*/
-	// calc local goal index
-	double now_distance = 0.0;
-	int local_goal_index = -1;
-	for (int i=nearest_index+1; i<orig_plan.size(); ++i) {
-		now_distance += UtilFcn::calcDist(orig_plan[i-1], orig_plan[i]);
-		if (goal_distance < now_distance) {
-			local_goal_index = i;
-			break;
-		}
-	}
-
-	// resize orig_plan
-	shortened_plan.clear();
-	if (local_goal_index == -1) {
-		shortened_plan = orig_plan;
-	} else {
-		for (int i=nearest_index; i<local_goal_index; ++i) {
-			shortened_plan.push_back(orig_plan[i]);
-		}
-	}
-}/*}}}*/
-
 void YmgLP::publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explored)
 {/*{{{*/
 	base_local_planner::MapGridCostPoint pt;

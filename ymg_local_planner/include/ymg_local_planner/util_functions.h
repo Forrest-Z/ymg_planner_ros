@@ -90,20 +90,17 @@ class UtilFcn {
 		void setPlan(const std::vector<geometry_msgs::PoseStamped>& plan);
 		void setPose(const geometry_msgs::PoseStamped& pose);
 		void setPose(const tf::Stamped<tf::Pose>& pose);
+		void setForwardPointDist(double forward_point_dist);
+		void setSearchDist(double max_dist);
 
-		void setForwardPointDist(double forward_point_dist)
-		{/*{{{*/
-			forward_point_dist_ = forward_point_dist;
-		}/*}}}*/
 		int getNearestIndex();
 		void getShortenedPlan(double distance, std::vector<geometry_msgs::PoseStamped>& shortened_plan);
 		double getRobotDirection();
 		double getNearestDirection();
 		double getDirectionError();
-		void setSearchDist(double max_dist);
 		double getPathDist();
-		double getForwardPointPathDist(bool back_mode = false);
 		double getPathDist(double x, double y);
+		double getForwardPointPathDist(bool back_mode = false);
 		double scoreTrajDist(base_local_planner::Trajectory& traj);
 		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode = false);
 

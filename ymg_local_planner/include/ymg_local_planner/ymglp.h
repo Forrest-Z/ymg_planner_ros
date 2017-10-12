@@ -127,11 +127,6 @@ class YmgLP {
 				bool publish_cost_grid_pc_; ///< @brief Whether or not to build and publish a PointCloud
 				bool publish_traj_pc_;
 
-				void shortenPath(const std::vector<geometry_msgs::PoseStamped>& orig_plan,
-						std::vector<geometry_msgs::PoseStamped>& shortened_plan,
-						int nearest_index, double goal_distance);
-				void calcPoseError( const tf::Stamped<tf::Pose>& pose,
-						const std::vector<geometry_msgs::PoseStamped>& path);
 				void publishTrajPC(std::vector<base_local_planner::Trajectory>& all_explored);
 
 				// see constructor body for explanations

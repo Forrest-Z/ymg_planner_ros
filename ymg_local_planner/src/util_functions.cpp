@@ -30,6 +30,29 @@ void UtilFcn::setPose(const tf::Stamped<tf::Pose>& pose)
 	setPose(p);
 }/*}}}*/
 
+void UtilFcn::setForwardPointDist(double forward_point_dist)
+		{/*{{{*/
+			forward_point_dist_ = forward_point_dist;
+		}/*}}}*/
+
+void UtilFcn::setSearchDist(double max_dist)
+{/*{{{*/
+	double max_sq_dist;
+	if (0.0 < forward_point_dist_) {
+		max_sq_dist = (max_dist+forward_point_dist_) * (max_dist+forward_point_dist_);
+	}
+	else {
+		max_sq_dist = max_dist * max_dist;
+	}
+
+	for (int i=getNearestIndex(); i<plan_.size(); ++i) {
+		if (max_sq_dist < calcSqDist(pose_, plan_[i])) {
+			max_search_index_ = i;
+			break;
+		}
+	}
+}/*}}}*/
+
 int UtilFcn::getNearestIndex()
 {/*{{{*/
 	if (has_nearest_index_) {
@@ -93,27 +116,14 @@ double UtilFcn::getNearestDirection()
 	return nearest_direction_;
 }/*}}}*/
 
-void UtilFcn::setSearchDist(double max_dist)
-{/*{{{*/
-	double max_sq_dist;
-	if (0.0 < forward_point_dist_) {
-		max_sq_dist = (max_dist+forward_point_dist_) * (max_dist+forward_point_dist_);
-	}
-	else {
-		max_sq_dist = max_dist * max_dist;
-	}
-
-	for (int i=getNearestIndex(); i<plan_.size(); ++i) {
-		if (max_sq_dist < calcSqDist(pose_, plan_[i])) {
-			max_search_index_ = i;
-			break;
-		}
-	}
-}/*}}}*/
-
 double UtilFcn::getPathDist()
 {/*{{{*/
-	return calcDist(pose_, plan_[getNearestIndex()]);
+	int nearest_index = getNearestIndex();
+	if (nearest_index+1 < plan_.size()) {
+		++nearest_index;
+	}
+
+	return calcDist(pose_, plan_[nearest_index]);
 }/*}}}*/
 
 double UtilFcn::getPathDist(double x, double y)
@@ -169,8 +179,8 @@ double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool 
 	if (0.0 < forward_point_dist_) {
 		int sign = 1;
 		if (back_mode) sign = -1;
-		x = x + sign*forward_point_dist_ * cos(th);
-		y = y + sign*forward_point_dist_ * sin(th);
+		x += sign*forward_point_dist_ * cos(th);
+		y += sign*forward_point_dist_ * sin(th);
 	}
 
 	return getPathDist(x, y);

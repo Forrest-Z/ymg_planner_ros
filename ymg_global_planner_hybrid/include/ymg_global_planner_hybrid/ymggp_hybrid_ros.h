@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <navfn/navfn.h>
 #include <ymg_global_planner/ymggp.h>
+#include <ymg_local_planner/util_functions.h>
 #include <costmap_2d/costmap_2d.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Point.h>

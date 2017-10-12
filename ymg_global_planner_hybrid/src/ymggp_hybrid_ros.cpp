@@ -453,6 +453,19 @@ bool YmgGPHybROS::makePlan(const geometry_msgs::PoseStamped& start,
 		}
 	}
 
+	// for debug
+	double dist_min = DBL_MAX, dist_max = -1.0, dist;
+	for (int i=1; i<plan.size(); ++i) {
+		dist = ymglp::UtilFcn::calcDist(plan[i-1], plan[i]);
+		if (dist < dist_min) {
+			dist_min = dist;
+		}
+		if (dist_max < dist) {
+			dist_max = dist;
+		}
+	}
+	ROS_INFO("dist between traj point m-M : %f : %f", dist_min, dist_max);
+
 	return !plan.empty();
 }/*}}}*/
 
