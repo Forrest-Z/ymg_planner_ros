@@ -222,17 +222,14 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
-	ROS_INFO("RUNNING");
 
 	updateRobotStatus(start, goal, plan);
-	ROS_INFO("RUNNING");
 
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
 		ROS_INFO("[YmgGPHybROS] Changes planner to ymggp.");
 		setBGPFlag(false);
 	}
-	ROS_INFO("RUNNING");
 
 	if (use_bgp_) {
 		// ROS_INFO("path size: %d", (int)plan.size());
@@ -395,6 +392,7 @@ bool YmgGPBGP::makeYmggpPlan (const geometry_msgs::PoseStamped& start,
 		const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	plan.clear();
+	ROS_INFO("RUNNING");
 	ymg_global_planner_.makePlan(start, goal, plan);
 
 	return !plan.empty();
