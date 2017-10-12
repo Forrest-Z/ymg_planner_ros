@@ -109,7 +109,6 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			continue;
 		}
 
-
 		// if velocity is zero, do not calc forward point obstacle score
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj, !UtilFcn::isZero(traj.xv_));
 		// if the trajectory hit obstacles
@@ -125,7 +124,8 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		}
 
 		// far from global path and can approach global path
-		else if (comp_traj.cost_ < now_dist && comp_traj.cost_<better_traj.cost_) {
+		// else if (comp_traj.cost_ < now_dist && comp_traj.cost_<better_traj.cost_) {
+		else if (comp_traj.cost_<better_traj.cost_) {
 			better_traj = comp_traj;
 		}
 	}
