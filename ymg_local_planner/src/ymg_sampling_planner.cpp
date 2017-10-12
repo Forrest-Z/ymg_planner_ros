@@ -171,6 +171,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 	target_vel[0] = vel_x;
 	target_vel[1] = 0.0;   // velocity_y must be zero
 	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
+	ROS_INFO("min-max vel[2] : %f - %f", min_vel_[2], max_vel_[2]);
 
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel[2] = max_vel_[2] - i * w_step;
@@ -189,7 +190,6 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj);
 		}
 #ifdef DEBUG
-		ROS_INFO("min-max vel[2] : %f - %f", min_vel_[2], max_vel_[2]);
 		ROS_INFO("target_vel[2] : %f", target_vel[2]);
 		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 #endif
