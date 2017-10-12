@@ -94,6 +94,7 @@ class UtilFcn {
 		void setForwardPointDist(double forward_point_dist);
 		void setSearchDist(double max_dist);
 
+		geometry_msgs::PoseStamped getPoseStamped();
 		int getNearestIndex();
 		void getShortenedPlan(double distance, std::vector<geometry_msgs::PoseStamped>& shortened_plan);
 		double getRobotDirection();

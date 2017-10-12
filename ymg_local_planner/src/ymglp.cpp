@@ -31,7 +31,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
 			config.path_tolerance, config.obstacle_tolerance);
 	direction_adjust_planner_.setParameters(
-			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_);
+			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
+			config.path_tolerance, config.obstacle_tolerance);
 
 	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
 			config.yaw_goal_tolerance, config.obstacle_tolerance);
@@ -261,8 +262,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	result_traj_.cost_ = -7;
 
 	if (!use_dwa_) {
-		if (0) {
-		// if (direction_adjust_planner_.haveToHandle()) {
+		// if (0) {
+		if (direction_adjust_planner_.haveToHandle()) {
 			// ROS_INFO("direction_adjust_planner running.");
 			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);

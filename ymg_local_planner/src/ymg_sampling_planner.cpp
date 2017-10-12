@@ -96,7 +96,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		v_step *= -1;
 	}
 
-	double now_dist = utilfcn_->getForwardPointPathDist();
+	// double now_dist = utilfcn_->getForwardPointPathDist();
 
 	// trajectory.cost_ is the distance from global path.
 	double target_vel_x;
@@ -111,14 +111,11 @@ bool YmgSamplingPlanner::findBestTrajectory(
 
 		// if velocity is zero, do not calc forward point obstacle score
 		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
-		ROS_INFO("obs cost : %f", obstacle_cost);
+		// ROS_INFO("obs cost : %f", obstacle_cost);
 		// if the trajectory hit obstacles
 		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
 			ROS_INFO("vel: %f will hit the obstacle", target_vel_x);
 			continue;
-		}
-		else {
-			ROS_INFO("cost better comp : %f %f", better_traj.cost_, comp_traj.cost_);
 		}
 
 		// find closest path
@@ -131,13 +128,13 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		// far from global path and can approach global path
 		// else if (comp_traj.cost_ < now_dist && comp_traj.cost_<better_traj.cost_) {
 		else if (comp_traj.cost_<better_traj.cost_) {
-			ROS_INFO("better traj found");
+			// ROS_INFO("better traj found");
 			better_traj = comp_traj;
 		}
 	}
 
 	// find better path (closest to the global plan)
-	ROS_INFO("cost better : %f", better_traj.cost_);
+	// ROS_INFO("cost better : %f", better_traj.cost_);
 	if (better_traj.cost_ != DBL_MAX) {
 		traj = better_traj;
 		return true;
@@ -157,7 +154,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	traj.thetav_ = 0.0;
 	traj.cost_ = 77.7;
 	traj.addPoint(pos_[0], pos_[1], pos_[2]);
-	ROS_INFO("[YSP] failed to find valid path. (send zero velocity)");
+	ROS_INFO("[YSP] Failed to find valid path. (send zero velocity)");
 
 	return false;
 }/*}}}*/

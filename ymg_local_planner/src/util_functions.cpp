@@ -53,6 +53,11 @@ void UtilFcn::setSearchDist(double max_dist)
 	}
 }/*}}}*/
 
+geometry_msgs::PoseStamped UtilFcn::getPoseStamped()
+{/*{{{*/
+	return pose_;
+}/*}}}*/
+
 int UtilFcn::getNearestIndex()
 {/*{{{*/
 	if (has_nearest_index_) {

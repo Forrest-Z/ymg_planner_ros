@@ -53,8 +53,7 @@ bool DirAdjustPlanner::haveToHandle()
 	}
 	else{
 		if (direction_tolerance_ < fabs(direction_error)) {
-			if (handle_latch_ == false)
-				ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
+			if (handle_latch_ == false) ROS_INFO("[DirAdjustPlanner] Adjusting direction.");
 			handle_latch_ = true;
 		}
 		else if (fabs(direction_error) < yaw_goal_tolerance_) {
@@ -73,21 +72,48 @@ void DirAdjustPlanner::resetRotateDirection()
 	rotate_direction_ = UNDEFINED;
 }/*}}}*/
 
+void DirAdjustPlanner::defineDirection()
+{/*{{{*/
+	int num_steps = ceil(2*M_PI / angular_sim_granularity_);
+	double rad_step = 2*M_PI / num_steps;
+	double target_theta, min_dist = DBL_MAX;
+
+	geometry_msgs::PoseStamped robot_pose = utilfcn_->getPoseStamped();
+	for (int i=0; i<=num_steps; ++i) {
+		double comp_theta = -M_PI + i * rad_step;
+		base_local_planner::Trajectory traj;
+		traj.addPoint(
+				robot_pose.pose.position.x,
+				robot_pose.pose.position.y,
+				comp_theta);
+		double dist = utilfcn_->scoreTrajForwardDist(traj);
+		if (0.0 < dist && dist < min_dist) {
+			min_dist = dist;
+			target_theta = comp_theta;
+		}
+	}
+
+	// find closest direction
+	if (min_dist != DBL_MAX) {
+		double path_direction = utilfcn_->getDirectionError(utilfcn_->getRobotDirection(), target_theta);
+		if (0.0 < path_direction) {
+			ROS_INFO("[DirAdjPlanner] direction:CCW (path_direction : %f)", path_direction);
+			rotate_direction_ = CCW;
+		}
+		else {
+			ROS_INFO("[DirAdjPlanner] direction:CW (path_direction : %f)", path_direction);
+			rotate_direction_ = CW;
+		}
+	}
+}/*}}}*/
+
 bool DirAdjustPlanner::findBestTrajectory(
 		base_local_planner::Trajectory& traj,
 		std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
 
 	if (rotate_direction_ == UNDEFINED) {
-		double direction_error = utilfcn_->getDirectionError();
-		if (0.0 < direction_error) {
-			ROS_INFO("[DirAdjPlanner] direction:CW (error : %f)", direction_error);
-			rotate_direction_ = CW;
-		}
-		else {
-			ROS_INFO("[DirAdjPlanner] direction:CCW (error : %f)", direction_error);
-			rotate_direction_ = CCW;
-		}
+		defineDirection();
 	}
 
 	if (obstacle_critic_->prepare() == false) {
@@ -104,9 +130,11 @@ bool DirAdjustPlanner::findBestTrajectory(
 	target_vel[1] = 0.0;
 
 	double theta_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
-	base_local_planner::Trajectory comp_traj;
+	base_local_planner::Trajectory comp_traj, min_dist_traj, CCW_traj, CW_traj;
+	min_dist_traj.cost_ = DBL_MAX;
+	CCW_traj.cost_ = -1.0;
+	CW_traj.cost_ = -1.0;
 
-	double path_cost, obstacle_cost;
 	double x, y, th;
 
 	traj.cost_ = -1;
@@ -119,38 +147,57 @@ bool DirAdjustPlanner::findBestTrajectory(
 			continue;
 		}
 
-		obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
+		double obstacle_cost = obstacle_critic_->scoreTrajectory(comp_traj);
 		// ROS_INFO("obstacle_cost : %f", obstacle_cost);
-		if (obstacle_cost < 0.0 || obstacle_tolerance_+0.5 < obstacle_cost) {
+		if (obstacle_cost < 0.0 || obstacle_tolerance_ < obstacle_cost) {
 			continue;
 		}
 
-		comp_traj.getEndpoint(x, y, th);
-		double direction_error;
-		if (rotate_direction_ == CCW) {
-			direction_error = UtilFcn::getDirectionErrorCCW(th, utilfcn_->getNearestDirection());
+		comp_traj.cost_ = utilfcn_->scoreTrajForwardDist(comp_traj);
+		if (comp_traj.cost_ < min_dist_traj.cost_) {
+			min_dist_traj.cost_ = comp_traj.cost_;
 		}
-		if (rotate_direction_ == CW) {
-			direction_error = UtilFcn::getDirectionErrorCW(th, utilfcn_->getNearestDirection());
-		}
-		// ROS_INFO("direction error : %f", direction_error);
 
-		if (traj.cost_ < 0.0 || fabs(direction_error) < traj.cost_) {
-			traj = comp_traj;
-			traj.cost_ = fabs(direction_error);
+		if (CCW_traj.cost_ < 0.0 || CCW_traj.thetav_ < comp_traj.thetav_) {
+			CCW_traj = comp_traj;
+		}
+
+		if (CW_traj.cost_ < 0.0 || comp_traj.thetav_ < CW_traj.thetav_) {
+			CW_traj = comp_traj;
 		}
 	}
 
-	// ROS_INFO("best_direction_error : %f", traj.cost_);
-
-	if (rotate_direction_ == CCW && traj.thetav_ < 0.0) {
-		rotate_direction_ = CW;
-	}
-	if (rotate_direction_ == CW && 0.0 < traj.thetav_) {
-		rotate_direction_ = CCW;
+	if (min_dist_traj.cost_ < path_tolerance_) {
+		traj = min_dist_traj;
+		handle_latch_ = false;
+		return true;
 	}
 
-	return true;
+	if (rotate_direction_ == CCW && 0.0 < CCW_traj.cost_) {
+		traj = CCW_traj;
+		if (0.0 > traj.thetav_) {
+			rotate_direction_ = CW;
+		}
+		return true;
+	}
+
+	if (rotate_direction_ == CW && 0.0 < CW_traj.cost_) {
+		traj = CW_traj;
+		if (0.0 < traj.thetav_) {
+			rotate_direction_ = CCW;
+		}
+		return true;
+	}
+
+	traj.resetPoints();
+	traj.xv_ = 0.0;
+	traj.yv_ = 0.0;
+	traj.thetav_ = 0.0;
+	traj.cost_ = 77.7;
+	traj.addPoint(pos_[0], pos_[1], pos_[2]);
+	ROS_INFO("[DirAdjPlanner] Failed to find valid path. (send zero velocity)");
+
+	return false;
 }/*}}}*/
 
 bool DirAdjustPlanner::generateTrajectory(
