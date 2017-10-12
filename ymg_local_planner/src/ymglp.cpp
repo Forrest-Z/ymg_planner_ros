@@ -286,6 +286,7 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 		drive_velocities.setIdentity();
 	}
 	else {
+		ROS_INFO("vel : %f, %f, %f", result_traj_.xv_, result_traj_.yv_, result_traj_.thetav_);
 		tf::Vector3 start(result_traj_.xv_, result_traj_.yv_, 0);
 		drive_velocities.setOrigin(start);
 		tf::Matrix3x3 matrix;
