@@ -218,7 +218,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		ROS_ERROR("This planner has not been initialized yet, but it is being used, please call initialize() before use");
 		return false;
 	}
-	ROS_INFO("RUNNING");
 
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
@@ -392,9 +391,7 @@ bool YmgGPBGP::makeYmggpPlan (const geometry_msgs::PoseStamped& start,
 		const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	plan.clear();
-	ROS_INFO("RUNNING");
 	ymg_global_planner_.makePlan(start, goal, plan);
-	ROS_INFO("RUNNING");
 
 	return !plan.empty();
 }/*}}}*/
