@@ -143,12 +143,12 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	}
 
 
-	ROS_INFO("[YSP] failed to find valid path. (send zero velocity)");
 	traj.resetPoints();
 	traj.xv_ = 0.0;
 	traj.yv_ = 0.0;
 	traj.thetav_ = 0.0;
 	traj.addPoint(pos_[0], pos_[1], pos_[2]);
+	ROS_INFO("[YSP] failed to find valid path. (send zero velocity)");
 
 	return false;
 }/*}}}*/
