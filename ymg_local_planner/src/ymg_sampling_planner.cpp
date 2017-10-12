@@ -156,7 +156,7 @@ bool YmgSamplingPlanner::findBestTrajectory(
 base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(double vel_x)
 {/*{{{*/
 	base_local_planner::Trajectory best_traj;
-	best_traj.cost_ = DBL_MAX;
+	best_traj.cost_ = DBL_MAX;   // cost_ contains the distance of the global path
 
 	Eigen::Vector3f target_vel;
 	target_vel[0] = vel_x;
@@ -165,6 +165,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel[2] = max_vel_[2] - i * w_step;
+
 		base_local_planner::Trajectory comp_traj;
 		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
 			continue;
@@ -178,12 +179,12 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		else {
 			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj);
 		}
-		// ROS_INFO("[closest] cost : %f", comp_traj.cost_);
+		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 		if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
 			best_traj = comp_traj;
 		}
 	}
-	// ROS_INFO("roop end");
+	ROS_INFO("roop end");
 
 	// cannot find closest path
 	if (best_traj.cost_ == DBL_MAX) {
