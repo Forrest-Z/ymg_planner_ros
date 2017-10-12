@@ -142,7 +142,6 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		return true;
 	}
 
-
 	traj.resetPoints();
 	traj.xv_ = 0.0;
 	traj.yv_ = 0.0;

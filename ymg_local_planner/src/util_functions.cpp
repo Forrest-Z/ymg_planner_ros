@@ -126,6 +126,42 @@ double UtilFcn::getPathDist()
 	return calcDist(pose_, plan_[nearest_index]);
 }/*}}}*/
 
+double UtilFcn::getPathDistHQ(double x, double y)
+{/*{{{*/
+	double sq_dist, min_sq_dist = DBL_MAX;
+	double dx, dy;
+
+	int start_index = getNearestIndex();
+	if (start_index+1 <= max_search_index_) {
+		++start_index;
+	}
+
+	int nearest_index = -1;
+	for (int i=start_index; i<=max_search_index_; ++i) {
+		dx = plan_[i].pose.position.x - x;
+		dy = plan_[i].pose.position.y - y;
+		sq_dist = dx*dx + dy*dy;
+		if (sq_dist < min_sq_dist) {
+			min_sq_dist = sq_dist; 
+			nearest_index = i;
+		}
+	}
+
+	if (nearest_index!=-1 && nearest_index+1 < plan_.size()) {
+		// path vector
+		double v1_x = plan_[nearest_index+1].pose.position.x - plan_[nearest_index].pose.position.x;
+		double v1_y = plan_[nearest_index+1].pose.position.y - plan_[nearest_index].pose.position.y;
+		// point vector
+		double v2_x = x - plan_[nearest_index].pose.position.x;
+		double v2_y = y - plan_[nearest_index].pose.position.y;
+
+		double cross = v1_x * v2_y - v1_y * v2_x;
+		return fabs(cross / sqrt(v1_x*v1_x + v1_y*v1_y));
+	}
+
+	return sqrt(min_sq_dist);
+}/*}}}*/
+
 double UtilFcn::getPathDist(double x, double y)
 {/*{{{*/
 	double sq_dist, min_sq_dist = DBL_MAX;

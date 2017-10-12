@@ -6,6 +6,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/tf.h>
 #include <base_local_planner/trajectory.h>
+#include <Eigen/Core>
 
 namespace ymglp {
 
@@ -100,6 +101,7 @@ class UtilFcn {
 		double getDirectionError();
 		double getPathDist();
 		double getPathDist(double x, double y);
+		double getPathDistHQ(double x, double y);
 		double getForwardPointPathDist(bool back_mode = false);
 		double scoreTrajDist(base_local_planner::Trajectory& traj);
 		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode = false);
