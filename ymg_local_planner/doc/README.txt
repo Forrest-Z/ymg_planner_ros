@@ -4,13 +4,17 @@
 
 ### Published Topics
 ~/YmgLPROS/global_plan (nav_msgs/Path)  
-このプランナーが追従するglobal plan．
+このプランナーが追従するglobal plan．local_costmapのサイズにリサイズされている．
 
 ~/YmgLPROS/local_plan (nav_msgs/Path)  
-dwaにより決定されたlocal plan．
+ymglpにて算出されたlocal plan．
+
+~/YmgLPROS/local_plan (geometry_msgs/PoseArray)  
+ymglpにて算出されたlocal plan．
+nav_msgs/pathでは，並進速度が0で回転角速度のみが出ている場合に速度を可視化することができないため．
 
 ~/YmgLPROS/local_goal (geometry_msgs/PointStamped)  
-local goalの位置を可視化．デバッグ用．
+local goalの位置を可視化．デバッグ用．local_goalはuse_dwa = trueにした時のみpublishされる．
 
 
 
@@ -81,8 +85,9 @@ path_distance_bias, goal_distance_bias, occdist_scale, local_goal_distanceはdwa
 ~/YmgLPROS/path_tolerance (double[m], default: 0.1)
 The tolerance between global path and endpoint of the simulated local path.
 [ymg_sampling_planner]ローカルプランの終端とグローバルパスの距離の許容値．
-距離はグリッドマップ上で計算されるため，距離の精度はローカルコストマップの解像度に依存するため注意．
-（解像度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
+距離はglobal pathの点との距離が算出されるため，距離の精度はglobal pathの点密度に依存することに注意．
+（点密度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
+（ymggp．）
 
 ~/YmgLPROS/obstacle_tolerance (int, default: 253)
 The maximum cost of the cell which the path can be drawn.

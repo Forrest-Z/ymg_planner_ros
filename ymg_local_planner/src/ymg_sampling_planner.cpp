@@ -69,8 +69,7 @@ void YmgSamplingPlanner::initialize(
 }/*}}}*/
 
 bool YmgSamplingPlanner::findBestTrajectory(
-		base_local_planner::Trajectory& traj,
-		std::vector<base_local_planner::Trajectory>* all_explored)
+		base_local_planner::Trajectory& traj, std::vector<base_local_planner::Trajectory>* all_explored)
 {/*{{{*/
 	if (!is_param_set_) {
 		ROS_WARN("[YSP] Has not set parameters. Please call setParameters() fcn.");

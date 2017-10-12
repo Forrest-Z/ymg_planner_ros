@@ -26,8 +26,8 @@ navfnモードの状態で1を受け取るとnavfnのゴールに到達した後
 ### Parameters
 (move base param) ~/base_global_planner: "ymggp/YmgGPHybROS"  
 
-~/YmgGPHybROS/path_resolution (double[points/m], default: 10.0)
-点の集合で表されるグローバルパスの密度．
+~/YmgGPHybROS/path_granularity (double[m], default: 0.05)
+点の集合で表されるグローバルパスのきめ細かさ．
 
 ~/YmgGPHybROS/stuck_timeout (double[sec], default: 10.0)
 When the robot stops while this time, this planner changes algorithm to dijkstra.

@@ -11,5 +11,5 @@
 ### Parameters
 (move base param) ~/base_global_planner: "ymggp/YmgGPROS"  
 
-~/YmgGPROS/path_resolution (double[points/m], default: 10.0)
-点の集合で表されるグローバルパスの密度．
+~/YmgGPROS/path_granularity (double[m], default: 0.05)
+点の集合で表されるグローバルパスのきめ細かさ．
