@@ -394,6 +394,7 @@ bool YmgGPBGP::makeYmggpPlan (const geometry_msgs::PoseStamped& start,
 	plan.clear();
 	ROS_INFO("RUNNING");
 	ymg_global_planner_.makePlan(start, goal, plan);
+	ROS_INFO("RUNNING");
 
 	return !plan.empty();
 }/*}}}*/
