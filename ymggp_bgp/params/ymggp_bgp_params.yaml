@@ -1,0 +1,20 @@
+# ########## ymggp_bgp params ##########
+
+YmgGPBGP:
+
+  # Base Global Planner params
+  use_dijkster: false
+  use_quadratic: false
+  use_grid_path: true
+  visualize_potential: false
+
+  # ymggp params
+  path_granularity: 0.05
+  stuck_timeout: 7.0
+  stuck_vel: 0.05
+  stuck_rot_vel: -1.0
+  goal_tolerance: 0.5
+  navfn_goal_dist: 5.0
+  recovery_dist: 2.0
+  clear_plan_when_goal_reached: true
+
