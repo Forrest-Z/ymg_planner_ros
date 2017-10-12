@@ -150,6 +150,14 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	planner_->setFactor(config.cost_factor);
 	publish_potential_ = config.publish_potential;
 	orientation_filter_->setMode(config.orientation_mode);
+
+	path_granularity_ = config.path_granularity;
+	stuck_timeout_ = config.stuck_timeout;
+	stuck_vel_ = config.stuck_vel;
+	stuck_rot_vel_ = config.stuck_rot_vel;
+	bgp_goal_dist_ = config.bgp_goal_dist;
+	recovery_dist_ = config.recovery_dist;
+	clear_plan_when_goal_reached_ = config.clear_plan_when_goal_reached;
 }/*}}}*/
 
 void YmgGPBGP::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my)
