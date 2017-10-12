@@ -117,6 +117,9 @@ bool YmgSamplingPlanner::findBestTrajectory(
 			ROS_INFO("vel: %f will hit the obstacle", target_vel_x);
 			continue;
 		}
+		else {
+			ROS_INFO("cost better comp : %f %f", better_traj.cost_, comp_traj.cost_);
+		}
 
 		// find closest path
 		if (comp_traj.cost_ < path_tolerance_) {
