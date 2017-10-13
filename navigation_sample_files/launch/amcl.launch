@@ -1,5 +1,6 @@
 <launch>
 
+	<!-- for M1 parameters -->
 	<node pkg="amcl" type="amcl" name="amcl" output="screen">
 		<!-- amcl parameter -->
 		<param name="min_particles" value="300"/>
