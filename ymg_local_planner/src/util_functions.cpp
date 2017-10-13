@@ -30,16 +30,16 @@ void UtilFcn::setPose(const tf::Stamped<tf::Pose>& pose)
 	setPose(p);
 }/*}}}*/
 
-void UtilFcn::setForwardPointDist(double forward_point_dist)
-		{/*{{{*/
-			forward_point_dist_ = forward_point_dist;
-		}/*}}}*/
+void UtilFcn::setScoringPointOffsetX(double scoring_point_offset_x)
+{/*{{{*/
+	scoring_point_offset_x_ = scoring_point_offset_x;
+}/*}}}*/
 
 void UtilFcn::setSearchDist(double max_dist)
 {/*{{{*/
 	double max_sq_dist;
-	if (0.0 < forward_point_dist_) {
-		max_sq_dist = (max_dist+forward_point_dist_) * (max_dist+forward_point_dist_);
+	if (0.0 < scoring_point_offset_x_) {
+		max_sq_dist = (max_dist+scoring_point_offset_x_) * (max_dist+scoring_point_offset_x_);
 	}
 	else {
 		max_sq_dist = max_dist * max_dist;
@@ -191,41 +191,32 @@ double UtilFcn::getPathDist(double x, double y)
 
 double UtilFcn::getForwardPointPathDist(bool back_mode)
 {/*{{{*/
-	if (forward_point_dist_ < 0.0) {
+	if (scoring_point_offset_x_ < 0.0) {
 		return getPathDist();
 	}
 
 	double robot_th = getRobotDirection();
 	int sign = 1;
 	if (back_mode) sign = -1;
-	double forward_x = pose_.pose.position.x + sign*forward_point_dist_ * cos(robot_th);
-	double forward_y = pose_.pose.position.y + sign*forward_point_dist_ * sin(robot_th);
+	double forward_x = pose_.pose.position.x + sign*scoring_point_offset_x_ * cos(robot_th);
+	double forward_y = pose_.pose.position.y + sign*scoring_point_offset_x_ * sin(robot_th);
 
 	return getPathDist(forward_x, forward_y);
 }/*}}}*/
 
-double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj)
+double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool put_offset, bool back_mode)
 {/*{{{*/
 	double x, y, th;
 	traj.getEndpoint(x, y, th);
 
-	return getPathDist(x, y);
-}/*}}}*/
-
-double UtilFcn::scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode)
-{/*{{{*/
-	double x, y, th;
-	traj.getEndpoint(x, y, th);
-
-	if (0.0 < forward_point_dist_) {
+	if (0.0 < scoring_point_offset_x_ && put_offset) {
 		int sign = 1;
 		if (back_mode) sign = -1;
-		x += sign*forward_point_dist_ * cos(th);
-		y += sign*forward_point_dist_ * sin(th);
+		x += sign*scoring_point_offset_x_ * cos(th);
+		y += sign*scoring_point_offset_x_ * sin(th);
 	}
 
 	return getPathDist(x, y);
-	// return getPathDistHQ(x, y);
 }/*}}}*/
 
 double UtilFcn::getDirectionError()

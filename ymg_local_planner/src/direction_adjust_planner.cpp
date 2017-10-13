@@ -85,7 +85,7 @@ void DirAdjustPlanner::defineDirection()
 				robot_pose.pose.position.x,
 				robot_pose.pose.position.y,
 				comp_theta);
-		double dist = utilfcn_->scoreTrajForwardDist(traj);
+		double dist = utilfcn_->scoreTrajDist(traj, true);
 		if (0.0 < dist && dist < min_dist) {
 			min_dist = dist;
 			target_theta = comp_theta;
@@ -152,7 +152,7 @@ bool DirAdjustPlanner::findBestTrajectory(
 			continue;
 		}
 
-		comp_traj.cost_ = utilfcn_->scoreTrajForwardDist(comp_traj);
+		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, true);
 		if (comp_traj.cost_ < min_dist_traj.cost_) {
 			min_dist_traj.cost_ = comp_traj.cost_;
 		}

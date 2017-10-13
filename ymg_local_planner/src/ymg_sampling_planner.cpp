@@ -181,14 +181,8 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			continue;
 		}
 
-		// comp_traj.cost_ = path_critic_->scoreTrajectory(comp_traj);
-		if (1) {
-		// if (UtilFcn::isZero(comp_traj.xv_)) {
-			comp_traj.cost_ = utilfcn_->scoreTrajForwardDist(comp_traj, reverse_order_);
-		}
-		else {
-			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj);
-		}
+		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, !UtilFcn::isZero(comp_traj.xv_), reverse_order_);
+
 #ifdef DEBUG
 		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 #endif

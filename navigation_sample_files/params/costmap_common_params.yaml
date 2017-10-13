@@ -1,0 +1,12 @@
+# ########## common params ##########
+
+obstacle_range: 3.0
+raytrace_range: 5.0
+
+# M1 footprint
+footprint: [[0.19, 0.15], [-0.19, 0.15], [-0.19, -0.15], [0.19, -0.15], [0.19, 0.15]]
+inflation_radius: 0.5
+
+observation_sources: laser_scan_sensor
+laser_scan_sensor: {topic: scan, sensor_frame: laser, data_type: LaserScan, clearing: true, marking: true, inf_is_valid: true}
+

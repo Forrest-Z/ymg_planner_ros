@@ -1,0 +1,16 @@
+# ########## move base params ##########"
+
+# base_global_planner: "ymggp/YmgGPHybROS"
+# base_global_planner: "global_planner/GlobalPlanner"
+base_global_planner: "ymggp_bgp/YmgGPBGP"
+planner_frequency: 1.0
+
+# base_local_planner: "dwa_local_planner/DWAPlannerROS"
+base_local_planner: "ymglp/YmgLPROS"
+controller_frequency: 20.0
+# planner_patience: 10.0
+recovery_behavior_enabled: false
+# controller_patience: 10.0
+# conservative_reset_dist: 0.0
+shutdown_costmaps: true
+oscillation_timeout: 0.0

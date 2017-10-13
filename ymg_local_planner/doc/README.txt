@@ -93,7 +93,7 @@ The tolerance between global path and endpoint of the simulated local path.
 The maximum cost of the cell which the path can be drawn.
 [ymg_sampling_planner]シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
 
-~/YmgLPROS/direction_tolerance (double[rad], default: 1.57(M_PI/2))
+~/YmgLPROS/direction_tolerance (double[rad], default: 1.57(M_PI/2))   ### このパラメータは今は実装されていない
 The tolerance of the direction error between global path and robot.
 [ymg_sampling_planner]グローバルパスとロボットの向きのズレの許容値．
 ロボットがグローバルパス上にいる(グローバルパスとの距離がpath_tolerance以下)かつ
@@ -117,11 +117,14 @@ The distance to the local goal
 [dwa]ローカルゴールを現在位置から(グローバルパス上の)どのくらい先に置くか．
 
 
-~/YmgLPROS/forward_point_distance (double[m], default: 0.325)  
+~/YmgLPROS/scoring_point_offset_x (double[m], default: 0.3)  
 The distance from the center point of the robot to place an additional scoring point, in meters  
 グローバルパスとの距離，ローカルゴールまでの距離からコストを算出する際にロボットの前方に追加の点を置くことができる．
 その際，算出されるコストはロボットの中心と追加の点で算出されたコストの平均値となる．
 設定値を大きくし過ぎるとゴールにたどり着くのが困難になる可能性があるため，xy_goal_toleranceを大きめに取ること．
+
+~/YmgLPROS/obstacle_stop_margine (double[m], default: 0.3)  
+障害物の手前で停止する際にどれだけ余裕を持って停止するか．
 
 ~/YmgLPROS/scaling_speed (double[m/s], default: 0.25)  
 The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  

@@ -30,14 +30,14 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	ymg_sampling_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
 			config.path_tolerance, config.obstacle_tolerance);
+
 	direction_adjust_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
 			config.path_tolerance, config.obstacle_tolerance);
-
 	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
 			config.yaw_goal_tolerance, config.obstacle_tolerance);
 	
-	utilfcn_.setForwardPointDist(config.forward_point_dist);
+	utilfcn_.setScoringPointOffsetX(config.scoring_point_offset_x);
 
 	double resolution = planner_util_->getCostmap()->getResolution();
 	pdist_scale_ = config.path_distance_bias;
@@ -45,7 +45,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 		path_costs_.setScale(resolution);
 	else
 		path_costs_.setScale(resolution * pdist_scale_);
-	path_costs_.setForwardPointDist(config.forward_point_dist);
+	path_costs_.setForwardPointDist(config.scoring_point_offset_x);
 
 	gdist_scale_ = config.goal_distance_bias;
 	goal_costs_.setScale(resolution * gdist_scale_);
@@ -56,7 +56,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	else
 		obstacle_costs_.setScale(resolution * occdist_scale_);
 	obstacle_costs_.setSimGranularity(config.sim_granularity);
-	obstacle_costs_.setForwardPointDist(config.forward_point_dist_obstacle);
+	obstacle_costs_.setForwardPointDist(config.obstacle_stop_margin);
 
 	// obstacle costs can vary due to scaling footprint feature
 	double max_vel_abs = fabs(config.max_vel_x);

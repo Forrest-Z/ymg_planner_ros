@@ -91,7 +91,7 @@ class UtilFcn {
 		void setPlan(const std::vector<geometry_msgs::PoseStamped>& plan);
 		void setPose(const geometry_msgs::PoseStamped& pose);
 		void setPose(const tf::Stamped<tf::Pose>& pose);
-		void setForwardPointDist(double forward_point_dist);
+		void setScoringPointOffsetX(double scoring_point_offset_x);
 		void setSearchDist(double max_dist);
 
 		geometry_msgs::PoseStamped getPoseStamped();
@@ -104,14 +104,13 @@ class UtilFcn {
 		double getPathDist(double x, double y);
 		double getPathDistHQ(double x, double y);
 		double getForwardPointPathDist(bool back_mode = false);
-		double scoreTrajDist(base_local_planner::Trajectory& traj);
-		double scoreTrajForwardDist(base_local_planner::Trajectory& traj, bool back_mode = false);
+		double scoreTrajDist(base_local_planner::Trajectory& traj, bool put_offset, bool bake_mode = false);
 
 	private:
 		void resetFlag();
 		geometry_msgs::PoseStamped pose_;
 		std::vector<geometry_msgs::PoseStamped> plan_;
-		double forward_point_dist_;
+		double scoring_point_offset_x_;
 
 		bool has_nearest_index_, has_nearest_direction_;
 		int nearest_index_, max_search_index_;
