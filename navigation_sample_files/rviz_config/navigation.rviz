@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.430379748
     Tree Height: 518
@@ -106,7 +107,7 @@ Visualization Manager:
           Value: false
         odom:
           Value: false
-      Marker Scale: 2
+      Marker Scale: 1
       Name: TF
       Show Arrows: false
       Show Axes: true
@@ -282,7 +283,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.32729053
+      Distance: 4.75433111
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -296,10 +297,10 @@ Visualization Manager:
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.56979632
+      Pitch: 1.50979638
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 4.63041353
+      Yaw: 5.21041298
     Saved:
       - Class: rviz/Orbit
         Distance: 43.5610199
