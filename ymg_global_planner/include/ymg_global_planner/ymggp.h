@@ -25,9 +25,10 @@ class YmgGP {
 				const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);
 		void setPathGranularity(double path_granularity) {path_granularity_ = path_granularity;}
 
+		std::vector<geometry_msgs::PoseStamped> plan_;
+
 	private:
 		bool initialized_;
-		std::vector<geometry_msgs::PoseStamped> plan_;
 		std::string global_frame_;
 		double path_granularity_;   //**< path resolution in point/m */
 

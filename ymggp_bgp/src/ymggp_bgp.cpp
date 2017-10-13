@@ -232,7 +232,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
-		ROS_INFO("[YmgGPHybROS] Changes planner to ymggp.");
+		ROS_INFO("[YmgGPBLP] Changes planner to ymggp.");
 		setBGPFlag(false);
 	}
 
@@ -246,10 +246,11 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	else if (robot_status_ == stopped
 			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
 			&& setBGPFlag(true)) {
-		ROS_INFO("[YmgGPHybROS] Changes planner to BGP.");
+		ROS_INFO("[YmgGPBLP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
 		setBGPGoal(plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);
+		addYmggpPlan(plan);
 		publishBGPPlan(plan);
 	}
 	else {
@@ -263,7 +264,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		msg.point = bgp_goal_.pose.position;
 		bgp_goal_pub_.publish(msg);
 		if (plan.empty()) {
-			ROS_INFO("[YmgGPHybROS] BGP faild to produce path.");
+			ROS_INFO("[YmgGPBLP] BGP faild to produce path.");
 		}
 	}
 
@@ -622,6 +623,14 @@ void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 	}
 
 }/*}}}*/
+
+void YmgGPBGP::addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan)
+{
+	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
+	for (int i=closest_index; i<ymg_global_planner_.plan_.size(); ++i) {
+		plan.push_back(ymg_global_planner_.plan_[i]);
+	}
+}
 
 void YmgGPBGP::publishBGPPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/

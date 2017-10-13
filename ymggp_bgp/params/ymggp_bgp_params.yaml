@@ -15,6 +15,6 @@ YmgGPBGP:
   stuck_rot_vel: -1.0
   goal_tolerance: 0.5
   navfn_goal_dist: 5.0
-  recovery_dist: 2.0
+  recovery_dist: 0.5
   clear_plan_when_goal_reached: true
 
