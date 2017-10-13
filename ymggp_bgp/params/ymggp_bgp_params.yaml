@@ -3,9 +3,9 @@
 YmgGPBGP:
 
   # Base Global Planner params
-  use_dijkster: false
-  use_quadratic: false
-  use_grid_path: true
+  use_dijkster: true
+  use_quadratic: true
+  use_grid_path: false 
   visualize_potential: false
 
   # ymggp params
