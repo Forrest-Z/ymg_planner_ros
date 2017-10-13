@@ -13,7 +13,7 @@ YmgGPBGP:
   stuck_timeout: 7.0
   stuck_vel: 0.05
   stuck_rot_vel: -1.0
-  goal_tolerance: 0.5
+  goal_tolerance: 0.3
   navfn_goal_dist: 5.0
   recovery_dist: 0.5
   clear_plan_when_goal_reached: true

@@ -185,7 +185,7 @@ Visualization Manager:
       Head Diameter: 0.300000012
       Head Length: 0.200000003
       Length: 0.300000012
-      Line Style: Billboards
+      Line Style: Lines
       Line Width: 0.0500000007
       Name: YMG GP Path
       Offset:
@@ -207,8 +207,8 @@ Visualization Manager:
       Head Diameter: 0.300000012
       Head Length: 0.200000003
       Length: 0.300000012
-      Line Style: Lines
-      Line Width: 0.0299999993
+      Line Style: Billboards
+      Line Width: 0.0399999991
       Name: YMG LP GlobalPath
       Offset:
         X: 0
@@ -283,7 +283,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.75433111
+      Distance: 7.80054569
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -297,10 +297,10 @@ Visualization Manager:
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.50979638
+      Pitch: 1.56979632
       Target Frame: base_link
       Value: Orbit (rviz)
-      Yaw: 5.21041298
+      Yaw: 4.6554122
     Saved:
       - Class: rviz/Orbit
         Distance: 43.5610199
