@@ -240,6 +240,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("path size: %d", (int)plan.size());
 		updateBGPGoal(start, plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);
+		addYmggpPlan(plan);
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
