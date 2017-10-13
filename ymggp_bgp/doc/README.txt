@@ -53,3 +53,4 @@ BGPモード時にBGPのゴールとの距離がこの値以下となった時�
 
 ~/YmgGPBGP/clear_plan_when_goal_reached (bool, default: true)
 ロボットがゴールに到達した時，ymggpのglobal_planをclearするかどうか．
+
