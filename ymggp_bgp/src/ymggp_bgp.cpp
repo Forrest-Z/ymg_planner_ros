@@ -10,7 +10,7 @@
 #include <global_planner/gradient_path.h>
 #include <global_planner/quadratic_calculator.h>
 
-//register this planner as a BaseGlobalPlanner plugin
+// register this planner as a BaseGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(ymggp_bgp::YmgGPBGP, nav_core::BaseGlobalPlanner);
 
 namespace ymggp_bgp {
