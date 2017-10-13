@@ -22,23 +22,23 @@ local goalの位置を可視化．デバッグ用．local_goalはuse_dwa = true�
 (move base param) ~/base_local_planner: "ymglp/YmgLPROS"  
 
 
-~/YmgLPROS/max_vel_x (double[m/s], default: 0.55)  
+~/YmgLPROS/max_vel_x (double[m/s], default: 0.6)  
 The maximum x velocity for the robot in m/s  
-ロボットのx方向の速度の上限．マイナスにセットすると，バックすることができる．
+ロボットの並進速度の上限．マイナスにセットすると，バックすることができる．
 min_vel_xは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)
 
-~/YmgLPROS/max_rot_vel (double[rad/s], default: 1.0)  
+~/YmgLPROS/max_rot_vel (double[rad/s], default: 0.6)  
 The absolute value of the maximum rotational velocity for the robot in rad/s  
-ロボットの角速度の絶対値の上限.
+ロボットの回転角速度の絶対値の上限.
 min_rot_velは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)
 
-~/YmgLPROS/acc_lim_x (double[m/s^2], default: 2.5)  
+~/YmgLPROS/acc_lim_x (double[m/s^2], default: 0.3)  
 The acceleration limit of the robot in the x direction
-ロボットのx方向の加速度の絶対値の上限．
+ロボットの並進加速度の絶対値の上限．
 
-~/YmgLPROS/acc_lim_theta (double[rad/s^2], default: 3.2)  
+~/YmgLPROS/acc_lim_theta (double[rad/s^2], default: 0.3)  
 The acceleration limit of the robot in the theta direction  
-ロボットの角加速度の絶対値の上限．
+ロボットの回転角加速度の絶対値の上限．
 
 
 
@@ -54,15 +54,15 @@ Within what maximum angle difference we consider the robot to face goal directio
 
 ~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.1)  
 Below what maximum velocity we consider the robot to be stopped in translation  
-ロボットの速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
+ロボットの並進速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
 
 ~/YmgLPROS/rot_stopped_vel (double[m/s], default: 0.1)  
 Below what maximum rotation velocity we consider the robot to be stopped in rotation  
-ロボットの角速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
+ロボットの回転角速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
 
 
 
-~/YmgLPROS/sim_time (double[sec], defalut: 1.7)  
+~/YmgLPROS/sim_time (double[sec], defalut: 1.5)  
 The amount of time to roll trajectories out for in seconds  
 経路を算出する際のシミュレート時間．
 
@@ -70,7 +70,7 @@ The amount of time to roll trajectories out for in seconds
 The granularity with which to check for collisions along each trajectory in meters  
 シミュレートの際の点の間隔．
 
-~/YmgLPROS/angular_sim_granularity (double[rad], default: 0.1)  
+~/YmgLPROS/angular_sim_granularity (double[rad], default: 0.1  = about 5.7[degree]) 
 The granularity with which to check for collisions for rotations in radians  
 シミュレートの際の角度の間隔．
 
@@ -87,18 +87,13 @@ The tolerance between global path and endpoint of the simulated local path.
 [ymg_sampling_planner]ローカルプランの終端とグローバルパスの距離の許容値．
 距離はglobal pathの点との距離が算出されるため，距離の精度はglobal pathの点密度に依存することに注意．
 （点密度が粗く，path_toleranceが小さい場合には有効なパスが引かれない可能性がある．）
-（ymggp．）
 
 ~/YmgLPROS/obstacle_tolerance (int, default: 253)
 The maximum cost of the cell which the path can be drawn.
 [ymg_sampling_planner]シミュレートされた経路上にこの値より大きいコストがあった場合，その経路は棄却される．
+costmap_2dのコストは，254がcritical(definitely in collision)に設定されている．詳しくはROS wiki costmap_2dを参照．
 
-~/YmgLPROS/direction_tolerance (double[rad], default: 1.57(M_PI/2))   ### このパラメータは今は実装されていない
-The tolerance of the direction error between global path and robot.
-[ymg_sampling_planner]グローバルパスとロボットの向きのズレの許容値．
-ロボットがグローバルパス上にいる(グローバルパスとの距離がpath_tolerance以下)かつ
-向きのズレがこの値以上あるとき，専用のdirection_adjust_plannerで向きを調整する．
-direction_adjust_plannerはグローバルパスとロボットの向きのズレがyaw_goal_tolerance以下になるまで回転を行う．
+
 
 ~/YmgLPROS/path_distance_bias (double, default: 32.0)  
 The weight for the path distance part of the cost function  
@@ -117,35 +112,36 @@ The distance to the local goal
 [dwa]ローカルゴールを現在位置から(グローバルパス上の)どのくらい先に置くか．
 
 
+
 ~/YmgLPROS/scoring_point_offset_x (double[m], default: 0.3)  
 The distance from the center point of the robot to place an additional scoring point, in meters  
 グローバルパスとの距離，ローカルゴールまでの距離からコストを算出する際にロボットの前方に追加の点を置くことができる．
 その際，算出されるコストはロボットの中心と追加の点で算出されたコストの平均値となる．
 設定値を大きくし過ぎるとゴールにたどり着くのが困難になる可能性があるため，xy_goal_toleranceを大きめに取ること．
 
-~/YmgLPROS/obstacle_stop_margine (double[m], default: 0.3)  
+~/YmgLPROS/obstacle_stop_margine (double[m], default: 0.5)  
 障害物の手前で停止する際にどれだけ余裕を持って停止するか．
 
 ~/YmgLPROS/scaling_speed (double[m/s], default: 0.25)  
 The absolute value of the velocity at which to start scaling the robot's footprint, in m/s  
-速度の閾値．ロボットの速度の絶対値がこの値を超えると，footprintがスケーリングされる．
+速度の閾値．ロボットの並進速度の絶対値がこの値を超えると，footprintがスケーリングされる．
 
 ~/YmgLPROS/max_scaling_factor (double, default: 1.5)  
 The maximum factor to scale the robot's footprint by  
 footprintのスケーリングの割合の上限．
 デフォルト値を用い，ロボットがmax_trans_velで走行するとfootprintが1.5倍にスケーリングされる．
 
-~/YmgLPROS/vx_samples (int, default: 3)  
+velocity_x || 0.0 | ~ | scaling_speed | ~~~~~~~~~~~~~~~~~~ | max_vel_x
+     scale || 1.0 | ~ |      1.0      | gradually inclease | max_scaling_factor
+
+~/YmgLPROS/vx_samples (int, default: 4)  
 The number of samples to use when exploring the x velocity space  
-dwaでのロボットのx方向速度のシミュレートの数．
+ロボットの並進速度のシミュレートの数．
 
-~/YmgLPROS/vy_samples (int, default: 0)  
-The number of samples to use when exploring the y velocity space  
-dwaでのロボットのx方向速度のシミュレートの数．
-
-~/YmgLPROS/vth_samples (int, default: 21)  
+~/YmgLPROS/vth_samples (int, default: 20)  
 The number of samples to use when exploring the theta velocity space  
-ロボットの角速度のシミュレートの数．
+ロボットの回転角速度のシミュレートの数．
 
 ~/YmgLPROS/restore_defaults (bool, default: False)  
 Restore to the original configuration  
+全パラメータをデフォルト値にセットする.
