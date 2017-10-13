@@ -171,7 +171,10 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 	target_vel[0] = vel_x;
 	target_vel[1] = 0.0;   // velocity_y must be zero
 	double w_step = (max_vel_[2] - min_vel_[2]) / vsamples_[2];
-	// ROS_INFO("min-max vel[2] : %f - %f", min_vel_[2], max_vel_[2]);
+
+#ifdef DEBUG
+	ROS_INFO("min-max vel[2] : %f - %f", min_vel_[2], max_vel_[2]);
+#endif
 
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel[2] = max_vel_[2] - i * w_step;
@@ -181,15 +184,17 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			continue;
 		}
 
-		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, true, reverse_order_);
+		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
 
 #ifdef DEBUG
 		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
 #endif
+
 		if (0.0<=comp_traj.cost_ && comp_traj.cost_<best_traj.cost_) {
 			best_traj = comp_traj;
 		}
 	}
+
 #ifdef DEBUG
 	ROS_INFO("roop end.");
 #endif
@@ -215,8 +220,7 @@ bool YmgSamplingPlanner::generateTrajectory(
 	if (angular_sim_granularity_ < 0.0) {
 		num_steps = ceil(sim_time_ / sim_granularity_);
 	} else {
-		//compute the number of steps we must take along this trajectory to be "safe"
-		double sim_time_distance = sample_target_vel[0] * sim_time_; // the distance the robot would travel in sim_time if it did not change velocity
+		double sim_time_distance = sample_target_vel[0] * sim_time_; // the distance the robot would travel in sim_time
 		double sim_time_angle = fabs(sample_target_vel[2]) * sim_time_; // the angle the robot would rotate in sim_time
 		num_steps =
 			ceil(std::max(sim_time_distance / sim_granularity_, sim_time_angle / angular_sim_granularity_));
@@ -230,15 +234,10 @@ bool YmgSamplingPlanner::generateTrajectory(
 	traj.yv_     = sample_target_vel[1];
 	traj.thetav_ = sample_target_vel[2];
 
-	//simulate the trajectory and check for collisions, updating costs along the way
+	// simulate the trajectory and check for collisions, updating costs along the way
 	for (int i = 0; i < num_steps; ++i) {
-
-		//add the point to the trajectory so we can draw it later if we want
 		traj.addPoint(pos[0], pos[1], pos[2]);
-
-		//update the position of the robot using the velocities passed in
 		pos = computeNewPositions(pos, sample_target_vel, dt);
-
 	} // end for simulation steps
 
 	return num_steps > 0; // true if trajectory has at least one point

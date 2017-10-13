@@ -104,7 +104,7 @@ class UtilFcn {
 		double getPathDist(double x, double y);
 		double getPathDistHQ(double x, double y);
 		double getForwardPointPathDist(bool back_mode = false);
-		double scoreTrajDist(base_local_planner::Trajectory& traj, bool put_offset, bool back_mode = false);
+		double scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mode = false);
 
 	private:
 		void resetFlag();

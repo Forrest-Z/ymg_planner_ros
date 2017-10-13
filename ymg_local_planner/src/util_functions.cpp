@@ -204,12 +204,12 @@ double UtilFcn::getForwardPointPathDist(bool back_mode)
 	return getPathDist(forward_x, forward_y);
 }/*}}}*/
 
-double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool put_offset, bool back_mode)
+double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mode)
 {/*{{{*/
 	double x, y, th;
 	traj.getEndpoint(x, y, th);
 
-	if (0.0 < scoring_point_offset_x_ && put_offset) {
+	if (0.0 < scoring_point_offset_x_) {
 		int sign = 1;
 		if (back_mode) sign = -1;
 		x += sign*scoring_point_offset_x_ * cos(th);
