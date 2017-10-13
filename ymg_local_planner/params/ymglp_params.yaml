@@ -17,7 +17,7 @@ YmgLPROS:
   xy_goal_tolerance: 0.35
 
   # simulation params
-  controller_frequency: 10.0
+  controller_frequency: 20.0
   sim_time: 1.5
   sim_granularity: 0.05
   angular_sim_granularity: 0.04
