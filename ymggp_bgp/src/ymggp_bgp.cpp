@@ -103,7 +103,7 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 
 		orientation_filter_ = new global_planner::OrientationFilter();
 
-		bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
+		// bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("plan", 1);
 		potential_pub_ = private_nh.advertise<nav_msgs::OccupancyGrid>("potential", 1);
 
 		private_nh.param("allow_unknown", allow_unknown_, true);
@@ -240,7 +240,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("path size: %d", (int)plan.size());
 		updateBGPGoal(start, plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);
-		addYmggpPlan(plan);
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
@@ -251,7 +250,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("path size: %d", (int)plan.size());
 		setBGPGoal(plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);
-		addYmggpPlan(plan);
 		publishBGPPlan(plan);
 	}
 	else {
@@ -390,7 +388,8 @@ bool YmgGPBGP::makeBGPPlan(const geometry_msgs::PoseStamped& start, const geomet
 	orientation_filter_->processPath(start, plan);
 
 	//publish the plan for visualization purposes
-	publishPlan(plan);
+	// publishPlan(plan);
+	addYmggpPlan(plan);   // XXX added
 	delete potential_array_;
 	return !plan.empty();
 }/*}}}*/

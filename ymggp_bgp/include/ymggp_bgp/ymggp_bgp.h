@@ -145,7 +145,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		 */
 		costmap_2d::Costmap2D* costmap_;
 		std::string frame_id_;
-		ros::Publisher bgp_plan_pub_, ymggp_plan_pub_;
+		// ros::Publisher bgp_plan_pub_;
 		bool initialized_, allow_unknown_, visualize_potential_;
 
 	private:
@@ -201,7 +201,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		void publishBGPPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 		void publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 
-		ros::Publisher bgp_goal_pub_;
+		ros::Publisher ymggp_plan_pub_, bgp_plan_pub_, bgp_goal_pub_;
 		geometry_msgs::PoseStamped bgp_goal_;
 
 		void resetFlagCallback (const std_msgs::Empty& msg);
