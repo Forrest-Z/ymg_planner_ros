@@ -112,7 +112,7 @@ bool YmgSPlanner::findBestTrajectory(
 		}
 
 		if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
-			ROS_INFO("failed to generate traj.");
+			ROS_INFO("[YSP] Failed to generate traj.");
 			continue;
 		}
 
@@ -190,16 +190,12 @@ bool YmgSPlanner::generateTrajectory(
 {/*{{{*/
 	traj.cost_   = -1.0;   // placed here in case we return early
 	traj.resetPoints();   //trajectory might be reused so we'll make sure to reset it
+	traj.addPoint(pos[0], pos[1], pos[2]);   // add initial pose
 
-	int num_steps;
-	if (angular_sim_granularity_ < 0.0) {
-		num_steps = ceil(sim_time_ / sim_granularity_);
-	} else {
-		double sim_time_distance = sample_target_vel[0] * sim_time_; // the distance the robot would travel in sim_time
-		double sim_time_angle = fabs(sample_target_vel[2]) * sim_time_; // the angle the robot would rotate in sim_time
-		num_steps =
-			ceil(std::max(sim_time_distance / sim_granularity_, sim_time_angle / angular_sim_granularity_));
-	}
+	double sim_time_distance = sample_target_vel[0] * sim_time_; // the distance the robot would travel in sim_time
+	double sim_time_angle = fabs(sample_target_vel[2]) * sim_time_; // the angle the robot would rotate in sim_time
+	int num_steps =
+		ceil(std::max(sim_time_distance / sim_granularity_, sim_time_angle / angular_sim_granularity_));
 
 	//compute a timestep
 	double dt = sim_time_ / num_steps;
@@ -211,8 +207,8 @@ bool YmgSPlanner::generateTrajectory(
 
 	// simulate the trajectory and check for collisions, updating costs along the way
 	for (int i = 0; i < num_steps; ++i) {
-		traj.addPoint(pos[0], pos[1], pos[2]);
 		pos = computeNewPositions(pos, sample_target_vel, dt);
+		traj.addPoint(pos[0], pos[1], pos[2]);
 	} // end for simulation steps
 
 	return num_steps > 0; // true if trajectory has at least one point

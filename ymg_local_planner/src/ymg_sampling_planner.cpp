@@ -181,6 +181,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 
 		base_local_planner::Trajectory comp_traj;
 		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
+			ROS_INFO("[YSP] Failed to generate traj.");
 			continue;
 		}
 
