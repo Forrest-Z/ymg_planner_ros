@@ -133,6 +133,17 @@ bool YmgSPlanner::findBestTrajectory(
 		}
 	}
 
+	// cannot find best traj
+	if (traj.cost_ < 0.0) {
+		target_vel[0] = min_vel_[0];
+		if (0.0 < target_curvature_) {
+			target_vel[2] = max_vel_[2];
+		}
+		else {
+			target_vel[2] = min_vel_[2];
+		}
+	}
+
 
 	
 	// if (max_vel_[2] < target_curvature_ * min_vel_[0]) {
