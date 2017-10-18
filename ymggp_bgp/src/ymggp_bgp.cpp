@@ -205,8 +205,9 @@ bool YmgGPBGP::worldToMap(double wx, double wy, double& mx, double& my)
 	mx = (wx - origin_x) / resolution - convert_offset_;
 	my = (wy - origin_y) / resolution - convert_offset_;
 
-	if (mx < costmap_->getSizeInCellsX() && my < costmap_->getSizeInCellsY())
+	if (mx < costmap_->getSizeInCellsX() && my < costmap_->getSizeInCellsY()) {
 		return true;
+	}
 
 	return false;
 }/*}}}*/
@@ -680,6 +681,45 @@ void YmgGPBGP::publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& p
 	}
 
 	ymggp_plan_pub_.publish(gui_path);
+}/*}}}*/
+
+void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
+{/*{{{*/
+	ymg_global_planner_.clearPlan();
+	setBGPFlag(false);
+	robot_status_ = stopped;
+}/*}}}*/
+
+void YmgGPBGP::useYmggpForceCallback (const std_msgs::Int32& msg)
+{/*{{{*/
+	switch (msg.data) {
+		case 0:
+			use_ymggp_force_ = false;
+			break;
+		case 1:
+			use_ymggp_force_ = true;
+			break;
+		case 2:
+			use_ymggp_force_ = true;
+			use_bgp_ = false;
+			break;
+	}
+	ROS_INFO("[YmgGPBGP] subscribed /use_ymggp_force (data : %d)", msg.data);
+}/*}}}*/
+		
+void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg)
+{/*{{{*/
+	if (msg->status_list.empty())
+		return;
+
+	actionlib_msgs::GoalStatus status = msg->status_list[0];
+
+	if (clear_plan_when_goal_reached_
+			&& status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
+		ymg_global_planner_.clearPlan();
+		use_bgp_ = false;
+		// ROS_INFO_NAMED("YmgGPHyb", "Goal reached. Cleared plan.");
+	}
 }/*}}}*/
 
 } //end namespace ymggp
