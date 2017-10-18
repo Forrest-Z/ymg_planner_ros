@@ -39,7 +39,7 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 			config.path_tolerance, config.obstacle_tolerance);
 	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
 			config.yaw_goal_tolerance, config.obstacle_tolerance);
-	
+
 	utilfcn_.setScoringPointOffsetX(config.scoring_point_offset_x);
 
 	double resolution = planner_util_->getCostmap()->getResolution();
@@ -267,16 +267,20 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 
 	if (!use_dwa_) {
 		if (0) {
-		// if (direction_adjust_planner_.haveToHandle()) {
+			// if (direction_adjust_planner_.haveToHandle()) {
 			// ROS_INFO("direction_adjust_planner running.");
 			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_);
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 		else {
-			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
-			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-			ymg_s_planner_.initialize(&limits, pos, vel, vsamples_);
-			ymg_s_planner_.findBestTrajectory(result_traj_, &all_explored);
+			if (0) {
+				ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+				ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
+			}
+			else {
+				ymg_s_planner_.initialize(&limits, pos, vel, vsamples_);
+				ymg_s_planner_.findBestTrajectory(result_traj_, &all_explored);
+			}
 		}
 	}
 	else {
@@ -304,4 +308,4 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	return result_traj_;
 }/*}}}*/
 
-}
+}   // namespace ymglp
