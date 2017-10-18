@@ -144,9 +144,9 @@ double YmgSPlanner::getTragetCurvature()
 
 	if (goal_r[0] < 0.0) {
 		if (0.0 < goal_r[1])
-			return 10.0;
+			return 1000.0;
 		else
-			return -10.0;
+			return -1000.0;
 	}
 
 	return 1.0/r_center_y;
