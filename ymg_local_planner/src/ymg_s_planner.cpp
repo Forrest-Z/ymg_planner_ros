@@ -112,6 +112,7 @@ bool YmgSPlanner::findBestTrajectory(
 		}
 
 		if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
+			ROS_INFO("failed to generate traj.");
 			continue;
 		}
 
