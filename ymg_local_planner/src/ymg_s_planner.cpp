@@ -142,6 +142,13 @@ double YmgSPlanner::getTragetCurvature()
 	ROS_INFO("goal_r : %f, %f", goal_r[0], goal_r[1]);
 	ROS_INFO("r_center_y : %f", r_center_y);
 
+	if (goal_r[0] < 0.0) {
+		if (0.0 < goal_r[1])
+			return 10.0;
+		else
+			return -10.0;
+	}
+
 	return 1.0/r_center_y;
 }/*}}}*/
 
