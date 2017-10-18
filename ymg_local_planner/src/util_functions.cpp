@@ -258,7 +258,7 @@ void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 	p2[1] = pose2.pose.position.y;
 	Eigen::Vector2d p12 = p2 - p1;
 	double ratio = dist_error / p12.norm();
-	goal = p1 + ratio * p2;
+	goal = p1 + ratio * p12;
 }/*}}}*/
 
 void UtilFcn::tfGlobal2Robot(const Eigen::Vector2d& global, Eigen::Vector2d& robot)
