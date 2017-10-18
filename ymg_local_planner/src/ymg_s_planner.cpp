@@ -41,8 +41,6 @@ void YmgSPlanner::initialize(
 	vsamples_ = vsamples;
 	limits_ = limits;
 
-	target_curvature_ = getTragetCurvature();
-
 	double max_vel_th = limits->max_rot_vel;
 	double min_vel_th = -1.0 * max_vel_th;
 	Eigen::Vector3f acc_lim = limits->getAccLimits();
@@ -60,6 +58,8 @@ void YmgSPlanner::initialize(
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
+
+	target_curvature_ = getTragetCurvature();
 
 	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
 	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
@@ -91,42 +91,71 @@ bool YmgSPlanner::findBestTrajectory(
 
 	Eigen::Vector3f target_vel;
 	target_vel[1] = 0.0;   // velocity y must be zero
-	
-	if (max_vel_[2] < target_curvature_ * min_vel_[0]) {
-		target_vel[0] = min_vel_[0];
-		target_vel[2] = max_vel_[2];
-	}
-	else if (target_curvature_ * min_vel_[0] < min_vel_[2]) {
-		target_vel[0] = min_vel_[0];
-		target_vel[2] = min_vel_[2];
-	}
-	else {
 
-		double target_omega = target_curvature_ * max_vel_[0];
-		if (max_vel_[2] < target_omega) {
+	double v_step = (max_vel_[0] - min_vel_[0]) / vsamples_[0];
+	double start_vel_x = max_vel_[0];
+
+	if (reverse_order_) {
+		start_vel_x = min_vel_[0];
+		v_step *= -1;
+	}
+
+	traj.cost_ = -1.0;
+	for (int i=0; i<=vsamples_[0]; ++i) {
+		target_vel[0] = start_vel_x - i * v_step;
+		target_vel[2] = target_curvature_ * target_vel[0];
+		if (max_vel_[2] < target_vel[2]) {
 			target_vel[2] = max_vel_[2];
-			target_vel[0] = target_vel[2] / target_curvature_;
 		}
-		else if (target_omega < min_vel_[2]) {
+		else if (target_vel[2] < min_vel_[2]) {
 			target_vel[2] = min_vel_[2];
-			target_vel[0] = target_vel[2] / target_curvature_;
-		}
-		else {
-			target_vel[0] = max_vel_[0];
-			target_vel[2] = target_vel[0] * target_curvature_;
 		}
 
-	}
+		if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
+			continue;
+		}
 
-	ROS_INFO("target_curvature : %f", target_curvature_);
-	ROS_INFO("vel : %f, %f, %f", target_vel[0], target_vel[1], target_vel[2]);
+		if (0.0 < obstacle_critic_->scoreTrajectory(traj)) {
+			traj.cost_ = 1.0;
+			break;
+		}
+	}
+	
+	// if (max_vel_[2] < target_curvature_ * min_vel_[0]) {
+	// 	target_vel[0] = min_vel_[0];
+	// 	target_vel[2] = max_vel_[2];
+	// }
+	// else if (target_curvature_ * min_vel_[0] < min_vel_[2]) {
+	// 	target_vel[0] = min_vel_[0];
+	// 	target_vel[2] = min_vel_[2];
+	// }
+	// else {
+  //
+	// 	double target_omega = target_curvature_ * max_vel_[0];
+	// 	if (max_vel_[2] < target_omega) {
+	// 		target_vel[2] = max_vel_[2];
+	// 		target_vel[0] = target_vel[2] / target_curvature_;
+	// 	}
+	// 	else if (target_omega < min_vel_[2]) {
+	// 		target_vel[2] = min_vel_[2];
+	// 		target_vel[0] = target_vel[2] / target_curvature_;
+	// 	}
+	// 	else {
+	// 		target_vel[0] = max_vel_[0];
+	// 		target_vel[2] = target_vel[0] * target_curvature_;
+	// 	}
+  //
+	// }
+  //
+	// ROS_INFO("target_curvature : %f", target_curvature_);
+	// ROS_INFO("vel : %f, %f, %f", target_vel[0], target_vel[1], target_vel[2]);
 
-	if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
-		traj.cost_ = -1.0;
-	}
-	else {
-		traj.cost_ = 1.0;
-	}
+	// if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
+	// 	traj.cost_ = -1.0;
+	// }
+	// else {
+	// 	traj.cost_ = 1.0;
+	// }
 }/*}}}*/
 
 double YmgSPlanner::getTragetCurvature()
