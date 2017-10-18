@@ -625,12 +625,12 @@ void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 }/*}}}*/
 
 void YmgGPBGP::addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan)
-{
+{/*{{{*/
 	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
 	for (int i=closest_index; i<ymg_global_planner_.plan_.size(); ++i) {
 		plan.push_back(ymg_global_planner_.plan_[i]);
 	}
-}
+}/*}}}*/
 
 void YmgGPBGP::publishBGPPlan(const std::vector<geometry_msgs::PoseStamped>& path)
 {/*{{{*/

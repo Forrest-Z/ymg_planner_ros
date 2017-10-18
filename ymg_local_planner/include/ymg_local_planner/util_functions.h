@@ -7,6 +7,7 @@
 #include <tf/tf.h>
 #include <base_local_planner/trajectory.h>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 namespace ymglp {
 
@@ -105,6 +106,8 @@ class UtilFcn {
 		double getPathDistHQ(double x, double y);
 		double getForwardPointPathDist(bool back_mode = false);
 		double scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mode = false);
+		void getLocalGoal(double dist, Eigen::Vector2d& goal);
+		void tfGlobal2Robot(Eigen::Vector2d global, Eigen::Vector2d robot);
 
 	private:
 		void resetFlag();

@@ -51,6 +51,7 @@ add_library(ymglp
 	src/simple_scored_sampling_planner_kai.cpp
 	src/simple_trajectory_generator_kai.cpp
 	src/ymg_sampling_planner.cpp
+	src/ymg_s_planner.cpp
 	src/direction_adjust_planner.cpp
 	)
 add_dependencies(ymglp

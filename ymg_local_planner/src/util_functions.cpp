@@ -121,6 +121,13 @@ double UtilFcn::getNearestDirection()
 	return nearest_direction_;
 }/*}}}*/
 
+double UtilFcn::getDirectionError()
+{/*{{{*/
+	// pi to -pi minus pi to -pi  ===>  2*pi to -2*pi
+	double error = getRobotDirection() - getNearestDirection();
+	return atan2(sin(error), cos(error));
+}/*}}}*/
+
 double UtilFcn::getPathDist()
 {/*{{{*/
 	int nearest_index = getNearestIndex();
@@ -219,11 +226,53 @@ double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mo
 	return getPathDist(x, y);
 }/*}}}*/
 
-double UtilFcn::getDirectionError()
+void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 {/*{{{*/
-	// pi to -pi minus pi to -pi  ===>  2*pi to -2*pi
-	double error = getRobotDirection() - getNearestDirection();
-	return atan2(sin(error), cos(error));
+	geometry_msgs::PoseStamped pose1, pose2;
+	double now_dist = 0.0;
+	pose1 = pose_;
+	int nearest_index = getNearestIndex();
+
+	if (nearest_index+1 < plan_.size()) {
+		++nearest_index;
+	}
+	pose2 = plan_[nearest_index];
+
+	now_dist += calcDist(pose1, pose2);
+	if (!(dist < now_dist)) {
+		for (int i=nearest_index+1; i<plan_.size(); ++i) {
+			pose1 = pose2;
+			pose2 = plan_[i];
+			now_dist += calcDist(pose1, pose2);
+			if (dist < now_dist) {
+				break;
+			}
+		}
+	}
+
+	double dist_error = now_dist - dist;
+	Eigen::Vector2d p1, p2;
+	p1[0] = pose1.pose.position.x;
+	p1[1] = pose1.pose.position.y;
+	p2[0] = pose2.pose.position.x;
+	p2[1] = pose2.pose.position.y;
+	Eigen::Vector2d p12 = p2 - p1;
+	double ratio = dist_error / p12.norm();
+	goal = p1 + ratio * p2;
+}/*}}}*/
+
+void UtilFcn::tfGlobal2Robot(Eigen::Vector2d global, Eigen::Vector2d robot)
+{/*{{{*/
+	double theta = -1 * getRobotDirection();
+	Eigen::Matrix2d rotation;
+	rotation(0,0) =  cos(theta);
+	rotation(0,1) = -sin(theta);
+	rotation(1,0) =  sin(theta);
+	rotation(1,1) =  cos(theta);
+	Eigen::Vector2d translation; 
+	translation[0] = pose_.pose.position.x;
+	translation[1] = pose_.pose.position.y;
+	robot = rotation * (global - translation);
 }/*}}}*/
 
 void UtilFcn::resetFlag()

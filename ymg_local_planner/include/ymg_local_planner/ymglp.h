@@ -22,6 +22,7 @@
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
 #include <ymg_local_planner/ymg_sampling_planner.h>
+#include <ymg_local_planner/ymg_s_planner.h>
 #include <ymg_local_planner/direction_adjust_planner.h>
 #include <ymg_local_planner/util_functions.h>
 
@@ -139,6 +140,7 @@ class YmgLP {
 				bool use_dwa_, reverse_mode_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 				YmgSamplingPlanner ymg_sampling_planner_;
+				YmgSPlanner ymg_s_planner_;
 				DirAdjustPlanner direction_adjust_planner_;
 
 				double local_goal_distance_;
