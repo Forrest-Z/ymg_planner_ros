@@ -138,6 +138,8 @@ double YmgSPlanner::getTragetCurvature()
 	double r_center_y = (goal_r[0]*goal_r[0] - goal_r[1]*goal_r[1]) / (2*goal_r[1]);
 	double theta = atan2(r_center_y - goal_r[1], fabs(goal_r[0]));
 
+	ROS_INFO("r_center_y : %f", r_center_y);
+
 	return 1.0/r_center_y;
 }/*}}}*/
 
