@@ -188,6 +188,7 @@ class YmgGPHybROS : public nav_core::BaseGlobalPlanner {
 				const geometry_msgs::PoseStamped& goal,
 				const std::vector<geometry_msgs::PoseStamped>& plan);
 
+		int navfn_goal_max_cost_;
 		bool use_navfn_, use_ymggp_force_, clear_plan_when_goal_reached_;
 		bool setNavfnGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
 		bool updateNavfnGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);

@@ -129,6 +129,19 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 
 		initialized_ = true;
 
+
+		private_nh.param("path_granularity", path_granularity_, 0.05);
+		private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
+		private_nh.param("bgp_goal_dist", bgp_goal_dist_, 5.0);
+		private_nh.param("bgp_goal_max_cost", bgp_goal_max_cost_, 50);
+		private_nh.param("recovery_dist", recovery_dist_, 2.0);
+
+		private_nh.param("stuck_vel", stuck_vel_, 0.05);
+		private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
+		private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
+
+		private_nh.param("clear_plan_when_goal_reached", clear_plan_when_goal_reached_, true);
+
 		setBGPFlag(false);
 		ymg_global_planner_.initialize(frame_id, path_granularity_);
 		odom_helper_.setOdomTopic("odom");
@@ -548,7 +561,8 @@ bool YmgGPBGP::updateBGPGoal (const geometry_msgs::PoseStamped robot_pos,
 
 	// in the costmap and not free space
 	if (costmap_->worldToMap(px, py, cell_x, cell_y)
-			&& costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
+			&& bgp_goal_max_cost_ < costmap_->getCost(cell_x, cell_y))
+			// && costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
 	{
 		int goal_closest_index = ymglp::UtilFcn::getClosestIndexOfPath(bgp_goal_, plan);
 		setValidGoal(plan, goal_closest_index);
@@ -568,7 +582,8 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 		py = plan[i].pose.position.y;
 		// out of the costmap or free space
 		if (!costmap_->worldToMap(px, py, cell_x, cell_y)
-				|| costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
+				|| costmap_->getCost(cell_x, cell_y) <= bgp_goal_max_cost_) {
+				// || costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
 			bgp_goal_ = plan[i];
 			return true;
 		}

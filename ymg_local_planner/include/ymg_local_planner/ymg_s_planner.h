@@ -41,7 +41,7 @@ class YmgSPlanner {
 
 	private:
 
-		double getTragetCurvature();
+		double getTragetCurvature(double goal_dist);
 
 		bool generateTrajectory(
 				Eigen::Vector3f pos, Eigen::Vector3f vel, Eigen::Vector3f sample_target_vel,
@@ -60,7 +60,7 @@ class YmgSPlanner {
 		Eigen::Vector3f pos_, vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
 		Eigen::Vector3f max_c_vel_, min_c_vel_;
-		double target_curvature_;
+		double max_curvature_, target_curvature_, in_plane_rot_vel_;
 
 		base_local_planner::MapGridCostFunctionKai* path_critic_;
 		UtilFcn* utilfcn_;

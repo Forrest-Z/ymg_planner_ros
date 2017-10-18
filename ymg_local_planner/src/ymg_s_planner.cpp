@@ -59,7 +59,6 @@ void YmgSPlanner::initialize(
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
 
-	target_curvature_ = getTragetCurvature();
 
 	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
 	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
@@ -68,6 +67,11 @@ void YmgSPlanner::initialize(
 		reverse_order_ = true;
 	else
 		reverse_order_ = false;
+
+	double goal_dist = max_vel_abs * sim_time_;
+	target_curvature_ = getTragetCurvature(goal_dist);
+	max_curvature_ = 2.0 / goal_dist;
+	in_plane_rot_vel_ = max_vel_th * target_curvature_ / max_curvature_;
 
 	// ROS_INFO("max - min : %f - %f", max_vel_[0], min_vel_[0]);
 }/*}}}*/
@@ -103,24 +107,33 @@ bool YmgSPlanner::findBestTrajectory(
 	traj.cost_ = -1.0;
 	for (int i=0; i<=vsamples_[0]; ++i) {
 		target_vel[0] = start_vel_x - i * v_step;
-		target_vel[2] = target_curvature_ * target_vel[0];
-		if (max_vel_[2] < target_vel[2]) {
-			target_vel[2] = max_vel_[2];
-		}
-		else if (target_vel[2] < min_vel_[2]) {
-			target_vel[2] = min_vel_[2];
+
+		if (UtilFcn::isZero(target_vel[0])) {
+			target_vel[2] = in_plane_rot_vel_;
+			if (target_vel[2] < min_vel_[2]) {
+				target_vel[2] = min_vel_[2];
+			}
+			else if (max_vel_[2] < target_vel[2]) {
+				target_vel[2] = max_vel_[2];
+			}
 		}
 
-		if(!generateTrajectory(pos_, vel_, target_vel, traj)) {
-			ROS_INFO("[YSP] Failed to generate traj.");
-			continue;
+		else {
+			target_vel[2] = target_curvature_ * target_vel[0];
+			if (target_vel[2] < min_vel_[2] || max_vel_[2] < target_vel[2]) {
+				continue;
+			}
 		}
 
+
+		generateTrajectory(pos_, vel_, target_vel, traj);
 		if (0.0 < obstacle_critic_->scoreTrajectory(traj)) {
 			traj.cost_ = 1.0;
 			break;
 		}
 	}
+
+
 	
 	// if (max_vel_[2] < target_curvature_ * min_vel_[0]) {
 	// 	target_vel[0] = min_vel_[0];
@@ -159,10 +172,10 @@ bool YmgSPlanner::findBestTrajectory(
 	// }
 }/*}}}*/
 
-double YmgSPlanner::getTragetCurvature()
+double YmgSPlanner::getTragetCurvature(double goal_dist)
 {/*{{{*/
 	Eigen::Vector2d goal, goal_r;
-	utilfcn_->getLocalGoal(1.5, goal);
+	utilfcn_->getLocalGoal(goal_dist, goal);
 	utilfcn_->tfGlobal2Robot(goal, goal_r);
 
 	double r_center_y = (goal_r[0]*goal_r[0] - goal_r[1]*goal_r[1]) / (2*goal_r[1]);
@@ -174,9 +187,9 @@ double YmgSPlanner::getTragetCurvature()
 
 	if (goal_r[0] < 0.0) {
 		if (0.0 < goal_r[1])
-			return 1000.0;
+			return max_curvature_;
 		else
-			return -1000.0;
+			return -max_curvature_;
 	}
 
 	return 1.0/r_center_y;
@@ -211,7 +224,7 @@ bool YmgSPlanner::generateTrajectory(
 		traj.addPoint(pos[0], pos[1], pos[2]);
 	} // end for simulation steps
 
-	return num_steps > 0; // true if trajectory has at least one point
+	return 0 < traj.getPointsSize(); // true if trajectory has at least one point
 }/*}}}*/
 
 Eigen::Vector3f YmgSPlanner::computeNewPositions(

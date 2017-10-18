@@ -57,6 +57,7 @@ void YmgGPHybROS::initialize(std::string name, costmap_2d::Costmap2D* costmap, s
 		private_nh.param("path_granularity", path_granularity_, 0.05);
 		private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
 		private_nh.param("navfn_goal_dist", navfn_goal_dist_, 5.0);
+		private_nh.param("navfn_goal_max_cost", navfn_goal_max_cost_, 50);
 		private_nh.param("recovery_dist", recovery_dist_, 2.0);
 
 		private_nh.param("stuck_vel", stuck_vel_, 0.05);
@@ -501,7 +502,8 @@ bool YmgGPHybROS::updateNavfnGoal (const geometry_msgs::PoseStamped robot_pos,
 
 	// in the costmap and not free space
 	if (costmap_->worldToMap(px, py, cell_x, cell_y)
-			&& costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
+			&& navfn_goal_max_cost_ < costmap_->getCost(cell_x, cell_y))
+			// && costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
 	{
 		int goal_closest_index = ymglp::UtilFcn::getClosestIndexOfPath(navfn_goal_, plan);
 		setValidGoal(plan, goal_closest_index);
@@ -521,7 +523,8 @@ bool YmgGPHybROS::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& pl
 		py = plan[i].pose.position.y;
 		// out of the costmap or free space
 		if (!costmap_->worldToMap(px, py, cell_x, cell_y)
-				|| costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
+				|| costmap_->getCost(cell_x, cell_y) <= navfn_goal_max_cost_) {
+				// || costmap_->getCost(cell_x, cell_y) == costmap_2d::FREE_SPACE) {
 			navfn_goal_ = plan[i];
 			return true;
 		}

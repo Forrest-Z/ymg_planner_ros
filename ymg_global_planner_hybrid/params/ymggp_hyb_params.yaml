@@ -10,6 +10,7 @@ YmgGPHybROS:
   goal_tolerance: 0.5
 
   navfn_goal_dist: 5.0
+  navfn_goal_max_cost: 50
   recovery_dist: 2.0
 
   clear_plan_when_goal_reached: true

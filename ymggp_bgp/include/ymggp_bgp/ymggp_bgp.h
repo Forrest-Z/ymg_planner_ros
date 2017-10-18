@@ -182,6 +182,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		// ########## added for ymggp
 		ymggp::YmgGP ymg_global_planner_;
 		base_local_planner::OdometryHelperRos odom_helper_;
+		int bgp_goal_max_cost_;
 		double path_granularity_, bgp_goal_dist_, recovery_dist_;
 		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
