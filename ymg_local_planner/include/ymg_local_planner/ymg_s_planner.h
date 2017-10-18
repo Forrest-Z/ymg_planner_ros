@@ -59,7 +59,7 @@ class YmgSPlanner {
 		base_local_planner::LocalPlannerLimits* limits_;
 		Eigen::Vector3f pos_, vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
-		double min_curvature_, max_curvature_;
+		double target_curvature_;
 
 		base_local_planner::MapGridCostFunctionKai* path_critic_;
 		UtilFcn* utilfcn_;
