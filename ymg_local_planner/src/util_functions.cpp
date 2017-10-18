@@ -272,7 +272,8 @@ void UtilFcn::tfGlobal2Robot(Eigen::Vector2d global, Eigen::Vector2d robot)
 	Eigen::Vector2d translation; 
 	translation[0] = pose_.pose.position.x;
 	translation[1] = pose_.pose.position.y;
-	robot = rotation * (global - translation);
+	// robot = rotation * (global - translation);
+	robot = (global - translation);
 }/*}}}*/
 
 void UtilFcn::resetFlag()
