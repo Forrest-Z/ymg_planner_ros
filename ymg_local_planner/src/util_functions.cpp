@@ -261,7 +261,7 @@ void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 	goal = p1 + ratio * p2;
 }/*}}}*/
 
-void UtilFcn::tfGlobal2Robot(Eigen::Vector2d global, Eigen::Vector2d robot)
+void UtilFcn::tfGlobal2Robot(const Eigen::Vector2d& global, Eigen::Vector2d& robot)
 {/*{{{*/
 	double theta = -1 * getRobotDirection();
 	Eigen::Matrix2d rotation;
@@ -272,8 +272,7 @@ void UtilFcn::tfGlobal2Robot(Eigen::Vector2d global, Eigen::Vector2d robot)
 	Eigen::Vector2d translation; 
 	translation[0] = pose_.pose.position.x;
 	translation[1] = pose_.pose.position.y;
-	// robot = rotation * (global - translation);
-	robot = (global - translation);
+	robot = rotation * (global - translation);
 }/*}}}*/
 
 void UtilFcn::resetFlag()
