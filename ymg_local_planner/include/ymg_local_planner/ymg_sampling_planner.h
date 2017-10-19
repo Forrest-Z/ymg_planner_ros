@@ -50,15 +50,15 @@ class YmgSamplingPlanner {
 		Eigen::Vector3f computeNewPositions(
 				const Eigen::Vector3f& pos, const Eigen::Vector3f& vel, double dt);
 
-		bool is_param_set_;
+		bool is_param_set_, reverse_order_;
 		double sim_time_, sim_granularity_, angular_sim_granularity_, sim_period_;
 		double path_tolerance_;
 		int obstacle_tolerance_;
 
-		bool reverse_order_;
 		base_local_planner::LocalPlannerLimits* limits_;
 		Eigen::Vector3f pos_, vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
+		double max_vel_abs_;
 
 		base_local_planner::MapGridCostFunctionKai* path_critic_;
 		UtilFcn* utilfcn_;

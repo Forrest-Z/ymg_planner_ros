@@ -59,8 +59,8 @@ void YmgSamplingPlanner::initialize(
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
 
-	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
-	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
+	max_vel_abs_ = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
+	utilfcn_->setSearchDist(max_vel_abs_ * sim_time_); 
 
 	if (fabs(max_vel_x) < fabs(min_vel_x))
 		reverse_order_ = true;
@@ -181,7 +181,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		base_local_planner::Trajectory comp_traj;
 		generateTrajectory(pos_, vel_, target_vel, comp_traj);
 		if (UtilFcn::isZero(target_vel[0]))
-			comp_traj.cost_ = utilfcn_->scoreTrajInPlaceDist(comp_traj, reverse_order_);
+			comp_traj.cost_ = utilfcn_->scoreTrajInPlaceDist(comp_traj, max_vel_abs_*sim_time_, reverse_order_);
 		else
 			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
 
