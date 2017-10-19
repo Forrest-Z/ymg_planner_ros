@@ -106,6 +106,7 @@ class UtilFcn {
 		double getPathDistHQ(double x, double y);
 		double getForwardPointPathDist(bool back_mode = false);
 		double scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mode = false);
+		double scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, double goal_dist ,bool back_mode = false);
 		void getLocalGoal(double dist, Eigen::Vector2d& goal);
 		void tfGlobal2Robot(const Eigen::Vector2d& global, Eigen::Vector2d& robot);
 

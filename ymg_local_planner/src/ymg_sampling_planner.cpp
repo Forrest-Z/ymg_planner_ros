@@ -103,7 +103,6 @@ bool YmgSamplingPlanner::findBestTrajectory(
 	double target_vel_x;
 	for (int i=0; i<=vsamples_[0]; ++i) {
 		target_vel_x = start_vel_x - i * v_step;
-
 		comp_traj = generateClosestTrajectory(target_vel_x);
 		// cannot generate trajectory
 		if (comp_traj.cost_ < 0.0) {
@@ -180,12 +179,11 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 		target_vel[2] = max_vel_[2] - i * w_step;
 
 		base_local_planner::Trajectory comp_traj;
-		if(!generateTrajectory(pos_, vel_, target_vel, comp_traj)) {
-			ROS_INFO("[YSP] Failed to generate traj.");
-			continue;
-		}
-
-		comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
+		generateTrajectory(pos_, vel_, target_vel, comp_traj);
+		if (UtilFcn::isZero(target_vel[0]))
+			comp_traj.cost_ = utilfcn_->scoreTrajInPlaceDist(comp_traj, reverse_order_);
+		else
+			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
 
 #ifdef DEBUG
 		ROS_INFO("[closest] cost : %f", comp_traj.cost_);
@@ -216,6 +214,7 @@ bool YmgSamplingPlanner::generateTrajectory(
 {/*{{{*/
 	traj.cost_   = -1.0;   // placed here in case we return early
 	traj.resetPoints();   //trajectory might be reused so we'll make sure to reset it
+	traj.addPoint(pos[0], pos[1], pos[2]);   // add now point
 
 	int num_steps;
 	if (angular_sim_granularity_ < 0.0) {
@@ -237,11 +236,11 @@ bool YmgSamplingPlanner::generateTrajectory(
 
 	// simulate the trajectory and check for collisions, updating costs along the way
 	for (int i = 0; i < num_steps; ++i) {
-		traj.addPoint(pos[0], pos[1], pos[2]);
 		pos = computeNewPositions(pos, sample_target_vel, dt);
+		traj.addPoint(pos[0], pos[1], pos[2]);
 	} // end for simulation steps
 
-	return num_steps > 0; // true if trajectory has at least one point
+	return traj.getPointsSize() > 0; // true if trajectory has at least one point
 }/*}}}*/
 
 Eigen::Vector3f YmgSamplingPlanner::computeNewPositions(

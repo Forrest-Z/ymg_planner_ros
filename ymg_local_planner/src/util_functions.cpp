@@ -226,6 +226,38 @@ double UtilFcn::scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mo
 	return getPathDist(x, y);
 }/*}}}*/
 
+double UtilFcn::scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, double goal_dist, bool back_mode)
+{/*{{{*/
+	double x, y, th;
+	traj.getEndpoint(x, y, th);
+
+	if (0.0 < scoring_point_offset_x_) {
+		int sign = 1;
+		if (back_mode) sign = -1;
+		x += sign*scoring_point_offset_x_ * cos(th);
+		y += sign*scoring_point_offset_x_ * sin(th);
+	}
+
+	// look goal_dist away from robot
+	int start_index = getNearestIndex();
+	if (start_index+1 < plan_.size()) {
+		++start_index;
+	}
+
+	double goal_sq_dist = goal_dist * goal_dist;
+	geometry_msgs::PoseStamped endpoint;
+	endpoint.pose.position.x = x;
+	endpoint.pose.position.y = y;
+
+	for (int i=start_index; i<plan_.size(); ++i) {
+		if (goal_sq_dist < calcSqDist(pose_, plan_[i])) {
+			return calcDist(endpoint, plan_[i]);
+		}
+	}
+
+	return calcDist(endpoint, plan_.back());
+}/*}}}*/
+
 void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 {/*{{{*/
 	geometry_msgs::PoseStamped pose1, pose2;

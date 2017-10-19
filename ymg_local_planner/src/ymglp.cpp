@@ -273,7 +273,7 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 		else {
-			if (0) {
+			if (1) {
 				ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
 				ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 			}
