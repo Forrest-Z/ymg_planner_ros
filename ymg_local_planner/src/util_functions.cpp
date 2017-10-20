@@ -258,6 +258,42 @@ double UtilFcn::scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, doubl
 	return calcDist(endpoint, plan_.back());
 }/*}}}*/
 
+double UtilFcn::scoreTrajStraightDist(base_local_planner::Trajectory& traj, double goal_dist, bool back_mode)
+{/*{{{*/
+	Eigen::Vector2d local_goal, robot_pos, endpoint;
+	robot_pos[0] = pose_.pose.position.x;
+	robot_pos[1] = pose_.pose.position.y;
+	double x, y, th;
+	traj.getEndpoint(x, y, th);
+	if (0.0 < scoring_point_offset_x_ && isZero(traj.xv_)) {
+		int sign = 1;
+		if (back_mode) sign = -1;
+		x += sign*scoring_point_offset_x_ * cos(th);
+		y += sign*scoring_point_offset_x_ * sin(th);
+	}
+
+	getLocalGoal(goal_dist, local_goal);
+	local_goal -= robot_pos;
+	endpoint[0] = x - pose_.pose.position.x;
+	endpoint[1] = y - pose_.pose.position.y;
+	
+	double ratio = local_goal.dot(endpoint) / (local_goal.norm() * local_goal.norm());
+
+	double dist;
+	if (1.0 < ratio) {
+		dist = (local_goal - endpoint).norm();
+	}
+	else if (ratio < 0.0) {
+		dist = (robot_pos - endpoint).norm();
+	}
+	else {
+		double s = local_goal[0]* endpoint[1] - local_goal[1]*endpoint[0];
+		dist = s / local_goal.norm();
+	}
+
+	return dist;
+}/*}}}*/
+
 void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 {/*{{{*/
 	geometry_msgs::PoseStamped pose1, pose2;
