@@ -39,6 +39,8 @@ The acceleration limit of the robot in the x direction
 ~/YmgLPROS/acc_lim_theta (double[rad/s^2], default: 0.3)  
 The acceleration limit of the robot in the theta direction  
 ロボットの回転角加速度の絶対値の上限．
+note: 回転角加速度の上限が小さく制御周期が早い場合，探索範囲が狭くなり経路に追従できなくなる可能性がある．
+探索範囲: now_velocity_theta ± acc_lim_theta / controller_frequency
 
 
 

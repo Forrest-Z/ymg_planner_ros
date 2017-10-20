@@ -188,8 +188,8 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 			comp_traj.cost_ = utilfcn_->scoreTrajInPlaceDist(comp_traj, local_goal_dist_, reverse_order_);
 		else {
 			// remember set local_goal_dist
-			comp_traj.cost_ = utilfcn_->scoreTrajStraightDist(comp_traj, local_goal_dist_, reverse_order_);
-			// comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
+			// comp_traj.cost_ = utilfcn_->scoreTrajStraightDist(comp_traj, local_goal_dist_, reverse_order_);
+			comp_traj.cost_ = utilfcn_->scoreTrajDist(comp_traj, reverse_order_);
 		}
 
 #ifdef DEBUG
