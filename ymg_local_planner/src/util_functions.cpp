@@ -55,7 +55,7 @@ void UtilFcn::setSearchDist(double max_dist)
 
 void UtilFcn::setLocalGoalDist(double local_goal_dist)
 {/*{{{*/
-	local_goal_dist_ = local_goal_dist;
+	local_goal_dist_ = local_goal_dist + scoring_point_offset_x_;
 	has_local_goal_ = false;
 	has_straight_ = false;
 }/*}}}*/
