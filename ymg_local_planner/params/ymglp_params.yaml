@@ -3,10 +3,10 @@
 YmgLPROS:
 
   # robot velocity params
-  max_vel_x: 0.7
-  acc_lim_x: 0.7
-  max_rot_vel: 0.7
-  acc_lim_theta: 1.4
+  max_vel_x: 0.6
+  acc_lim_x: 0.3
+  max_rot_vel: 0.6
+  acc_lim_theta: 0.3
 
   # scaling robot's footprint
   scaling_speed: 0.4
@@ -18,7 +18,7 @@ YmgLPROS:
 
   # simulation params
   controller_frequency: 5.0
-  sim_time: 1.0
+  sim_time: 1.5
   sim_granularity: 0.05
   angular_sim_granularity: 0.04
   vx_samples: 4
