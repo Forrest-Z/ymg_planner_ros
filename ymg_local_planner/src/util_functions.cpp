@@ -56,6 +56,8 @@ void UtilFcn::setSearchDist(double max_dist)
 void UtilFcn::setLocalGoalDist(double local_goal_dist)
 {/*{{{*/
 	local_goal_dist_ = local_goal_dist;
+	has_local_goal_ = false;
+	has_straight_ = false;
 }/*}}}*/
 
 geometry_msgs::PoseStamped UtilFcn::getPoseStamped()
@@ -265,13 +267,16 @@ double UtilFcn::scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, doubl
 
 double UtilFcn::scoreTrajStraightDist(base_local_planner::Trajectory& traj, double goal_dist, bool back_mode)
 {/*{{{*/
-	Eigen::Vector2d robot_pos, straight_bgn, straight_end, scoring_point;
-	robot_pos[0] = pose_.pose.position.x;
-	robot_pos[1] = pose_.pose.position.y;
-	geometry_msgs::PoseStamped local_goal = getLocalGoal();
-	straight_end[0] = local_goal.pose.position.x;
-	straight_end[1] = local_goal.pose.position.y;
-	straight_bgn = robot_pos + (straight_end - robot_pos) * scoring_point_offset_x_ / (straight_end - robot_pos).norm();
+	if (!has_straight_) {
+		Eigen::Vector2d robot_pos;
+		robot_pos[0] = pose_.pose.position.x;
+		robot_pos[1] = pose_.pose.position.y;
+		geometry_msgs::PoseStamped local_goal = getLocalGoal();
+		straight_end_[0] = local_goal.pose.position.x;
+		straight_end_[1] = local_goal.pose.position.y;
+		straight_bgn_ = robot_pos
+			+ (straight_end_ - robot_pos) * scoring_point_offset_x_ / (straight_end_ - robot_pos).norm();
+	}
 
 	double x, y, th;
 	traj.getEndpoint(x, y, th);
@@ -281,21 +286,21 @@ double UtilFcn::scoreTrajStraightDist(base_local_planner::Trajectory& traj, doub
 		x += sign*scoring_point_offset_x_ * cos(th);
 		y += sign*scoring_point_offset_x_ * sin(th);
 	}
+	Eigen::Vector2d scoring_point, vec1, vec2;
 	scoring_point[0] = x;
 	scoring_point[1] = y;
 
-	Eigen::Vector2d vec1, vec2;
-	vec1 = straight_end - straight_bgn;
-	vec2 = scoring_point - straight_bgn;
+	vec1 = straight_end_ - straight_bgn_;
+	vec2 = scoring_point - straight_bgn_;
 	
 	double ratio = vec1.dot(vec2) / (vec1.norm() * vec1.norm());
 
 	double dist;
-	if (1.0 < ratio) {
-		dist = (straight_end - scoring_point).norm();
-	}
-	else if (ratio < 0.0) {
-		dist = (straight_bgn - scoring_point).norm();
+	// if (1.0 < ratio) {
+	// 	dist = (straight_end_ - scoring_point).norm();
+	// }
+	if (ratio < 0.0) {
+		dist = (straight_bgn_ - scoring_point).norm();
 	}
 	else {
 		double s = vec1[0]* vec2[1] - vec1[1]*vec2[0];

@@ -118,11 +118,15 @@ class UtilFcn {
 		std::vector<geometry_msgs::PoseStamped> plan_;
 		double scoring_point_offset_x_;
 
-		bool has_nearest_index_, has_nearest_direction_, has_local_goal_;
+		bool has_nearest_index_, has_nearest_direction_;
 		int nearest_index_, max_search_index_;
 		double nearest_direction_;
+
+		// for calc straight path dist
+		bool has_local_goal_, has_straight_;
 		double local_goal_dist_;
 		geometry_msgs::PoseStamped local_goal_;
+		Eigen::Vector2d straight_bgn_, straight_end_;
 
 };   // class utilfcn
 
