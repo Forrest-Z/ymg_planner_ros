@@ -45,12 +45,13 @@ void UtilFcn::setSearchDist(double max_dist)
 	max_sq_dist = max_dist * max_dist;
 
 	double now_dist;
+	bool search_index_bgn_found = false;
 	search_index_bgn_ = 0;
 	search_index_end_ = 0;
 	for (int i=getNearestIndex()+1; i<plan_.size(); ++i) {
 		now_dist = calcSqDist(pose_, plan_[i]);
 
-		if (min_sq_dist < now_dist) {
+		if (!search_index_bgn_found && min_sq_dist < now_dist) {
 			search_index_bgn_ = i;
 		}
 
