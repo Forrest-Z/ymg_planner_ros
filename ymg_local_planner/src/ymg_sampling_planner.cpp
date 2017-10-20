@@ -59,7 +59,7 @@ void YmgSamplingPlanner::initialize(
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);
 
-	local_goal_dist_ = std::max(fabs(max_vel_x), fabs(min_vel_x));
+	local_goal_dist_ = std::max(fabs(max_vel_x), fabs(min_vel_x)) * sim_time_;
 
 	double max_vel_abs = std::max(fabs(max_vel_[0]), fabs(min_vel_[0]));
 	utilfcn_->setSearchDist(max_vel_abs * sim_time_); 
