@@ -37,19 +37,31 @@ void UtilFcn::setScoringPointOffsetX(double scoring_point_offset_x)
 
 void UtilFcn::setSearchDist(double max_dist)
 {/*{{{*/
-	double max_sq_dist;
+	double max_sq_dist, min_sq_dist = 0.0;
 	if (0.0 < scoring_point_offset_x_) {
-		max_sq_dist = (max_dist+scoring_point_offset_x_) * (max_dist+scoring_point_offset_x_);
+		max_dist+=scoring_point_offset_x_;
+		min_sq_dist = scoring_point_offset_x_ * scoring_point_offset_x_;
 	}
-	else {
-		max_sq_dist = max_dist * max_dist;
-	}
+	max_sq_dist = max_dist * max_dist;
 
-	for (int i=getNearestIndex(); i<plan_.size(); ++i) {
-		if (max_sq_dist < calcSqDist(pose_, plan_[i])) {
-			max_search_index_ = i;
+	double now_dist;
+	search_index_bgn_ = 0;
+	search_index_end_ = 0;
+	for (int i=getNearestIndex()+1; i<plan_.size(); ++i) {
+		now_dist = calcSqDist(pose_, plan_[i]);
+
+		if (min_sq_dist < now_dist) {
+			search_index_bgn_ = i;
+		}
+
+		if (max_sq_dist < now_dist) {
+			search_index_end_ = i;
 			break;
 		}
+	}
+
+	if (search_index_end_ < search_index_bgn_) {
+		search_index_bgn_ = search_index_end_;
 	}
 }/*}}}*/
 
@@ -150,13 +162,8 @@ double UtilFcn::getPathDistHQ(double x, double y)
 	double sq_dist, min_sq_dist = DBL_MAX;
 	double dx, dy;
 
-	int start_index = getNearestIndex();
-	if (start_index+1 <= max_search_index_) {
-		++start_index;
-	}
-
 	int nearest_index = -1;
-	for (int i=start_index; i<=max_search_index_; ++i) {
+	for (int i=search_index_bgn_; i<=search_index_end_; ++i) {
 		dx = plan_[i].pose.position.x - x;
 		dy = plan_[i].pose.position.y - y;
 		sq_dist = dx*dx + dy*dy;
@@ -186,12 +193,7 @@ double UtilFcn::getPathDist(double x, double y)
 	double sq_dist, min_sq_dist = DBL_MAX;
 	double dx, dy;
 
-	int start_index = getNearestIndex();
-	if (start_index+1 <= max_search_index_) {
-		++start_index;
-	}
-
-	for (int i=start_index; i<=max_search_index_; ++i) {
+	for (int i=search_index_bgn_; i<=search_index_end_; ++i) {
 		dx = plan_[i].pose.position.x - x;
 		dy = plan_[i].pose.position.y - y;
 		sq_dist = dx*dx + dy*dy;
@@ -363,7 +365,8 @@ void UtilFcn::resetFlag()
 	has_nearest_index_ = false;
 	has_nearest_direction_ = false;
 	has_local_goal_ = false;
-	max_search_index_ = plan_.size()-1;
+	search_index_bgn_ = 0;
+	search_index_end_ = plan_.size()-1;
 }/*}}}*/
 
 }   // namespace ymglp

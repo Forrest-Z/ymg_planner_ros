@@ -119,7 +119,7 @@ class UtilFcn {
 		double scoring_point_offset_x_;
 
 		bool has_nearest_index_, has_nearest_direction_;
-		int nearest_index_, max_search_index_;
+		int nearest_index_, search_index_bgn_, search_index_end_;
 		double nearest_direction_;
 
 		// for calc straight path dist
