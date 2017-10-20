@@ -94,6 +94,7 @@ class UtilFcn {
 		void setPose(const tf::Stamped<tf::Pose>& pose);
 		void setScoringPointOffsetX(double scoring_point_offset_x);
 		void setSearchDist(double max_dist);
+		void setLocalGoalDist(double local_goal_dist);
 
 		geometry_msgs::PoseStamped getPoseStamped();
 		int getNearestIndex();
@@ -108,7 +109,7 @@ class UtilFcn {
 		double scoreTrajDist(base_local_planner::Trajectory& traj, bool back_mode = false);
 		double scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, double goal_dist ,bool back_mode = false);
 		double scoreTrajStraightDist(base_local_planner::Trajectory& traj, double goal_dist ,bool back_mode = false);
-		void getLocalGoal(double dist, Eigen::Vector2d& goal);
+		geometry_msgs::PoseStamped getLocalGoal();
 		void tfGlobal2Robot(const Eigen::Vector2d& global, Eigen::Vector2d& robot);
 
 	private:
@@ -117,9 +118,11 @@ class UtilFcn {
 		std::vector<geometry_msgs::PoseStamped> plan_;
 		double scoring_point_offset_x_;
 
-		bool has_nearest_index_, has_nearest_direction_;
+		bool has_nearest_index_, has_nearest_direction_, has_local_goal_;
 		int nearest_index_, max_search_index_;
 		double nearest_direction_;
+		double local_goal_dist_;
+		geometry_msgs::PoseStamped local_goal_;
 
 };   // class utilfcn
 

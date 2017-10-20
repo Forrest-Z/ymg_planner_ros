@@ -186,7 +186,10 @@ bool YmgSPlanner::findBestTrajectory(
 double YmgSPlanner::getTragetCurvature(double goal_dist)
 {/*{{{*/
 	Eigen::Vector2d goal, goal_r;
-	utilfcn_->getLocalGoal(goal_dist, goal);
+	utilfcn_->setLocalGoalDist(goal_dist);
+	geometry_msgs::PoseStamped goal_p = utilfcn_->getLocalGoal();
+	goal[0] = goal_p.pose.position.x;
+	goal[1] = goal_p.pose.position.y;
 	utilfcn_->tfGlobal2Robot(goal, goal_r);
 
 	double r_center_y = (goal_r[0]*goal_r[0] - goal_r[1]*goal_r[1]) / (2*goal_r[1]);

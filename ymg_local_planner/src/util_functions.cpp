@@ -53,6 +53,11 @@ void UtilFcn::setSearchDist(double max_dist)
 	}
 }/*}}}*/
 
+void UtilFcn::setLocalGoalDist(double local_goal_dist)
+{/*{{{*/
+	local_goal_dist_ = local_goal_dist;
+}/*}}}*/
+
 geometry_msgs::PoseStamped UtilFcn::getPoseStamped()
 {/*{{{*/
 	return pose_;
@@ -260,42 +265,54 @@ double UtilFcn::scoreTrajInPlaceDist(base_local_planner::Trajectory& traj, doubl
 
 double UtilFcn::scoreTrajStraightDist(base_local_planner::Trajectory& traj, double goal_dist, bool back_mode)
 {/*{{{*/
-	Eigen::Vector2d local_goal, robot_pos, endpoint;
+	Eigen::Vector2d robot_pos, straight_bgn, straight_end, scoring_point;
 	robot_pos[0] = pose_.pose.position.x;
 	robot_pos[1] = pose_.pose.position.y;
+	geometry_msgs::PoseStamped local_goal = getLocalGoal();
+	straight_end[0] = local_goal.pose.position.x;
+	straight_end[1] = local_goal.pose.position.y;
+	straight_bgn = robot_pos + (straight_end - robot_pos) * scoring_point_offset_x_ / (straight_end - robot_pos).norm();
+
 	double x, y, th;
 	traj.getEndpoint(x, y, th);
-	if (0.0 < scoring_point_offset_x_ && isZero(traj.xv_)) {
+	if (0.0 < scoring_point_offset_x_) {
 		int sign = 1;
 		if (back_mode) sign = -1;
 		x += sign*scoring_point_offset_x_ * cos(th);
 		y += sign*scoring_point_offset_x_ * sin(th);
 	}
+	scoring_point[0] = x;
+	scoring_point[1] = y;
 
-	getLocalGoal(goal_dist, local_goal);
-	local_goal -= robot_pos;
-	endpoint[0] = x - pose_.pose.position.x;
-	endpoint[1] = y - pose_.pose.position.y;
+	Eigen::Vector2d vec1, vec2;
+	vec1 = straight_end - straight_bgn;
+	vec2 = scoring_point - straight_bgn;
 	
-	double ratio = local_goal.dot(endpoint) / (local_goal.norm() * local_goal.norm());
+	double ratio = vec1.dot(vec2) / (vec1.norm() * vec1.norm());
 
 	double dist;
 	if (1.0 < ratio) {
-		dist = (local_goal - endpoint).norm();
+		dist = (straight_end - scoring_point).norm();
 	}
 	else if (ratio < 0.0) {
-		dist = (robot_pos - endpoint).norm();
+		dist = (straight_bgn - scoring_point).norm();
 	}
 	else {
-		double s = local_goal[0]* endpoint[1] - local_goal[1]*endpoint[0];
-		dist = s / local_goal.norm();
+		double s = vec1[0]* vec2[1] - vec1[1]*vec2[0];
+		dist = s / vec1.norm();
 	}
 
 	return dist;
 }/*}}}*/
 
-void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
+geometry_msgs::PoseStamped UtilFcn::getLocalGoal()
 {/*{{{*/
+
+	if (has_local_goal_) {
+		return local_goal_;
+	}
+
+
 	geometry_msgs::PoseStamped pose1, pose2;
 	double now_dist = 0.0;
 	pose1 = pose_;
@@ -307,26 +324,19 @@ void UtilFcn::getLocalGoal(double dist, Eigen::Vector2d& goal)
 	pose2 = plan_[nearest_index];
 
 	now_dist += calcDist(pose1, pose2);
-	if (!(dist < now_dist)) {
+	if (!(local_goal_dist_ < now_dist)) {
 		for (int i=nearest_index+1; i<plan_.size(); ++i) {
 			pose1 = pose2;
 			pose2 = plan_[i];
 			now_dist += calcDist(pose1, pose2);
-			if (dist < now_dist) {
+			if (local_goal_dist_ < now_dist) {
 				break;
 			}
 		}
 	}
 
-	double dist_error = now_dist - dist;
-	Eigen::Vector2d p1, p2;
-	p1[0] = pose1.pose.position.x;
-	p1[1] = pose1.pose.position.y;
-	p2[0] = pose2.pose.position.x;
-	p2[1] = pose2.pose.position.y;
-	Eigen::Vector2d p12 = p2 - p1;
-	double ratio = dist_error / p12.norm();
-	goal = p1 + ratio * p12;
+	local_goal_ = pose2;
+	return local_goal_;
 }/*}}}*/
 
 void UtilFcn::tfGlobal2Robot(const Eigen::Vector2d& global, Eigen::Vector2d& robot)
@@ -347,6 +357,7 @@ void UtilFcn::resetFlag()
 {/*{{{*/
 	has_nearest_index_ = false;
 	has_nearest_direction_ = false;
+	has_local_goal_ = false;
 	max_search_index_ = plan_.size()-1;
 }/*}}}*/
 
