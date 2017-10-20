@@ -296,10 +296,10 @@ double UtilFcn::scoreTrajStraightDist(base_local_planner::Trajectory& traj, doub
 	double ratio = vec1.dot(vec2) / (vec1.norm() * vec1.norm());
 
 	double dist;
-	// if (1.0 < ratio) {
-	// 	dist = (straight_end_ - scoring_point).norm();
-	// }
-	if (ratio < 0.0) {
+	if (1.0 < ratio) {
+		dist = (straight_end_ - scoring_point).norm();
+	}
+	else if (ratio < 0.0) {
 		dist = (straight_bgn_ - scoring_point).norm();
 	}
 	else {

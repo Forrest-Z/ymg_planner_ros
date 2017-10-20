@@ -177,7 +177,7 @@ base_local_planner::Trajectory YmgSamplingPlanner::generateClosestTrajectory(dou
 	ROS_INFO("min-max vel[2] : %f - %f", min_vel_[2], max_vel_[2]);
 #endif
 
-	utilfcn_->setLocalGoalDist(0.5);
+	utilfcn_->setLocalGoalDist(local_goal_dist_);
 	for (int i=0; i<=vsamples_[2]; ++i) {
 		target_vel[2] = max_vel_[2] - i * w_step;
 
