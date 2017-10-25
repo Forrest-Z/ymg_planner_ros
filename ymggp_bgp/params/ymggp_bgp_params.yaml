@@ -13,7 +13,6 @@ YmgGPBGP:
   stuck_timeout: 7.0
   stuck_vel: 0.05
   stuck_rot_vel: -1.0
-  goal_tolerance: 0.3
   bgp_goal_dist: 5.0
   bgp_goal_max_cost: 50
   recovery_dist: 0.5

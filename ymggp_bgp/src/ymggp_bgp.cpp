@@ -130,20 +130,20 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 		initialized_ = true;
 
 
-		private_nh.param("path_granularity", path_granularity_, 0.05);
-		private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
-		private_nh.param("bgp_goal_dist", bgp_goal_dist_, 5.0);
-		private_nh.param("bgp_goal_max_cost", bgp_goal_max_cost_, 50);
-		private_nh.param("recovery_dist", recovery_dist_, 2.0);
-
-		private_nh.param("stuck_vel", stuck_vel_, 0.05);
-		private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
-		private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
-
-		private_nh.param("clear_plan_when_goal_reached", clear_plan_when_goal_reached_, true);
+		// private_nh.param("path_granularity", path_granularity_, 0.05);
+		// private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
+		// private_nh.param("bgp_goal_dist", bgp_goal_dist_, 5.0);
+		// private_nh.param("bgp_goal_max_cost", bgp_goal_max_cost_, 50);
+		// private_nh.param("recovery_dist", recovery_dist_, 2.0);
+    //
+		// private_nh.param("stuck_vel", stuck_vel_, 0.05);
+		// private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
+		// private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
+    //
+		// private_nh.param("clear_plan_when_goal_reached", clear_plan_when_goal_reached_, true);
 
 		setBGPFlag(false);
-		ymg_global_planner_.initialize(frame_id, path_granularity_);
+		ymg_global_planner_.initialize(frame_id);
 		odom_helper_.setOdomTopic("odom");
 		robot_status_ = GOAL_REACHED;
 		stop_time_ = ros::Time::now();
@@ -179,6 +179,7 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	stuck_vel_ = config.stuck_vel;
 	stuck_rot_vel_ = config.stuck_rot_vel;
 	bgp_goal_dist_ = config.bgp_goal_dist;
+	bgp_goal_max_cost_ = config.bgp_goal_max_cost;
 	recovery_dist_ = config.recovery_dist;
 	clear_plan_when_goal_reached_ = config.clear_plan_when_goal_reached;
 }/*}}}*/
@@ -266,7 +267,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 			&& setBGPFlag(true)) {
 		ROS_INFO("[YmgGPBLP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
-		setBGPGoal(plan);
+		setBGPGoal(start, plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);
 		publishBGPPlan(plan);
 	}
@@ -544,20 +545,33 @@ bool YmgGPBGP::setBGPFlag(bool flag)
 	return use_bgp_;
 }/*}}}*/
 
-bool YmgGPBGP::setBGPGoal (const std::vector<geometry_msgs::PoseStamped>& plan)
+bool YmgGPBGP::setBGPGoal (const geometry_msgs::PoseStamped robot_pos,
+		const std::vector<geometry_msgs::PoseStamped>& ymggp_plan)
 {/*{{{*/
-	if (plan.empty())
+	if (ymggp_plan.empty())
 		return false;
 
-	int forward_index = bgp_goal_dist_ / path_granularity_;
-	setValidGoal(plan, forward_index);
+	// int forward_index = bgp_goal_dist_ / path_granularity_;
+
+	// XXX added but has not tested yet
+	int forward_index = 0;
+	double dist = ymglp::UtilFcn::calcDist(robot_pos, ymggp_plan[0]);
+	for (int i=1; i<ymggp_plan.size(); ++i) {
+		dist += ymglp::UtilFcn::calcDist(ymggp_plan[i-1], ymggp_plan[i]);
+		if (bgp_goal_dist_ < dist) {
+			forward_index = i;
+			break;
+		}
+	}
+
+	setValidGoal(ymggp_plan, forward_index);
 	// ROS_INFO("start_index = %d", forward_index);
 
 	return true;
 }/*}}}*/
 
 bool YmgGPBGP::updateBGPGoal (const geometry_msgs::PoseStamped robot_pos,
-		const std::vector<geometry_msgs::PoseStamped>& plan)
+		const std::vector<geometry_msgs::PoseStamped>& ymggp_plan)
 {/*{{{*/
 	unsigned int cell_x, cell_y;
 	double px = bgp_goal_.pose.position.x;
@@ -568,8 +582,8 @@ bool YmgGPBGP::updateBGPGoal (const geometry_msgs::PoseStamped robot_pos,
 			&& bgp_goal_max_cost_ < costmap_->getCost(cell_x, cell_y))
 			// && costmap_->getCost(cell_x, cell_y) != costmap_2d::FREE_SPACE)
 	{
-		int goal_closest_index = ymglp::UtilFcn::getClosestIndexOfPath(bgp_goal_, plan);
-		setValidGoal(plan, goal_closest_index);
+		int goal_closest_index = ymglp::UtilFcn::getClosestIndexOfPath(bgp_goal_, ymggp_plan);
+		setValidGoal(ymggp_plan, goal_closest_index);
 		return true;
 	}
 
@@ -603,11 +617,11 @@ void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 		const geometry_msgs::PoseStamped& goal,
 		const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
-	if (ymglp::UtilFcn::calcDist(start, goal) < goal_tolerance_) {
-		// ROS_INFO("[YmgGPBGP] robot status : goal_reached");
-		robot_status_ = GOAL_REACHED;
-		return;
-	}
+	// if (ymglp::UtilFcn::calcDist(start, goal) < goal_tolerance_) {
+	// 	// ROS_INFO("[YmgGPBGP] robot status : goal_reached");
+	// 	robot_status_ = GOAL_REACHED;
+	// 	return;
+	// }
 
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);

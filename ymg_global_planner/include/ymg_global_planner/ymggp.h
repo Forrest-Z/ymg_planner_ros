@@ -19,7 +19,7 @@ class YmgGP {
 
 	public:
 		YmgGP() : initialized_(false){};
-		void initialize(std::string global_frame, double path_granularity);
+		void initialize(std::string global_frame, double path_granularity = 0.05);
 		void clearPlan();
 		bool makePlan(const geometry_msgs::PoseStamped& start, 
 				const geometry_msgs::PoseStamped& goal, std::vector<geometry_msgs::PoseStamped>& plan);

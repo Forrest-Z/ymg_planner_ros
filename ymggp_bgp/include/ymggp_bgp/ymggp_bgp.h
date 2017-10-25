@@ -194,8 +194,10 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 				const std::vector<geometry_msgs::PoseStamped>& plan);
 
 		bool use_bgp_, use_ymggp_force_, clear_plan_when_goal_reached_;
-		bool setBGPGoal(const std::vector<geometry_msgs::PoseStamped>& plan);
-		bool updateBGPGoal(const geometry_msgs::PoseStamped robot_pos, const std::vector<geometry_msgs::PoseStamped>& plan);
+		bool setBGPGoal(const geometry_msgs::PoseStamped robot_pos,
+				const std::vector<geometry_msgs::PoseStamped>& ymggp_plan);
+		bool updateBGPGoal(const geometry_msgs::PoseStamped robot_pos,
+				const std::vector<geometry_msgs::PoseStamped>& ymggp_plan);
 		bool setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan, int start_index = 0);
 		bool setBGPFlag(bool flag);
 		void addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan);
