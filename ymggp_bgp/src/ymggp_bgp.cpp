@@ -152,6 +152,10 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
 		bgp_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("bgp_goal", 1);
 
+		reset_flag_sub_ = private_nh.subscribe("reset_flag", 100, &YmgGPBGP::resetFlagCallback, this);
+		use_ymggp_force_sub_ = private_nh.subscribe("use_ymggp_force", 100, &YmgGPBGP::useYmggpForceCallback, this);
+		movebase_status_sub_ = private_nh.subscribe("/move_base/status", 100, &YmgGPBGP::movebaseStatusCallback, this);
+
 	}
 	else {
 		ROS_WARN("This planner has already been initialized, you can't call it twice, doing nothing");
