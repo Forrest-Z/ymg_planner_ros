@@ -145,7 +145,7 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 		setBGPFlag(false);
 		ymg_global_planner_.initialize(frame_id, path_granularity_);
 		odom_helper_.setOdomTopic("odom");
-		robot_status_ = goal_reached;
+		robot_status_ = GOAL_REACHED;
 		stop_time_ = ros::Time::now();
 
 		bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("bgp_plan", 1);
@@ -261,7 +261,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
-	else if (robot_status_ == stopped
+	else if (robot_status_ == STOPPED
 			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
 			&& setBGPFlag(true)) {
 		ROS_INFO("[YmgGPBLP] Changes planner to BGP.");
@@ -605,7 +605,7 @@ void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 {/*{{{*/
 	if (ymglp::UtilFcn::calcDist(start, goal) < goal_tolerance_) {
 		// ROS_INFO("[YmgGPBGP] robot status : goal_reached");
-		robot_status_ = goal_reached;
+		robot_status_ = GOAL_REACHED;
 		return;
 	}
 
@@ -627,18 +627,18 @@ void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
 
 	if (v_is_zero && omega_is_zero) {
 		// ROS_INFO("[YmgGPBGP] robot status : stopped");
-		if (robot_status_ != stopped) {
+		if (robot_status_ != STOPPED) {
 			stop_time_ = ros::Time::now();
 		}
-		robot_status_ = stopped;
+		robot_status_ = STOPPED;
 	}
 	else {
 		// ROS_INFO("[YmgGPBGP] robot status : moving");
-		robot_status_ = moving;
+		robot_status_ = MOVING;
 	}
 
 	// ROS_INFO("[YmgGPBGP] robot status : %d", robot_status_);
-	if (robot_status_ == stopped) {
+	if (robot_status_ == STOPPED) {
 		ROS_INFO("[YmgGPBGP] robot stopped.");
 	}
 
@@ -706,7 +706,7 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
-	robot_status_ = stopped;
+	robot_status_ = STOPPED;
 	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 
@@ -729,6 +729,8 @@ void YmgGPBGP::useYmggpForceCallback (const std_msgs::Int32& msg)
 		
 void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg)
 {/*{{{*/
+	static bool cleared = 0;
+
 	if (msg->status_list.empty())
 		return;
 
@@ -736,9 +738,16 @@ void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::Co
 
 	if (clear_plan_when_goal_reached_
 			&& status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
-		ymg_global_planner_.clearPlan();
-		use_bgp_ = false;
-		ROS_INFO("[YmgGPBGP] Goal reached. Cleared plan.");
+		if (!cleared) {
+			cleared = true;
+			use_bgp_ = false;
+			robot_status_ = GOAL_REACHED;
+			ymg_global_planner_.clearPlan();
+			ROS_INFO("[YmgGPBGP] Goal reached. Cleared plan.");
+		}
+	}
+	else {
+		cleared = false;
 	}
 }/*}}}*/
 

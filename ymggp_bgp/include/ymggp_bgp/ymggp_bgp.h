@@ -186,7 +186,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		double path_granularity_, bgp_goal_dist_, recovery_dist_;
 		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
-		enum RobotStatus {moving, stopped, goal_reached};
+		enum RobotStatus {MOVING, STOPPED, GOAL_REACHED};
 		RobotStatus robot_status_;
 		ros::Time stop_time_;
 		void updateRobotStatus(const geometry_msgs::PoseStamped& start,
