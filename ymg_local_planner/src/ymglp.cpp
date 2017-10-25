@@ -273,14 +273,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 		else {
-			if (1) {
-				ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
-				ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
-			}
-			else {
-				ymg_s_planner_.initialize(&limits, pos, vel, vsamples_);
-				ymg_s_planner_.findBestTrajectory(result_traj_, &all_explored);
-			}
+			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
+			ymg_sampling_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 	}
 	else {

@@ -703,6 +703,7 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
 	robot_status_ = stopped;
+	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 
 void YmgGPBGP::useYmggpForceCallback (const std_msgs::Int32& msg)
@@ -733,7 +734,7 @@ void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::Co
 			&& status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
 		ymg_global_planner_.clearPlan();
 		use_bgp_ = false;
-		// ROS_INFO_NAMED("YmgGPHyb", "Goal reached. Cleared plan.");
+		ROS_INFO("[YmgGPBGP] Goal reached. Cleared plan.");
 	}
 }/*}}}*/
 
