@@ -130,18 +130,6 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 		initialized_ = true;
 
 
-		// private_nh.param("path_granularity", path_granularity_, 0.05);
-		// private_nh.param("stuck_timeout", stuck_timeout_, 10.0);
-		// private_nh.param("bgp_goal_dist", bgp_goal_dist_, 5.0);
-		// private_nh.param("bgp_goal_max_cost", bgp_goal_max_cost_, 50);
-		// private_nh.param("recovery_dist", recovery_dist_, 2.0);
-    //
-		// private_nh.param("stuck_vel", stuck_vel_, 0.05);
-		// private_nh.param("stuck_rot_vel", stuck_rot_vel_, -1.0);
-		// private_nh.param("goal_tolerance", goal_tolerance_, 0.3);
-    //
-		// private_nh.param("clear_plan_when_goal_reached", clear_plan_when_goal_reached_, true);
-
 		setBGPFlag(false);
 		ymg_global_planner_.initialize(frame_id);
 		odom_helper_.setOdomTopic("odom");
@@ -247,7 +235,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
 
-	updateRobotStatus(start, goal, plan);
+	updateRobotStatus();
 
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
@@ -613,15 +601,8 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 	return false;
 }/*}}}*/
 
-void YmgGPBGP::updateRobotStatus(const geometry_msgs::PoseStamped& start,
-		const geometry_msgs::PoseStamped& goal,
-		const std::vector<geometry_msgs::PoseStamped>& plan)
+void YmgGPBGP::updateRobotStatus()
 {/*{{{*/
-	// if (ymglp::UtilFcn::calcDist(start, goal) < goal_tolerance_) {
-	// 	// ROS_INFO("[YmgGPBGP] robot status : goal_reached");
-	// 	robot_status_ = GOAL_REACHED;
-	// 	return;
-	// }
 
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);

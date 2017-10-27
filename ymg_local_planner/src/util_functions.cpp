@@ -13,6 +13,11 @@ UtilFcn::UtilFcn()
 
 void UtilFcn::setPlan(const std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
+	if (plan.empty()) {
+		ROS_WARN("[UtilFcn] set plan is empty!");
+		return;
+	}
+
 	plan_ = plan;
 	resetFlag();
 }/*}}}*/
@@ -46,7 +51,7 @@ void UtilFcn::setSearchDist(double max_dist)
 
 	double now_dist;
 	search_index_bgn_ = 0;
-	search_index_end_ = 0;
+	search_index_end_ = plan_.size()-1;
 	for (int i=getNearestIndex()+1; i<plan_.size(); ++i) {
 		now_dist = calcSqDist(pose_, plan_[i]);
 
@@ -60,9 +65,6 @@ void UtilFcn::setSearchDist(double max_dist)
 		}
 	}
 
-	if (search_index_end_ < search_index_bgn_) {
-		search_index_bgn_ = search_index_end_;
-	}
 }/*}}}*/
 
 void UtilFcn::setLocalGoalDist(double local_goal_dist)

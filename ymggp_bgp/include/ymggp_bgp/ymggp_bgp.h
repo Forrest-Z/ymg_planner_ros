@@ -189,9 +189,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		enum RobotStatus {MOVING, STOPPED, GOAL_REACHED};
 		RobotStatus robot_status_;
 		ros::Time stop_time_;
-		void updateRobotStatus(const geometry_msgs::PoseStamped& start,
-				const geometry_msgs::PoseStamped& goal,
-				const std::vector<geometry_msgs::PoseStamped>& plan);
+		void updateRobotStatus();
 
 		bool use_bgp_, use_ymggp_force_, clear_plan_when_goal_reached_;
 		bool setBGPGoal(const geometry_msgs::PoseStamped robot_pos,
