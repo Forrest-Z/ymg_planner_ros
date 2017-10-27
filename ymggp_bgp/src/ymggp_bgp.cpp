@@ -752,9 +752,9 @@ void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::Co
 			ymg_global_planner_.clearPlan();
 			ROS_INFO("[YmgGPBGP] Goal reached. Cleared plan.");
 		}
-		else {
-			cleared = false;
-		}
+	}
+	else {
+		cleared = false;
 	}
 }/*}}}*/
 
