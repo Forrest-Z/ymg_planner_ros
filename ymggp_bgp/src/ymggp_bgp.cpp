@@ -603,6 +603,7 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 
 void YmgGPBGP::updateRobotStatus()
 {/*{{{*/
+	static RobotStatus robot_status_past = robot_status_;
 
 	tf::Stamped<tf::Pose> robot_vel;
 	odom_helper_.getRobotVel(robot_vel);
@@ -633,9 +634,20 @@ void YmgGPBGP::updateRobotStatus()
 	}
 
 	// ROS_INFO("[YmgGPBGP] robot status : %d", robot_status_);
-	if (robot_status_ == STOPPED) {
-		ROS_INFO("[YmgGPBGP] robot stopped.");
+	if (robot_status_ != robot_status_past) {
+		switch (robot_status_) {
+			case MOVING:
+				ROS_INFO("[YmgGPBGP] robot status MOVING.");
+				break;
+			case STOPPED:
+				ROS_INFO("[YmgGPBGP] robot status STOPPED.");
+				break;
+			case GOAL_REACHED:
+				ROS_INFO("[YmgGPBGP] robot status GOAL_REACHED.");
+				break;
+		}
 	}
+	robot_status_past = robot_status_;
 
 }/*}}}*/
 
