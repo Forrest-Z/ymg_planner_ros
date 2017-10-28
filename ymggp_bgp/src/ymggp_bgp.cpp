@@ -233,7 +233,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
-		ROS_INFO("[YmgGPBLP] Changes planner to ymggp.");
+		ROS_INFO("[YmgGPBGP] Changes planner to ymggp.");
 		setBGPFlag(false);
 	}
 
@@ -246,7 +246,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	}
 	else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()
 			&& setBGPFlag(true)) {
-		ROS_INFO("[YmgGPBLP] Changes planner to BGP.");
+		ROS_INFO("[YmgGPBGP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
 		setBGPGoal(start, plan);
 		makeBGPPlan(start, bgp_goal_, tolerance, plan);

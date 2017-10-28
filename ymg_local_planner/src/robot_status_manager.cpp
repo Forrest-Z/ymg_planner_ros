@@ -34,9 +34,11 @@ void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 			stopped_time_ = ros::Time::now();
 			is_robot_moving_ = false;
 		}
+		ROS_INFO("robot_stiooooooooo");
 	}
 	else {
 		is_robot_moving_ = true;
+		ROS_INFO("robot_mooooooooooooooov");
 	}
 
 	std::string robot_status = getRobotStatusString();
