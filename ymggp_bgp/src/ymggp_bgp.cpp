@@ -233,9 +233,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 
 	robot_status_manager_.updateRobotStatus();
 
-	ROS_INFO("recovery dist = %f", recovery_dist_);
-	ROS_INFO("dist = %f", ymglp::UtilFcn::calcDist(start, bgp_goal_));
-
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
 		ROS_INFO("[YmgGPBLP] Changes planner to ymggp.");

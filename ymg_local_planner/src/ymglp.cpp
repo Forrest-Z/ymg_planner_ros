@@ -94,7 +94,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	obstacle_costs_(planner_util->getCostmap()),
 	path_costs_(planner_util->getCostmap(), false),
 	goal_costs_(planner_util->getCostmap(), true),
-	ymg_sampling_planner_(&path_costs_, &obstacle_costs_, &utilfcn_),
+	ymg_sampling_planner_(&obstacle_costs_, &utilfcn_),
 	ymg_s_planner_(&path_costs_, &obstacle_costs_, &utilfcn_),
 	direction_adjust_planner_(&obstacle_costs_, &utilfcn_)
 {

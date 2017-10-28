@@ -18,10 +18,8 @@ class YmgSamplingPlanner {
 
 	public:
 
-		~YmgSamplingPlanner() {}
 		YmgSamplingPlanner() {}
 		YmgSamplingPlanner(
-				base_local_planner::MapGridCostFunctionKai* path_critic,
 				base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
 				UtilFcn* utilfcn);
 
@@ -60,7 +58,6 @@ class YmgSamplingPlanner {
 		Eigen::Vector3f pos_, vel_, vsamples_;
 		Eigen::Vector3f max_vel_, min_vel_;
 
-		base_local_planner::MapGridCostFunctionKai* path_critic_;
 		UtilFcn* utilfcn_;
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic_;
 

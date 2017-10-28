@@ -6,10 +6,12 @@
 namespace ymglp {
 
 YmgSamplingPlanner::YmgSamplingPlanner(
+		base_local_planner::MapGridCostFunctionKai* path_critic,
 		base_local_planner::ObstacleCostFunctionKai* obstacle_critic,
 		UtilFcn* utilfcn)
 	: is_param_set_(false), reverse_order_(false)
 {/*{{{*/
+	path_critic_ = path_critic;
 	utilfcn_ = utilfcn;
 	obstacle_critic_ = obstacle_critic;
 }/*}}}*/
@@ -78,6 +80,10 @@ bool YmgSamplingPlanner::findBestTrajectory(
 		return false;
 	}
 
+	if (path_critic_->prepare() == false) {
+		ROS_WARN("Pdist scoring function failed to prepare");
+		return false;
+	}
 	if (obstacle_critic_->prepare() == false) {
 		ROS_WARN("Obstacle scoring function failed to prepare");
 		return false;
