@@ -135,6 +135,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 
 	use_dwa_ = false;
 	backup_latch_ = false;
+	stuck_timeout_ = -1.0;
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 }/*}}}*/
