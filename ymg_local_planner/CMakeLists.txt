@@ -37,6 +37,14 @@ include_directories(
 )
 
 
+add_library(ymglp_utils
+	src/util_functions.cpp
+	src/robot_status_manager.cpp
+	)
+target_link_libraries(ymglp_utils
+	${catkin_LIBRARIES}
+	)
+
 add_library(ymglp
 	src/ymglp.cpp
 	src/ymglp_ros.cpp
@@ -47,12 +55,11 @@ add_library(ymglp
 	src/ymg_sampling_planner.cpp
 	src/ymg_s_planner.cpp
 	src/direction_adjust_planner.cpp
-	src/util_functions.cpp
-	src/robot_status_manager.cpp
 	)
 add_dependencies(ymglp
 	ymg_local_planner_gencfg
 	)
 target_link_libraries(ymglp
+	ymglp_utils
 	${catkin_LIBRARIES}
 	)
