@@ -11,8 +11,8 @@ YmgLPROS:
   # stuck params
   trans_stopped_vel: 0.1
   rot_stopped_vel: 0.2
-  stuck_timeout: 5
-  backup_vel: -1.0
+  stuck_timeout: 10
+  backup_vel: -0.1
   backup_time: 10.0
 
   # scaling robot's footprint
