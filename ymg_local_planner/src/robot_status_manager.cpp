@@ -34,21 +34,19 @@ void RobotStatusManager::updateRobotStatus()
 	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
 
 	if (v_is_zero && omega_is_zero) {
-		// ROS_INFO("[YmgGPBGP] robot status : stopped");
 		if (robot_status_ != STOPPED) {
 			stop_time_ = ros::Time::now();
 		}
 		robot_status_ = STOPPED;
 	}
 	else {
-		// ROS_INFO("[YmgGPBGP] robot status : moving");
 		robot_status_ = MOVING;
 	}
 
-	// ROS_INFO("[YmgGPBGP] robot status : %d", robot_status_);
 	if (robot_status_ != robot_status_past) {
-		ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
+		// ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
 	}
+		ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
 	robot_status_past = robot_status_;
 
 }/*}}}*/
