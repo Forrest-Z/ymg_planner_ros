@@ -36,6 +36,8 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	stuck_timeout_ = config.stuck_timeout;
 	backup_time_ = config.backup_time;
 
+	robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
+
 
 	utilfcn_.setScoringPointOffsetX(config.scoring_point_offset_x);
 
