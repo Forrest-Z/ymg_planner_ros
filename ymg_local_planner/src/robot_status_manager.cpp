@@ -26,19 +26,17 @@ void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 		omega_is_zero = true;
 	}
 
-	// ROS_INFO("stack_rot_vel - robot_w = %f - %f", stuck_rot_vel_, fabs(robot_w));
-	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
+	ROS_INFO("stack_rot_vel - robot_w = %f - %f", rot_stopped_vel_, fabs(robot_w));
+	ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
 
 	if (v_is_zero && omega_is_zero) {
 		if (is_robot_moving_) {
 			stopped_time_ = ros::Time::now();
 			is_robot_moving_ = false;
 		}
-		ROS_INFO("robot_stiooooooooo");
 	}
 	else {
 		is_robot_moving_ = true;
-		ROS_INFO("robot_mooooooooooooooov");
 	}
 
 	std::string robot_status = getRobotStatusString();
