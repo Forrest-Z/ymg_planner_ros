@@ -30,15 +30,12 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	ymg_sampling_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
 			config.path_tolerance, config.obstacle_tolerance);
-	ymg_s_planner_.setParameters(
+	simple_backup_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
-			config.path_tolerance, config.obstacle_tolerance);
+			config.obstacle_tolerance, config.backup_vel);
+	stuck_timeout_ = config.stuck_timeout;
+	backup_time_ = config.backup_time;
 
-	direction_adjust_planner_.setParameters(
-			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
-			config.path_tolerance, config.obstacle_tolerance);
-	direction_adjust_planner_.setTolerance(config.path_tolerance, config.direction_tolerance,
-			config.yaw_goal_tolerance, config.obstacle_tolerance);
 
 	utilfcn_.setScoringPointOffsetX(config.scoring_point_offset_x);
 
@@ -95,8 +92,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	path_costs_(planner_util->getCostmap(), false),
 	goal_costs_(planner_util->getCostmap(), true),
 	ymg_sampling_planner_(&obstacle_costs_, &utilfcn_),
-	ymg_s_planner_(&path_costs_, &obstacle_costs_, &utilfcn_),
-	direction_adjust_planner_(&obstacle_costs_, &utilfcn_)
+	simple_backup_planner_(&obstacle_costs_)
 {
 	ros::NodeHandle private_nh("~/" + name);
 
@@ -144,7 +140,6 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 
 bool YmgLP::setPlan (const std::vector<geometry_msgs::PoseStamped>& orig_global_plan)
 {/*{{{*/
-	direction_adjust_planner_.resetRotateDirection();
 	return planner_util_->setPlan(orig_global_plan);
 }/*}}}*/
 
@@ -269,8 +264,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 		if (0) {
 			// if (direction_adjust_planner_.haveToHandle()) {
 			// ROS_INFO("direction_adjust_planner running.");
-			direction_adjust_planner_.initialize(&limits, pos, vel, vsamples_);
-			direction_adjust_planner_.findBestTrajectory(result_traj_, &all_explored);
+			simple_backup_planner_.initialize(&limits, pos, vel);
+			simple_backup_planner_.findBestTrajectory(result_traj_, &all_explored);
 		}
 		else {
 			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);

@@ -231,8 +231,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
 
-	robot_status_manager_.updateRobotStatus();
-
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
 		ROS_INFO("[YmgGPBLP] Changes planner to ymggp.");
@@ -658,7 +656,7 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
-	robot_status_manager_.setRobotStatus(ymglp::RobotStatusManager::GOAL_REACHED);
+	robot_status_manager_.clearStoppedTime();
 	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 

@@ -21,7 +21,9 @@
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
+#include <ymg_local_planner/robot_status_manager.h>
 #include <ymg_local_planner/ymg_sampling_planner.h>
+#include <ymg_local_planner/simple_backup_planner.h>
 #include <ymg_local_planner/ymg_s_planner.h>
 #include <ymg_local_planner/direction_adjust_planner.h>
 #include <ymg_local_planner/util_functions.h>
@@ -137,11 +139,13 @@ class YmgLP {
 				base_local_planner::MapGridCostFunctionKai goal_costs_;
 				UtilFcn utilfcn_;
 
+				double stuck_timeout_, backup_time_;
+				RobotStatusManager robot_status_manager_;
+
 				bool use_dwa_, reverse_mode_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
 				YmgSamplingPlanner ymg_sampling_planner_;
-				YmgSPlanner ymg_s_planner_;
-				DirAdjustPlanner direction_adjust_planner_;
+				SimpleBackupPlanner simple_backup_planner_;
 
 				double local_goal_distance_;
 				ros::Publisher local_goal_pub_;

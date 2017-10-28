@@ -8,6 +8,11 @@ YmgLPROS:
   acc_lim_x: 0.3
   acc_lim_theta: 0.3
 
+  # stuck params
+  stuck_timeout: 20
+  backup_vel: -1.0
+  backup_time: 10.0
+
   # scaling robot's footprint
   scaling_speed: 0.4
   max_scaling_factor: 2.0

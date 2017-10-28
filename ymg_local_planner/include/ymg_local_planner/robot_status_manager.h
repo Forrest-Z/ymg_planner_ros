@@ -11,21 +11,21 @@ class RobotStatusManager {
 
 	public:
 		RobotStatusManager();
-		enum RobotStatus {MOVING, STOPPED, GOAL_REACHED};
 		void setStoppedVel(double trans_stopped_vel, double rot_stopped_vel);
-		void setRobotStatus(RobotStatus status);
-		void updateRobotStatus();
+		void clearStoppedTime();
 		ros::Duration getTimeWhileStopped();
+		std::string getRobotStatusString();
 
 	private:
 		double trans_stopped_vel_, rot_stopped_vel_;
-		ros::Time stop_time_;
-		RobotStatus robot_status_;
-		base_local_planner::OdometryHelperRos odom_helper_;
-		std::string robotStatusToString(RobotStatus status);
+		ros::Time stopped_time_;
+		bool is_goal_reached_, is_robot_moving_;
 
-		ros::Subscriber movebase_status_sub_;
+		void updateRobotStatus(double robot_v, double robot_w);
+
+		ros::Subscriber movebase_status_sub_, cmd_vel_sub_;
 		void movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+		void cmdVelCallback (const geometry_msgs::Twist& msg);
 
 };   // class RobotStatusManager
 

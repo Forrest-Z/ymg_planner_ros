@@ -6,21 +6,17 @@ RobotStatusManager::RobotStatusManager()
 : /*{{{*/
 	trans_stopped_vel_(-1.0), rot_stopped_vel_(-1.0)
 {
-	odom_helper_.setOdomTopic("odom");
-	robot_status_ = GOAL_REACHED;
+	is_goal_reached_ = true;
+	is_robot_moving_ = false;
 
 	ros::NodeHandle nh;
 	movebase_status_sub_ = nh.subscribe("/move_base/status", 100, &RobotStatusManager::movebaseStatusCallback, this);
+	cmd_vel_sub_ = nh.subscribe("/cmd_vel", 100, &RobotStatusManager::cmdVelCallback, this);
 }/*}}}*/
 
-void RobotStatusManager::updateRobotStatus()
+void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 {/*{{{*/
-	static RobotStatus robot_status_past = robot_status_;
-
-	tf::Stamped<tf::Pose> robot_vel;
-	odom_helper_.getRobotVel(robot_vel);
-	double robot_v = robot_vel.getOrigin().getX();
-	double robot_w = tf::getYaw(robot_vel.getRotation());
+	static std::string robot_status_past = getRobotStatusString();
 
 	bool v_is_zero = false, omega_is_zero = false;
 	if (fabs(robot_v) < trans_stopped_vel_) {
@@ -34,19 +30,20 @@ void RobotStatusManager::updateRobotStatus()
 	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
 
 	if (v_is_zero && omega_is_zero) {
-		if (robot_status_ != STOPPED) {
-			stop_time_ = ros::Time::now();
+		if (is_robot_moving_) {
+			stopped_time_ = ros::Time::now();
+			is_robot_moving_ = false;
 		}
-		robot_status_ = STOPPED;
 	}
 	else {
-		robot_status_ = MOVING;
+		is_robot_moving_ = true;
 	}
 
-	if (robot_status_ != robot_status_past) {
-		ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
+	std::string robot_status = getRobotStatusString();
+	if (robot_status != robot_status_past) {
+		ROS_INFO("[RSM] robot status %s.", robot_status.c_str());
 	}
-	robot_status_past = robot_status_;
+	robot_status_past = robot_status;
 
 }/*}}}*/
 
@@ -56,46 +53,57 @@ void RobotStatusManager::setStoppedVel(double trans_stopped_vel, double rot_stop
 	rot_stopped_vel_ = rot_stopped_vel;
 }/*}}}*/
 
-void RobotStatusManager::setRobotStatus(RobotStatus status)
+void RobotStatusManager::clearStoppedTime()
 {/*{{{*/
-	robot_status_ = status;
+	stopped_time_ = ros::Time::now();
 }/*}}}*/
 
 ros::Duration RobotStatusManager::getTimeWhileStopped()
 {/*{{{*/
-	if (robot_status_ != STOPPED) {
+	if (is_goal_reached_) {
 		return ros::Duration(0.0);
 	}
 
-	return ros::Time::now() - stop_time_;
+	return ros::Time::now() - stopped_time_;
 }/*}}}*/
 
-std::string RobotStatusManager::robotStatusToString(RobotStatus status)
+std::string RobotStatusManager::getRobotStatusString()
 {/*{{{*/
-	switch (status) {
-		case MOVING:
-			return "MOVING";
-		case STOPPED:
-			return "STOPPED";
-		case GOAL_REACHED:
-			return "GOAL_REACHED";
+	std::string ans;
+	if (is_goal_reached_) {
+		ans = "goal_reached";
+	}
+	else if (is_robot_moving_) {
+		ans = "moving";
+	}
+	else {
+		ans = "stopped";
 	}
 
-	return "Cannot convert to string.";
+	return ans;
 }/*}}}*/
 
 void RobotStatusManager::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::ConstPtr& msg)
 {/*{{{*/
-	static bool cleared = 0;
-
 	if (msg->status_list.empty())
 		return;
 
 	actionlib_msgs::GoalStatus status = msg->status_list[0];
 
 	if (status.status == actionlib_msgs::GoalStatus::SUCCEEDED) {
-		robot_status_ = GOAL_REACHED;
+		is_goal_reached_ = true;
 	}
+	else {
+		if (is_goal_reached_) {
+			stopped_time_ = ros::Time::now();
+			is_goal_reached_ = false;
+		}
+	}
+}/*}}}*/
+
+void RobotStatusManager::cmdVelCallback (const geometry_msgs::Twist& msg)
+{/*{{{*/
+	updateRobotStatus(msg.linear.x, msg.angular.z);
 }/*}}}*/
 
 }// namespace ymglp

@@ -55,6 +55,7 @@ add_library(ymglp
 	src/ymg_sampling_planner.cpp
 	src/ymg_s_planner.cpp
 	src/direction_adjust_planner.cpp
+	src/simple_backup_planner.cpp
 	)
 add_dependencies(ymglp
 	ymg_local_planner_gencfg
