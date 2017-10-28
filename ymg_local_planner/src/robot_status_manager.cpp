@@ -60,7 +60,7 @@ void RobotStatusManager::clearStoppedTime()
 
 ros::Duration RobotStatusManager::getTimeWhileStopped()
 {/*{{{*/
-	if (is_goal_reached_) {
+	if (is_goal_reached_ || is_robot_moving_) {
 		return ros::Duration(0.0);
 	}
 
