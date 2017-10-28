@@ -14,8 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
 	base_local_planner
-  ymg_global_planner
   ymg_local_planner
+  ymg_global_planner
 )
 
 generate_dynamic_reconfigure_options(
@@ -41,5 +41,6 @@ add_dependencies(ymggp_bgp
 	ymggp_bgp_gencfg
 	)
 target_link_libraries(ymggp_bgp
+	ymggp
 	${catkin_LIBRARIES}
 	)
