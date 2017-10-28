@@ -16,20 +16,17 @@ RobotStatusManager::RobotStatusManager()
 
 void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 {/*{{{*/
-	static std::string robot_status_past = getRobotStatusString();
-
 	bool v_is_zero = false, omega_is_zero = false;
 	if (fabs(robot_v) < trans_stopped_vel_) {
 		v_is_zero = true;
-		ROS_INFO("vvvvvvvvvvvvvvviszero");
 	}
 	if (fabs(robot_w) < rot_stopped_vel_ || rot_stopped_vel_ < 0.0) {
 		omega_is_zero = true;
 	}
 
-	ROS_INFO("trans_stopped_vel - robot_v = %f - %f", trans_stopped_vel_, fabs(robot_v));
-	ROS_INFO("rot_stopped_vel - robot_w = %f - %f", rot_stopped_vel_, fabs(robot_w));
-	ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
+	// ROS_INFO("trans_stopped_vel - robot_v = %f - %f", trans_stopped_vel_, fabs(robot_v));
+	// ROS_INFO("rot_stopped_vel - robot_w = %f - %f", rot_stopped_vel_, fabs(robot_w));
+	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
 
 	if (v_is_zero && omega_is_zero) {
 		if (is_robot_moving_) {
@@ -41,11 +38,12 @@ void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 		is_robot_moving_ = true;
 	}
 
-	std::string robot_status = getRobotStatusString();
-	if (robot_status != robot_status_past) {
-		ROS_INFO("[RSM] robot status %s.", robot_status.c_str());
-	}
-	robot_status_past = robot_status;
+	// static std::string robot_status_past = getRobotStatusString();
+	// std::string robot_status = getRobotStatusString();
+	// if (robot_status != robot_status_past) {
+	// 	ROS_INFO("[RSM] robot status %s.", robot_status.c_str());
+	// }
+	// robot_status_past = robot_status;
 
 }/*}}}*/
 

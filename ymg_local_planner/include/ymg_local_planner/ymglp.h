@@ -139,6 +139,8 @@ class YmgLP {
 				base_local_planner::MapGridCostFunctionKai goal_costs_;
 				UtilFcn utilfcn_;
 
+				ros::Time backup_start_time_;
+				bool backup_latch_;
 				double stuck_timeout_, backup_time_;
 				RobotStatusManager robot_status_manager_;
 

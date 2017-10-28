@@ -9,6 +9,8 @@ YmgLPROS:
   acc_lim_theta: 0.3
 
   # stuck params
+  trans_stopped_vel: 0.05
+  rot_stopped_vel: 0.1
   stuck_timeout: 20
   backup_vel: -1.0
   backup_time: 10.0

@@ -134,6 +134,7 @@ YmgLP::YmgLP (std::string name, base_local_planner::LocalPlannerUtil *planner_ut
 	generator_list.push_back(&generator_);
 
 	use_dwa_ = false;
+	backup_latch_ = false;
 	scored_sampling_planner_ = base_local_planner::SimpleScoredSamplingPlannerKai(generator_list, critics);
 	local_goal_pub_ = private_nh.advertise<geometry_msgs::PointStamped>("local_goal", 1);
 }/*}}}*/
@@ -260,12 +261,22 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 
+	if (backup_latch_ && 0.0 < stuck_timeout_
+			&& ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()) {
+		backup_latch_ = true;
+		backup_start_time_ = ros::Time::now();
+		ROS_INFO("[ymglp] Robot stopped while %f sec. Try backup.", stuck_timeout_);
+	}
+
 	if (!use_dwa_) {
-		if (0) {
-			// if (direction_adjust_planner_.haveToHandle()) {
-			// ROS_INFO("direction_adjust_planner running.");
+		if (backup_latch_) {
 			simple_backup_planner_.initialize(&limits, pos, vel);
 			simple_backup_planner_.findBestTrajectory(result_traj_, &all_explored);
+
+			if (ros::Duration(backup_time_) < ros::Time::now() - backup_start_time_) {
+				backup_latch_ = false;
+				ROS_INFO("[ymglp] Backup end.");
+			}
 		}
 		else {
 			ymg_sampling_planner_.initialize(&limits, pos, vel, vsamples_);
