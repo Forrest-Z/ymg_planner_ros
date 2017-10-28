@@ -14,8 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
 	base_local_planner
-  ymg_local_planner
   ymg_global_planner
+  ymg_local_planner
 )
 
 generate_dynamic_reconfigure_options(
