@@ -55,4 +55,3 @@ add_dependencies(ymglp
 target_link_libraries(ymglp
 	${catkin_LIBRARIES}
 	)
-

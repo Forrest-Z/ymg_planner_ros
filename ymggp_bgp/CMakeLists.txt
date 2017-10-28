@@ -10,12 +10,12 @@ find_package(catkin REQUIRED COMPONENTS
   nav_core
   nav_msgs
   navfn
-  pluginlib
-  roscpp
-  tf
 	base_local_planner
   ymg_local_planner
   ymg_global_planner
+  pluginlib
+  roscpp
+  tf
 )
 
 generate_dynamic_reconfigure_options(
@@ -41,6 +41,6 @@ add_dependencies(ymggp_bgp
 	ymggp_bgp_gencfg
 	)
 target_link_libraries(ymggp_bgp
-	ymggp
+	# ymggp
 	${catkin_LIBRARIES}
 	)
