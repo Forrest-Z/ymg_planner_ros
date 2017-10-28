@@ -43,6 +43,25 @@ note: 回転角加速度の上限が小さく制御周期が早い場合，探�
 探索範囲: now_velocity_theta ± acc_lim_theta / controller_frequency
 
 
+~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.05)  
+Below what maximum velocity we consider the robot to be stopped in translation  
+ロボットの並進速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
+
+~/YmgLPROS/rot_stopped_vel (double[rad/s], default: 0.2)  
+Below what maximum rotation velocity we consider the robot to be stopped in rotation  
+ロボットの回転角速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
+
+~/YmgLPROS/stuck_timeout (double[sec], default: 20.0)  
+ロボットの速度ががtrans, rot_stopped_vel以下となっている時間がこの時間以上となった時，バックによるリカバリを試みる．
+マイナスにセットすると，このプランナーはバックによるリカバリを試みない．
+
+~/YmgLPROS/backup_vel (double[m/s], default: -0.1)  
+バックでのリカバリの際のロボットの並進速度．バックを試みる際は回転角速度は0.0にセットされる．
+
+~/YmgLPROS/backup_time (double[sec], default: 10.0)  
+何秒間バックでのリカバリを行うか．
+
+
 
 ~/YmgLPROS/xy_goal_tolerance (double[m], default: 0.1)  
 Within what maximum distance we consider the robot to be in goal  
@@ -53,14 +72,6 @@ Within what maximum angle difference we consider the robot to face goal directio
 ゴール到達判定時のyaw方向のズレの許容範囲．
 
 
-
-~/YmgLPROS/trans_stopped_vel (double[m/s], default: 0.1)  
-Below what maximum velocity we consider the robot to be stopped in translation  
-ロボットの並進速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
-
-~/YmgLPROS/rot_stopped_vel (double[m/s], default: 0.1)  
-Below what maximum rotation velocity we consider the robot to be stopped in rotation  
-ロボットの回転角速度の絶対値がこの値以下の場合にロボットが止まっているとみなす．
 
 
 

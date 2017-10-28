@@ -11,7 +11,7 @@ YmgGPBGP:
   # ymggp params
   path_granularity: 0.05
   stuck_timeout: 7.0
-  trans_stopped_vel: 0.1
+  trans_stopped_vel: 0.05
   rot_stopped_vel: 0.2
   bgp_goal_dist: 5.0
   bgp_goal_max_cost: 50
