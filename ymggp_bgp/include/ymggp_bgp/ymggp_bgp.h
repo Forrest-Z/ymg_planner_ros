@@ -184,7 +184,7 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		base_local_planner::OdometryHelperRos odom_helper_;
 		int bgp_goal_max_cost_;
 		double path_granularity_, bgp_goal_dist_, recovery_dist_;
-		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
+		double stuck_timeout_, goal_tolerance_;
 
 		bool use_bgp_, use_ymggp_force_, clear_plan_when_goal_reached_;
 		bool setBGPGoal(const geometry_msgs::PoseStamped robot_pos,

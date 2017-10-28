@@ -161,8 +161,7 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	path_granularity_ = config.path_granularity;
 	ymg_global_planner_.setPathGranularity(path_granularity_);
 	stuck_timeout_ = config.stuck_timeout;
-	stuck_vel_ = config.stuck_vel;
-	stuck_rot_vel_ = config.stuck_rot_vel;
+	robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
 	bgp_goal_dist_ = config.bgp_goal_dist;
 	bgp_goal_max_cost_ = config.bgp_goal_max_cost;
 	recovery_dist_ = config.recovery_dist;

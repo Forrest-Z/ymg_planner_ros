@@ -27,7 +27,7 @@ The maximum x velocity for the robot in m/s
 ロボットの並進速度の上限．マイナスにセットすると，バックすることができる．
 min_vel_xは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)
 
-~/YmgLPROS/max_rot_vel (double[rad/s], default: 0.6)  
+~/YmgLPROS/max_vel_theta (double[rad/s], default: 0.6)  
 The absolute value of the maximum rotational velocity for the robot in rad/s  
 ロボットの回転角速度の絶対値の上限.
 min_rot_velは自動的に0.0に設定される．(ymg_local_plannerは障害物手前で停止するように設計されているため．)

@@ -4,7 +4,7 @@ namespace ymglp {
 
 RobotStatusManager::RobotStatusManager()
 : /*{{{*/
-	stuck_vel_(-1.0), stuck_rot_vel_(-1.0)
+	trans_stopped_vel_(-1.0), rot_stopped_vel_(-1.0)
 {
 	odom_helper_.setOdomTopic("odom");
 	robot_status_ = GOAL_REACHED;
@@ -23,10 +23,10 @@ void RobotStatusManager::updateRobotStatus()
 	double robot_w = tf::getYaw(robot_vel.getRotation());
 
 	bool v_is_zero = false, omega_is_zero = false;
-	if (fabs(robot_v) < stuck_vel_) {
+	if (fabs(robot_v) < trans_stopped_vel_) {
 		v_is_zero = true;
 	}
-	if (fabs(robot_w) < stuck_rot_vel_ || stuck_rot_vel_ < 0.0) {
+	if (fabs(robot_w) < rot_stopped_vel_ || rot_stopped_vel_ < 0.0) {
 		omega_is_zero = true;
 	}
 
@@ -44,11 +44,16 @@ void RobotStatusManager::updateRobotStatus()
 	}
 
 	if (robot_status_ != robot_status_past) {
-		// ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
-	}
 		ROS_INFO("[RSM] robot status %s.", robotStatusToString(robot_status_).c_str());
+	}
 	robot_status_past = robot_status_;
 
+}/*}}}*/
+
+void RobotStatusManager::setStoppedVel(double trans_stopped_vel, double rot_stopped_vel)
+{/*{{{*/
+	trans_stopped_vel_ = trans_stopped_vel;
+	rot_stopped_vel_ = rot_stopped_vel;
 }/*}}}*/
 
 void RobotStatusManager::setRobotStatus(RobotStatus status)

@@ -12,12 +12,13 @@ class RobotStatusManager {
 	public:
 		RobotStatusManager();
 		enum RobotStatus {MOVING, STOPPED, GOAL_REACHED};
-		void updateRobotStatus();
+		void setStoppedVel(double trans_stopped_vel, double rot_stopped_vel);
 		void setRobotStatus(RobotStatus status);
+		void updateRobotStatus();
 		ros::Duration getTimeWhileStopped();
 
 	private:
-		double stuck_vel_, stuck_rot_vel_;
+		double trans_stopped_vel_, rot_stopped_vel_;
 		ros::Time stop_time_;
 		RobotStatus robot_status_;
 		base_local_planner::OdometryHelperRos odom_helper_;

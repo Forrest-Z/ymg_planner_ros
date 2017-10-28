@@ -40,7 +40,7 @@ void YmgLPROS::reconfigureCB(YmgLPConfig &config, uint32_t level)
 	}
 	limits.max_vel_y = 0.0;
 	limits.min_vel_y = 0.0;
-	limits.max_rot_vel = config.max_rot_vel;
+	limits.max_rot_vel = config.max_vel_theta;
 	limits.min_rot_vel = 0.0;
 	limits.acc_lim_x = config.acc_lim_x;
 	limits.acc_lim_y = 0.0;
