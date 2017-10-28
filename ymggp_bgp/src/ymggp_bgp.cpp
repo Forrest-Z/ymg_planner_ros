@@ -540,7 +540,7 @@ bool YmgGPBGP::setBGPGoal (const geometry_msgs::PoseStamped robot_pos,
 	// int forward_index = bgp_goal_dist_ / path_granularity_;
 
 	// XXX added but has not tested yet
-	int forward_index = 0;
+	int forward_index = ymggp_plan.size()-1;
 	double dist = ymglp::UtilFcn::calcDist(robot_pos, ymggp_plan[0]);
 	for (int i=1; i<ymggp_plan.size(); ++i) {
 		dist += ymglp::UtilFcn::calcDist(ymggp_plan[i-1], ymggp_plan[i]);
