@@ -17,9 +17,9 @@
 #include <global_planner/traceback.h>
 #include <global_planner/orientation_filter.h>
 #include <ymggp_bgp/YmgGPBGPConfig.h>
-#include <base_local_planner/odometry_helper_ros.h>
 #include <ymg_global_planner/ymggp.h>
 #include <ymg_local_planner/util_functions.h>
+#include <ymg_local_planner/robot_status_manager.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Int32.h>
 #include <actionlib_msgs/GoalStatusArray.h>
@@ -186,11 +186,6 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		double path_granularity_, bgp_goal_dist_, recovery_dist_;
 		double stuck_timeout_, stuck_vel_, stuck_rot_vel_, goal_tolerance_;
 
-		enum RobotStatus {MOVING, STOPPED, GOAL_REACHED};
-		RobotStatus robot_status_;
-		ros::Time stop_time_;
-		void updateRobotStatus();
-
 		bool use_bgp_, use_ymggp_force_, clear_plan_when_goal_reached_;
 		bool setBGPGoal(const geometry_msgs::PoseStamped robot_pos,
 				const std::vector<geometry_msgs::PoseStamped>& ymggp_plan);
@@ -201,6 +196,8 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		void addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan);
 		void publishBGPPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 		void publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& path);
+
+		ymglp::RobotStatusManager robot_status_manager_;
 
 		ros::Publisher ymggp_plan_pub_, bgp_plan_pub_, bgp_goal_pub_;
 		geometry_msgs::PoseStamped bgp_goal_;

@@ -42,5 +42,6 @@ add_dependencies(ymggp_bgp
 	)
 target_link_libraries(ymggp_bgp
 	ymggp
+	ymglp
 	${catkin_LIBRARIES}
 	)

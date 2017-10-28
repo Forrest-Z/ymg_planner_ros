@@ -132,9 +132,6 @@ void YmgGPBGP::initialize(std::string name, costmap_2d::Costmap2D* costmap, std:
 
 		setBGPFlag(false);
 		ymg_global_planner_.initialize(frame_id);
-		odom_helper_.setOdomTopic("odom");
-		robot_status_ = GOAL_REACHED;
-		stop_time_ = ros::Time::now();
 
 		bgp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("bgp_plan", 1);
 		ymggp_plan_pub_ = private_nh.advertise<nav_msgs::Path>("ymggp_plan", 1);
@@ -235,7 +232,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	makeYmggpPlan(start, goal, plan);
 	publishYmggpPlan(plan);
 
-	updateRobotStatus();
+	robot_status_manager_.updateRobotStatus();
 
 	// if the robot is near the BGP goal. changes algorithm to BGP.
 	if (use_bgp_ && ymglp::UtilFcn::calcDist(start, bgp_goal_) < recovery_dist_) {
@@ -250,8 +247,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
-	else if (robot_status_ == STOPPED
-			&& ros::Duration(stuck_timeout_) < ros::Time::now() - stop_time_
+	else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()
 			&& setBGPFlag(true)) {
 		ROS_INFO("[YmgGPBLP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
@@ -601,56 +597,6 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 	return false;
 }/*}}}*/
 
-void YmgGPBGP::updateRobotStatus()
-{/*{{{*/
-	static RobotStatus robot_status_past = robot_status_;
-
-	tf::Stamped<tf::Pose> robot_vel;
-	odom_helper_.getRobotVel(robot_vel);
-	double robot_v = robot_vel.getOrigin().getX();
-	double robot_w = tf::getYaw(robot_vel.getRotation());
-	bool v_is_zero = false, omega_is_zero = false;
-
-	if (fabs(robot_v) < stuck_vel_) {
-		v_is_zero = true;
-	}
-	if (fabs(robot_w) < stuck_rot_vel_ || stuck_rot_vel_ < 0.0) {
-		omega_is_zero = true;
-	}
-
-	// ROS_INFO("stack_rot_vel - robot_w = %f - %f", stuck_rot_vel_, fabs(robot_w));
-	// ROS_INFO("v_zero - omega_zero = %d - %d", v_is_zero, omega_is_zero);
-
-	if (v_is_zero && omega_is_zero) {
-		// ROS_INFO("[YmgGPBGP] robot status : stopped");
-		if (robot_status_ != STOPPED) {
-			stop_time_ = ros::Time::now();
-		}
-		robot_status_ = STOPPED;
-	}
-	else {
-		// ROS_INFO("[YmgGPBGP] robot status : moving");
-		robot_status_ = MOVING;
-	}
-
-	// ROS_INFO("[YmgGPBGP] robot status : %d", robot_status_);
-	if (robot_status_ != robot_status_past) {
-		switch (robot_status_) {
-			case MOVING:
-				ROS_INFO("[YmgGPBGP] robot status MOVING.");
-				break;
-			case STOPPED:
-				ROS_INFO("[YmgGPBGP] robot status STOPPED.");
-				break;
-			case GOAL_REACHED:
-				ROS_INFO("[YmgGPBGP] robot status GOAL_REACHED.");
-				break;
-		}
-	}
-	robot_status_past = robot_status_;
-
-}/*}}}*/
-
 void YmgGPBGP::addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
 	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
@@ -713,7 +659,7 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
-	robot_status_ = GOAL_REACHED;
+	robot_status_manager_.setRobotStatus(ymglp::RobotStatusManager::GOAL_REACHED);
 	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 
@@ -748,7 +694,6 @@ void YmgGPBGP::movebaseStatusCallback (const actionlib_msgs::GoalStatusArray::Co
 		if (!cleared) {
 			cleared = true;
 			use_bgp_ = false;
-			robot_status_ = GOAL_REACHED;
 			ymg_global_planner_.clearPlan();
 			ROS_INFO("[YmgGPBGP] Goal reached. Cleared plan.");
 		}
