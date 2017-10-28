@@ -21,6 +21,7 @@ void RobotStatusManager::updateRobotStatus(double robot_v, double robot_w)
 	bool v_is_zero = false, omega_is_zero = false;
 	if (fabs(robot_v) < trans_stopped_vel_) {
 		v_is_zero = true;
+		ROS_INFO("vvvvvvvvvvvvvvviszero");
 	}
 	if (fabs(robot_w) < rot_stopped_vel_ || rot_stopped_vel_ < 0.0) {
 		omega_is_zero = true;
