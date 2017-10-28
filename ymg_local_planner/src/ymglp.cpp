@@ -262,7 +262,7 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 
-	if (backup_latch_ && 0.0 < stuck_timeout_
+	if (!backup_latch_ && 0.0 < stuck_timeout_
 			&& ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()) {
 		backup_latch_ = true;
 		backup_start_time_ = ros::Time::now();

@@ -263,7 +263,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		msg.point = bgp_goal_.pose.position;
 		bgp_goal_pub_.publish(msg);
 		if (plan.empty()) {
-			ROS_INFO("[YmgGPBLP] BGP faild to produce path.");
+			ROS_INFO("[YmgGPBGP] BGP faild to produce path.");
 		}
 	}
 
