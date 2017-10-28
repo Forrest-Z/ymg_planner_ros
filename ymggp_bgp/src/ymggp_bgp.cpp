@@ -713,7 +713,7 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
-	robot_status_ = STOPPED;
+	robot_status_ = GOAL_REACHED;
 	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 

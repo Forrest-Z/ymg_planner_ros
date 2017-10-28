@@ -35,6 +35,5 @@ add_library(ymggp
 	src/ymggp.cpp
 	)
 target_link_libraries(ymggp
-	ymglp_utilfcn
 	${catkin_LIBRARIES}
 	)

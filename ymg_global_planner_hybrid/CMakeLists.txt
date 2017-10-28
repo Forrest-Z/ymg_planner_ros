@@ -37,7 +37,5 @@ add_library(ymggp_hybrid
 	src/ymggp_hybrid_ros.cpp
 	)
 target_link_libraries(ymggp_hybrid
-	ymggp
-	ymglp_utilfcn
 	${catkin_LIBRARIES}
 	)
