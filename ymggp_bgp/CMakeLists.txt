@@ -41,6 +41,6 @@ add_dependencies(ymggp_bgp
 	ymggp_bgp_gencfg
 	)
 target_link_libraries(ymggp_bgp
-	# ymggp
+	ymggp
 	${catkin_LIBRARIES}
 	)
