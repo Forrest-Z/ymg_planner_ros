@@ -244,8 +244,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
-	else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()
-			&& setBGPFlag(true)) {
+	else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped() && setBGPFlag(true)) {
 		ROS_INFO("[YmgGPBGP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
 		setBGPGoal(start, plan);
@@ -265,6 +264,11 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		if (plan.empty()) {
 			ROS_INFO("[YmgGPBGP] BGP faild to produce path.");
 		}
+	}
+
+	// add now robot pose when the plan is empty,not to abort planning
+	if (plan.empty()) {
+		plan.push_back(start);
 	}
 
 	// for debug
@@ -596,6 +600,10 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 
 void YmgGPBGP::addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
+	if (plan.empty()) {
+		return;
+	}
+
 	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
 	for (int i=closest_index; i<ymg_global_planner_.plan_.size(); ++i) {
 		plan.push_back(ymg_global_planner_.plan_[i]);
