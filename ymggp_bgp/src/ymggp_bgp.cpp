@@ -166,6 +166,7 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	bgp_goal_max_cost_ = config.bgp_goal_max_cost;
 	recovery_dist_ = config.recovery_dist;
 	clear_plan_when_goal_reached_ = config.clear_plan_when_goal_reached;
+	prevent_from_aborting_ = config.prevent_from_aborting;
 }/*}}}*/
 
 void YmgGPBGP::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my)
@@ -267,7 +268,7 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 	}
 
 	// add now robot pose when the plan is empty,not to abort planning
-	if (plan.empty()) {
+	if (prevent_from_aborting_ && plan.empty()) {
 		plan.push_back(start);
 	}
 

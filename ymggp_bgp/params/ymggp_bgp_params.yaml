@@ -18,3 +18,5 @@ YmgGPBGP:
   recovery_dist: 0.5
   clear_plan_when_goal_reached: true
 
+  prevent_from_aborting: true
+
