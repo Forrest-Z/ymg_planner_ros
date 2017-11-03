@@ -31,6 +31,7 @@ bool RobotStatusManagerMk2::isStack()
 	if (!getCmdVelBar(v_bar, w_bar)) {
 		return false;
 	}
+	ROS_INFO("v_bar, w_bar = %f, %f", v_bar, w_bar);
 
 	if (trans_stopped_vel_ < 0.0) {
 		return false;
@@ -71,8 +72,8 @@ bool RobotStatusManagerMk2::getCmdVelBar(double& v_bar, double& w_bar)
 
 	double v_sum = 0.0, w_sum = 0.0;
 	for (int i=0; i<timestamp_.size(); ++i) {
-		v_sum += v_list_[i];
-		w_sum += w_list_[i];
+		v_sum += fabs(v_list_[i]);
+		w_sum += fabs(w_list_[i]);
 	}
 	v_bar = v_sum / timestamp_.size();
 	w_bar = v_sum / timestamp_.size();
