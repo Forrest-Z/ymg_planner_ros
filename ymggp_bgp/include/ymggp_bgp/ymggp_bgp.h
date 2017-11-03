@@ -19,7 +19,8 @@
 #include <ymggp_bgp/YmgGPBGPConfig.h>
 #include <ymg_global_planner/ymggp.h>
 #include <ymg_local_planner/util_functions.h>
-#include <ymg_local_planner/robot_status_manager.h>
+// #include <ymg_local_planner/robot_status_manager.h>
+#include <ymg_local_planner/robot_status_manager_mk2.h>
 #include <std_msgs/Empty.h>
 #include <std_msgs/Int32.h>
 #include <actionlib_msgs/GoalStatusArray.h>
@@ -197,7 +198,8 @@ class YmgGPBGP : public nav_core::BaseGlobalPlanner {
 		void publishBGPPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 		void publishYmggpPlan(const std::vector<geometry_msgs::PoseStamped>& path);
 
-		ymglp::RobotStatusManager robot_status_manager_;
+		// ymglp::RobotStatusManager robot_status_manager_;
+		ymglp::RobotStatusManagerMk2 status_manager_;
 
 		ros::Publisher ymggp_plan_pub_, bgp_plan_pub_, bgp_goal_pub_;
 		geometry_msgs::PoseStamped bgp_goal_;

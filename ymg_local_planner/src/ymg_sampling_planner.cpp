@@ -47,12 +47,15 @@ void YmgSamplingPlanner::initialize(
 	double min_vel_y = limits->min_vel_y;
 	double max_vel_y = limits->max_vel_y;
 
-	max_vel_[0] = std::min(max_vel_x, vel[0] + acc_lim[0] * sim_period_);
-	max_vel_[1] = std::min(max_vel_y, vel[1] + acc_lim[1] * sim_period_);
+	// XXX changed acc_lim_x[0] : acceleration_lim_x, acc_lim_x[1] : deceration_lim_x
+	double acc_lim_x = acc_lim[0], dec_lim_x = acc_lim[1];
+
+	max_vel_[0] = std::min(max_vel_x,  vel[0] + acc_lim_x  * sim_period_);
+	max_vel_[1] = std::min(max_vel_y,  vel[1] + acc_lim[1] * sim_period_);
 	max_vel_[2] = std::min(max_vel_th, vel[2] + acc_lim[2] * sim_period_);
 
-	min_vel_[0] = std::max(min_vel_x, vel[0] - acc_lim[0] * sim_period_);
-	min_vel_[1] = std::max(min_vel_y, vel[1] - acc_lim[1] * sim_period_);
+	min_vel_[0] = std::max(min_vel_x,  vel[0] - dec_lim_x  * sim_period_);
+	min_vel_[1] = std::max(min_vel_y,  vel[1] - acc_lim[1] * sim_period_);
 	min_vel_[2] = std::max(min_vel_th, vel[2] - acc_lim[2] * sim_period_);
 
 	// ROS_INFO("vel range : %f to %f", min_vel_[0], max_vel_[0]);

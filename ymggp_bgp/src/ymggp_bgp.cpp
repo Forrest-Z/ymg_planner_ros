@@ -160,8 +160,9 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 
 	path_granularity_ = config.path_granularity;
 	ymg_global_planner_.setPathGranularity(path_granularity_);
-	stuck_timeout_ = config.stuck_timeout;
-	robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
+	// stuck_timeout_ = config.stuck_timeout;
+	// robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
+	status_manager_.setParameters(config.trans_stopped_vel, config.rot_stopped_vel, config.stuck_timeout);
 	bgp_goal_dist_ = config.bgp_goal_dist;
 	bgp_goal_max_cost_ = config.bgp_goal_max_cost;
 	recovery_dist_ = config.recovery_dist;
@@ -245,7 +246,8 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		// ROS_INFO("dijkstra path size: %d", (int)plan.size());
 		publishBGPPlan(plan);
 	}
-	else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped() && setBGPFlag(true)) {
+	// else if (ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped() && setBGPFlag(true)) {
+	else if (status_manager_.isStack() && setBGPFlag(true)) {
 		ROS_INFO("[YmgGPBGP] Changes planner to BGP.");
 		// ROS_INFO("path size: %d", (int)plan.size());
 		setBGPGoal(start, plan);
@@ -665,7 +667,8 @@ void YmgGPBGP::resetFlagCallback (const std_msgs::Empty& msg)
 {/*{{{*/
 	ymg_global_planner_.clearPlan();
 	setBGPFlag(false);
-	robot_status_manager_.clearStoppedTime();
+	// robot_status_manager_.clearStoppedTime();
+	status_manager_.clearStatus();
 	ROS_INFO("Reset flag received. Cleared plan.");
 }/*}}}*/
 

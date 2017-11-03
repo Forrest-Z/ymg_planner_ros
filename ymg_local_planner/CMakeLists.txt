@@ -40,6 +40,7 @@ include_directories(
 add_library(ymglp_utils
 	src/util_functions.cpp
 	src/robot_status_manager.cpp
+	src/robot_status_manager_mk2.cpp
 	)
 target_link_libraries(ymglp_utils
 	${catkin_LIBRARIES}

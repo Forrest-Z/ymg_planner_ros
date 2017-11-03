@@ -34,7 +34,16 @@ min_rot_velは自動的に0.0に設定される．(ymg_local_plannerは障害物
 
 ~/YmgLPROS/acc_lim_x (double[m/s^2], default: 0.3)  
 The acceleration limit of the robot in the x direction
+このパラメータは試験的にoffにしている．以下のdeceleration_lim_x, acceleration_lim_xにて加速度を指定．
 ロボットの並進加速度の絶対値の上限．
+
+~/YmgLPROS/deceleration_lim_x (double[m/s^2], default: 0.3)  
+The deceleration limit of the robot in the x direction
+ロボットの減速時の並進加速度の絶対値の上限．
+
+~/YmgLPROS/acceleration_lim_x (double[m/s^2], default: 0.3)  
+The acceleration limit of the robot in the x direction
+ロボットの加速時の並進加速度の絶対値の上限．
 
 ~/YmgLPROS/acc_lim_theta (double[rad/s^2], default: 0.3)  
 The acceleration limit of the robot in the theta direction  

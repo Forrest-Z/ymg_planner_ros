@@ -42,10 +42,17 @@ void YmgLPROS::reconfigureCB(YmgLPConfig &config, uint32_t level)
 	limits.min_vel_y = 0.0;
 	limits.max_rot_vel = config.max_vel_theta;
 	limits.min_rot_vel = 0.0;
-	limits.acc_lim_x = config.acc_lim_x;
-	limits.acc_lim_y = 0.0;
+
+	// XXX changed to use acceleration and deceleration
+	// acc_lim_y is used for deceleration_lim_x
+	// limits.acc_lim_x = config.acc_lim_x;
+	// limits.acc_lim_y = 0.0;
+	limits.acc_lim_x = config.acceleration_lim_x;
+	limits.acc_lim_y = config.deceleration_lim_x;
+
 	limits.acc_lim_theta = config.acc_lim_theta;
-	limits.acc_limit_trans = config.acc_lim_x;
+	// limits.acc_limit_trans = config.acc_lim_x;
+	limits.acc_limit_trans = std::max(config.deceleration_lim_x, config.acceleration_lim_x);
 	limits.xy_goal_tolerance = config.xy_goal_tolerance;
 	limits.yaw_goal_tolerance = config.yaw_goal_tolerance;
 	limits.prune_plan = false;
