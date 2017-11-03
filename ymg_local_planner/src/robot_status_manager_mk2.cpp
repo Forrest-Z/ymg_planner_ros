@@ -76,7 +76,7 @@ bool RobotStatusManagerMk2::getCmdVelBar(double& v_bar, double& w_bar)
 		w_sum += fabs(w_list_[i]);
 	}
 	v_bar = v_sum / timestamp_.size();
-	w_bar = v_sum / timestamp_.size();
+	w_bar = w_sum / timestamp_.size();
 
 	return true;
 }/*}}}*/
