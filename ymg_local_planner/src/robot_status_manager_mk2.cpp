@@ -31,7 +31,7 @@ bool RobotStatusManagerMk2::isStack()
 	if (!getCmdVelBar(v_bar, w_bar)) {
 		return false;
 	}
-	ROS_INFO("v_bar, w_bar = %f, %f", v_bar, w_bar);
+	// ROS_INFO("v_bar, w_bar = %f, %f", v_bar, w_bar);
 
 	if (trans_stopped_vel_ < 0.0) {
 		return false;
