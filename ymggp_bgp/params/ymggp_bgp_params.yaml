@@ -14,8 +14,8 @@ YmgGPBGP:
   trans_stopped_vel: 0.05
   rot_stopped_vel: 0.2
   bgp_goal_dist: 5.0
-  bgp_goal_max_cost: 50
-  bgp_goal_reverse_search: true 
+  bgp_goal_max_cost: 127 
+  bgp_goal_pull_back: true 
   recovery_dist: 0.5
   clear_plan_when_goal_reached: true
 

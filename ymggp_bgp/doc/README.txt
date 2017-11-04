@@ -43,13 +43,18 @@ When the robot stops while this time, this planner changes algorithm to dijkstra
 マイナスにセットした場合は角速度はスタック判定に用いられない．
 
 ~/YmgGPBGP/bgp_goal_dist (double[m], default: 5.0)
-BGPにアルゴリズムが切り替わった時，現在地から(ymggpで算出されたパス上の)何メートル先にBGPのゴールを置くか．
+BGPにアルゴリズムが切り替わった時，現在地からymggpで算出されたパス上の何メートル先にBGPのゴールを置くか．
 
-~/YmgGPBGP/recovery_dist (double[m], default: 2.0)
+~/YmgGPBGP/bgp_goal_max_cost (int, default: 127)
+BGPゴールが置かれる点のコストマップ上のコストの最大値．
+(127 : ROS,costmap_2dでのdefinitely not in collisionの最大値)
+ゴール地点がこの値以上のコストになっていた場合には，ymggpで算出されたパス上のこの値を超えない地点まで遠方にゴールを移動させる．
+
+~/YmgGPBGP/bgp_goal_pull_back (bool, default: True)
+BGPのゴールを遠方に移動させる際に，ymggpで算出されたパスの終端まで移動させても有効なゴールが見つからなかった場合，ymggpで算出されたパス上の手前方向にも探索を行う．
+
+~/YmgGPBGP/recovery_dist (double[m], default: 0.5)
 BGPモード時にBGPのゴールとの距離がこの値以下となった時，ymggpモードに切り替わる．
-
-~/YmgGPBGP/goal_tolerance (double[m], default: 0.3)
-ロボットとゴールの位置がこの距離以下となって止まっている時，ロボットはスタック判定を行わない．(BGPモードに切り替わらない)
 
 ~/YmgGPBGP/clear_plan_when_goal_reached (bool, default: true)
 ロボットがゴールに到達した時，ymggpのglobal_planをclearするかどうか．

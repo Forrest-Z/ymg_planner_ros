@@ -165,7 +165,7 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	status_manager_.setParameters(config.trans_stopped_vel, config.rot_stopped_vel, config.stuck_timeout);
 	bgp_goal_dist_ = config.bgp_goal_dist;
 	bgp_goal_max_cost_ = config.bgp_goal_max_cost;
-	bgp_goal_reverse_search_ = config.bgp_goal_reverse_search;
+	bgp_goal_pull_back_ = config.bgp_goal_pull_back;
 	recovery_dist_ = config.recovery_dist;
 	clear_plan_when_goal_reached_ = config.clear_plan_when_goal_reached;
 	prevent_from_aborting_ = config.prevent_from_aborting;
@@ -597,7 +597,7 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 	}
 	
 	// XXX added 
-	if (bgp_goal_reverse_search_) {
+	if (bgp_goal_pull_back_) {
 		for (int i=start_index-1; 0<=i; --i) {
 			px = plan[i].pose.position.x;
 			py = plan[i].pose.position.y;
