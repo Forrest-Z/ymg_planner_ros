@@ -168,7 +168,6 @@ void YmgGPBGP::reconfigureCB(ymggp_bgp::YmgGPBGPConfig& config, uint32_t level)
 	bgp_goal_pull_back_ = config.bgp_goal_pull_back;
 	recovery_dist_ = config.recovery_dist;
 	clear_plan_when_goal_reached_ = config.clear_plan_when_goal_reached;
-	prevent_from_aborting_ = config.prevent_from_aborting;
 }/*}}}*/
 
 void YmgGPBGP::clearRobotCell(const tf::Stamped<tf::Pose>& global_pose, unsigned int mx, unsigned int my)
@@ -268,11 +267,6 @@ bool YmgGPBGP::makePlan(const geometry_msgs::PoseStamped& start, const geometry_
 		if (plan.empty()) {
 			ROS_INFO("[YmgGPBGP] BGP faild to produce path.");
 		}
-	}
-
-	// add now robot pose when the plan is empty,not to abort planning
-	if (prevent_from_aborting_ && plan.empty()) {
-		plan.push_back(start);
 	}
 
 	// for debug
@@ -618,11 +612,14 @@ bool YmgGPBGP::setValidGoal(const std::vector<geometry_msgs::PoseStamped>& plan,
 
 void YmgGPBGP::addYmggpPlan(std::vector<geometry_msgs::PoseStamped>& plan)
 {/*{{{*/
+	int closest_index;
 	if (plan.empty()) {
-		return;
+		closest_index = 0;
+	}
+	else {
+		closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
 	}
 
-	int closest_index = ymglp::UtilFcn::getClosestIndexOfPath(plan.back(), ymg_global_planner_.plan_);
 	for (int i=closest_index; i<ymg_global_planner_.plan_.size(); ++i) {
 		plan.push_back(ymg_global_planner_.plan_[i]);
 	}
