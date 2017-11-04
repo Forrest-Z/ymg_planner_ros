@@ -32,10 +32,11 @@ void YmgLP::reconfigure (YmgLPConfig &config)
 	simple_backup_planner_.setParameters(
 			config.sim_time, config.sim_granularity, config.angular_sim_granularity, sim_period_,
 			config.obstacle_tolerance, config.backup_vel);
-	stuck_timeout_ = config.stuck_timeout;
+	// stuck_timeout_ = config.stuck_timeout;
 	backup_time_ = config.backup_time;
 
-	robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
+	// robot_status_manager_.setStoppedVel(config.trans_stopped_vel, config.rot_stopped_vel);
+	status_manager_.setParameters(config.trans_stopped_vel, config.rot_stopped_vel, config.stuck_timeout);
 
 
 	utilfcn_.setScoringPointOffsetX(config.scoring_point_offset_x);
@@ -263,8 +264,8 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 	std::vector<base_local_planner::Trajectory> all_explored;
 	result_traj_.cost_ = -7;
 
-	if (!backup_latch_ && 0.0 < stuck_timeout_
-			&& ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()) {
+	if (!backup_latch_ && 0.0 < stuck_timeout_ && status_manager_.isStack()) {
+			// && ros::Duration(stuck_timeout_) < robot_status_manager_.getTimeWhileStopped()) {
 		backup_latch_ = true;
 		backup_start_time_ = ros::Time::now();
 		ROS_INFO("[ymglp] Robot stopped while %f sec. Try backup.", stuck_timeout_);
@@ -277,6 +278,7 @@ base_local_planner::Trajectory YmgLP::findBestPath (
 
 			if (ros::Duration(backup_time_) < ros::Time::now() - backup_start_time_) {
 				backup_latch_ = false;
+				status_manager_.clearStatus();
 				ROS_INFO("[ymglp] Backup end.");
 			}
 		}

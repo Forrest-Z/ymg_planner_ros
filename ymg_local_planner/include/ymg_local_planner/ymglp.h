@@ -21,7 +21,8 @@
 #include <ymg_local_planner/map_grid_cost_function_kai.h>
 #include <ymg_local_planner/obstacle_cost_function_kai.h>
 #include <ymg_local_planner/simple_scored_sampling_planner_kai.h>
-#include <ymg_local_planner/robot_status_manager.h>
+// #include <ymg_local_planner/robot_status_manager.h>
+#include <ymg_local_planner/robot_status_manager_mk2.h>
 #include <ymg_local_planner/ymg_sampling_planner.h>
 #include <ymg_local_planner/simple_backup_planner.h>
 #include <ymg_local_planner/ymg_s_planner.h>
@@ -142,7 +143,8 @@ class YmgLP {
 				ros::Time backup_start_time_;
 				bool backup_latch_;
 				double stuck_timeout_, backup_time_;
-				RobotStatusManager robot_status_manager_;
+				// RobotStatusManager robot_status_manager_;
+				RobotStatusManagerMk2 status_manager_;
 
 				bool use_dwa_, reverse_mode_;
 				base_local_planner::SimpleScoredSamplingPlannerKai scored_sampling_planner_;
