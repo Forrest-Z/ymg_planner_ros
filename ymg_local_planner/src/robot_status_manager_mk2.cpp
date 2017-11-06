@@ -16,6 +16,7 @@ void RobotStatusManagerMk2::setParameters(double trans_stopped_vel, double rot_s
 	trans_stopped_vel_ = trans_stopped_vel;
 	rot_stopped_vel_ = rot_stopped_vel;
 	period_ = period;
+	clearStatus();
 }/*}}}*/
 
 void RobotStatusManagerMk2::clearStatus()

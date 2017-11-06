@@ -13,7 +13,7 @@ YmgLPROS:
 
   # stuck params
   trans_stopped_vel: 0.05
-  rot_stopped_vel: 0.2
+  rot_stopped_vel: -1.0 
   stuck_timeout: 120.0
   backup_vel: -0.1
   backup_time: 10.0
